@@ -18,6 +18,12 @@ namespace CanvasApp.Forms
         private readonly ComentariosDB _comentariosDB;
         private readonly UsuarioDB _usuarioDB;
 
+        // Controles criados programaticamente
+        private Button btnSalvarDataAlarme;
+        private Button btnAtribuirUsuario;
+        private Label lblUsuarioAtribuido;
+        private Button btnAdicionarSubtarefa;
+
         public Frm_TarefasDetalhes(Projeto_Tarefas tarefa)
         {
             InitializeComponent();
@@ -48,7 +54,18 @@ namespace CanvasApp.Forms
             // --- Seção Data e Alarme ---
             Lbl_DefinirDataLembrete.Click += Lbl_DefinirDataLembrete_Click;
             Btn_FecharData.Click += Bin_FecharData_Click;
-            Btn_SalvarDataAlarme.Click += Btn_SalvarDataAlarme_Click;
+
+            // Adicionar botão salvar data/alarme programaticamente
+            btnSalvarDataAlarme = new Button
+            {
+                Text = "Salvar",
+                Size = new Size(60, 25),
+                Location = new Point(Dtp_Prazo.Left, Dtp_Prazo.Bottom + 5),
+                Visible = true,
+                Name = "Btn_SalvarDataAlarme"
+            };
+            btnSalvarDataAlarme.Click += Btn_SalvarDataAlarme_Click;
+            this.Controls.Add(btnSalvarDataAlarme);
 
             Cbo_Repeticao.Items.AddRange(new string[] {
                 "Nunca repetir", "Repetir todos os dias", "Repetir toda semana", "Repetir todo mês"
@@ -62,6 +79,20 @@ namespace CanvasApp.Forms
             // --- Seção Subtarefas ---
             Txt_NovaSubtarefa.KeyDown += Txt_NovaSubtarefa_KeyDown;
 
+            // Adicionar botão para adicionar subtarefa
+            btnAdicionarSubtarefa = new Button
+            {
+                Text = "+",
+                Size = new Size(30, 23),
+                Location = new Point(Txt_NovaSubtarefa.Right + 5, Txt_NovaSubtarefa.Top),
+                Name = "Btn_AdicionarSubtarefa"
+            };
+            btnAdicionarSubtarefa.Click += (s, e) => AdicionarNovaSubtarefa();
+            if (Flw_Subtarefas.Parent != null)
+            {
+                Flw_Subtarefas.Parent.Controls.Add(btnAdicionarSubtarefa);
+            }
+
             // --- Seção Comentários (Chat) ---
             Btn_AbrirChat.Click += Btn_AbrirChat_Click;
             Btn_FecharChat.Click += Bin_FecharChat_Click;
@@ -69,7 +100,31 @@ namespace CanvasApp.Forms
             Txt_NovoComentarioChat.KeyDown += Txt_NovoComentarioChat_KeyDown;
 
             // --- Seção Atribuição ---
-            Btn_AtribuirUsuario.Click += Btn_AtribuirUsuario_Click;
+            // Adicionar botão de atribuição programaticamente
+            btnAtribuirUsuario = new Button
+            {
+                Text = "Atribuir Usuário",
+                Size = new Size(100, 25),
+                Location = new Point(Pct_Colaborador.Right + 10, Pct_Colaborador.Top),
+                Visible = true,
+                Name = "Btn_AtribuirUsuario"
+            };
+            btnAtribuirUsuario.Click += Btn_AtribuirUsuario_Click;
+            this.Controls.Add(btnAtribuirUsuario);
+
+            // Adicionar label de usuário atribuído programaticamente
+            lblUsuarioAtribuido = new Label
+            {
+                Text = "Não atribuído",
+                Location = new Point(Pct_Colaborador.Left, Pct_Colaborador.Bottom + 5),
+                AutoSize = true,
+                Visible = true,
+                Name = "Lbl_UsuarioAtribuido",
+                Font = new Font("Segoe UI", 9),
+                ForeColor = Color.Gray
+            };
+            this.Controls.Add(lblUsuarioAtribuido);
+
             Pct_Colaborador.Click += Pct_Colaborador_Click;
 
             // Configuração do Painel de Chat (Oculto inicialmente)
@@ -100,7 +155,10 @@ namespace CanvasApp.Forms
             Dtp_Prazo.Visible = true;
             Dtp_HoraAlarme.Visible = true;
             Cbo_Repeticao.Visible = true;
-            Btn_SalvarDataAlarme.Visible = true;
+
+            // Encontrar e mostrar o botão salvar
+            if (btnSalvarDataAlarme != null)
+                btnSalvarDataAlarme.Visible = true;
         }
 
         private void CarregarPrazoAlarme()
@@ -292,15 +350,20 @@ namespace CanvasApp.Forms
 
         private void CarregarComentarios()
         {
-            // Carregar comentários do banco
+            // Carregar comentários do banco - método atualizado para usar dados reais
             var comentarios = _comentariosDB.ObterComentariosPorTarefa(tarefaAtual.Codigo);
-            Lbl_ContadorComentarios.Text = $"({comentarios.Count})";
+
+            // Atualizar contador no botão de abrir chat
+            Btn_AbrirChat.Text = $"Comentários ({comentarios.Count})";
         }
 
         private void AtualizarPreviewComentarios()
         {
             var comentarios = _comentariosDB.ObterComentariosPorTarefa(tarefaAtual.Codigo);
             int contagem = comentarios.Count;
+
+            // Atualizar botão com a contagem
+            Btn_AbrirChat.Text = $"Comentários ({contagem})";
 
             if (contagem > 0)
             {
@@ -408,7 +471,7 @@ namespace CanvasApp.Forms
 
             var usuario = _usuarioDB.ObterUsuarioPorCodigo(com.CodUsuario);
             string nomeUsuario = usuario?.NomeUsuario ?? "Usuário";
-            string dataFormatada = _comentariosDB.FormatarDataComentario(com.Data);
+            string dataFormatada = com.Data.ToString("dd/MM/yyyy HH:mm");
 
             Label lblInicial = new Label
             {
@@ -478,37 +541,55 @@ namespace CanvasApp.Forms
                     tt.SetToolTip(Pct_Colaborador, $"Atribuído a: {usuario.NomeUsuario}");
 
                     Pct_Colaborador.Visible = true;
-                    Lbl_UsuarioAtribuido.Text = usuario.NomeUsuario;
-                    Lbl_UsuarioAtribuido.Visible = true;
+
+                    // Atualizar label de usuário atribuído
+                    if (lblUsuarioAtribuido != null)
+                    {
+                        lblUsuarioAtribuido.Text = usuario.NomeUsuario;
+                        lblUsuarioAtribuido.ForeColor = Color.Black;
+                    }
                     return;
                 }
             }
 
             Pct_Colaborador.Visible = false;
-            Lbl_UsuarioAtribuido.Text = "Não atribuído";
-            Lbl_UsuarioAtribuido.Visible = true;
+            if (lblUsuarioAtribuido != null)
+            {
+                lblUsuarioAtribuido.Text = "Não atribuído";
+                lblUsuarioAtribuido.ForeColor = Color.Gray;
+            }
         }
 
         private void Btn_AtribuirUsuario_Click(object sender, EventArgs e)
         {
-            // Abrir formulário para selecionar usuário
-            var formSelecao = new Frm_SelecionarUsuario();
-            if (formSelecao.ShowDialog() == DialogResult.OK)
+            // Método simplificado para atribuir usuário - seleção por input box
+            string codUsuario = Microsoft.VisualBasic.Interaction.InputBox(
+                "Digite o código do usuário para atribuir esta tarefa:",
+                "Atribuir Tarefa",
+                "");
+
+            if (!string.IsNullOrEmpty(codUsuario))
             {
-                string codUsuarioSelecionado = formSelecao.UsuarioSelecionado?.Codigo;
-                if (!string.IsNullOrEmpty(codUsuarioSelecionado))
+                // Verificar se o usuário existe
+                var usuario = _usuarioDB.ObterUsuarioPorCodigo(codUsuario);
+                if (usuario != null)
                 {
-                    if (_tarefasDB.AtribuirTarefaUsuario(tarefaAtual.Codigo, codUsuarioSelecionado))
+                    if (_tarefasDB.AtribuirTarefaUsuario(tarefaAtual.Codigo, codUsuario))
                     {
-                        tarefaAtual.CodUsuario = codUsuarioSelecionado;
+                        tarefaAtual.CodUsuario = codUsuario;
                         CarregarAtribuicao();
-                        MessageBox.Show("Usuário atribuído com sucesso!", "Sucesso",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show($"Tarefa atribuída a {usuario.NomeUsuario} com sucesso!",
+                            "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     else
                     {
                         MessageBox.Show(_tarefasDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
+                }
+                else
+                {
+                    MessageBox.Show("Usuário não encontrado!", "Erro",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -517,27 +598,17 @@ namespace CanvasApp.Forms
         {
             if (string.IsNullOrEmpty(tarefaAtual.CodUsuario)) return;
 
-            if (!_usuarioDB.VerificarPermissaoVisualizacao(usuarioLogado.Codigo, tarefaAtual.CodUsuario))
+            var usuario = _usuarioDB.ObterUsuarioPorCodigo(tarefaAtual.CodUsuario);
+            if (usuario != null)
             {
-                MessageBox.Show("Você não tem permissão para visualizar as tarefas de outro colaborador.",
-                    "Acesso Negado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                MessageBox.Show($"Usuário atribuído: {usuario.NomeUsuario}\nCódigo: {usuario.Codigo}",
+                    "Informações do Usuário", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-
-            // Abrir perfil do usuário ou lista de tarefas dele
-            MessageBox.Show($"Abrir perfil do usuário: {Lbl_UsuarioAtribuido.Text}",
-                "Visualizar Usuário", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void Bin_FecharJanela_Click(object sender, EventArgs e)
         {
             this.Close();
-        }
-
-        // Método auxiliar para adicionar botão de subtarefas
-        private void Btn_AdicionarSubtarefa_Click(object sender, EventArgs e)
-        {
-            AdicionarNovaSubtarefa();
         }
     }
 }

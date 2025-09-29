@@ -346,6 +346,9 @@ namespace CanvasApp
 
             // Ajustar layout responsivo
             this.Resize += Frm_Projeto_Resize;
+
+            // Ajustar layout inicial
+            AjustarLayoutParaMenuLateral();
         }
 
         private void CarregarMenuLateral()
@@ -677,17 +680,50 @@ namespace CanvasApp
 
         private void CarregarTarefasHoje(int usuarioId)
         {
-            MessageBox.Show("Carregando tarefas de hoje...");
+            DateTime hoje = DateTime.Today;
+            DateTime amanha = hoje.AddDays(1);
+
+            var tarefasHoje = dbTarefas.ObterTarefasPorPeriodo(usuarioId, hoje, amanha);
+
+            this.tarefasPendentes = tarefasHoje.Where(t => !t.isConcluida).ToList();
+            this.tarefasConcluidas = tarefasHoje.Where(t => t.isConcluida).ToList();
+            this.isModoFavoritos = false;
+            this.projetoSelecionado = null;
+
+            Lbl_Titulo.Text = "Tarefas de Hoje";
+            AtualizarInterface();
         }
 
         private void CarregarTarefasSemana(int usuarioId)
         {
-            MessageBox.Show("Carregando tarefas da semana...");
+            DateTime inicioSemana = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
+            DateTime fimSemana = inicioSemana.AddDays(7).AddSeconds(-1);
+
+            var tarefasSemana = dbTarefas.ObterTarefasPorPeriodo(usuarioId, inicioSemana, fimSemana);
+
+            this.tarefasPendentes = tarefasSemana.Where(t => !t.isConcluida).ToList();
+            this.tarefasConcluidas = tarefasSemana.Where(t => t.isConcluida).ToList();
+            this.isModoFavoritos = false;
+            this.projetoSelecionado = null;
+
+            Lbl_Titulo.Text = "Tarefas da Semana";
+            AtualizarInterface();
         }
 
         private void CarregarTarefasMes(int usuarioId)
         {
-            MessageBox.Show("Carregando tarefas do mês...");
+            DateTime inicioMes = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+            DateTime fimMes = inicioMes.AddMonths(1).AddSeconds(-1);
+
+            var tarefasMes = dbTarefas.ObterTarefasPorPeriodo(usuarioId, inicioMes, fimMes);
+
+            this.tarefasPendentes = tarefasMes.Where(t => !t.isConcluida).ToList();
+            this.tarefasConcluidas = tarefasMes.Where(t => t.isConcluida).ToList();
+            this.isModoFavoritos = false;
+            this.projetoSelecionado = null;
+
+            Lbl_Titulo.Text = "Tarefas do Mês";
+            AtualizarInterface();
         }
 
         private void AbrirFormProjeto(Projetos projeto, int usuarioId)

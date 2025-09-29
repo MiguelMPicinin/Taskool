@@ -579,5 +579,32 @@ namespace CanvasApp.Classes.Databases
         {
             return _alarmeDB.ResetarConfiguracoesTarefa(codTarefa);
         }
+
+        // Adicione este método na classe TarefasDB
+        public bool AtribuirTarefaUsuario(int codTarefa, string codUsuario)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = @"UPDATE Projeto_Tarefas 
+                         SET CodUsuario = @CodUsuario 
+                         WHERE Codigo = @CodTarefa";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@CodUsuario", codUsuario);
+                        cmd.Parameters.AddWithValue("@CodTarefa", codTarefa);
+                        cmd.ExecuteNonQuery();
+                        Mensagem = "Tarefa atribuída com sucesso.";
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao atribuir tarefa: " + ex.Message;
+                return false;
+            }
+        }
     }
 }
