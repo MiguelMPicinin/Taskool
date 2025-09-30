@@ -20,9 +20,9 @@ namespace CanvasApp {
     [global::System.ComponentModel.DesignerCategoryAttribute("code")]
     [global::System.ComponentModel.ToolboxItem(true)]
     [global::System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedDataSetSchema")]
-    [global::System.Xml.Serialization.XmlRootAttribute("dbTarefas2DataSet1")]
+    [global::System.Xml.Serialization.XmlRootAttribute("dbTarefas2DataSet")]
     [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.DataSet")]
-    public partial class dbTarefas2DataSet1 : global::System.Data.DataSet {
+    public partial class dbTarefas2DataSet : global::System.Data.DataSet {
         
         private AlarmeDataTable tableAlarme;
         
@@ -74,7 +74,7 @@ namespace CanvasApp {
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-        public dbTarefas2DataSet1() {
+        public dbTarefas2DataSet() {
             this.BeginInit();
             this.InitClass();
             global::System.ComponentModel.CollectionChangeEventHandler schemaChangedHandler = new global::System.ComponentModel.CollectionChangeEventHandler(this.SchemaChanged);
@@ -85,7 +85,7 @@ namespace CanvasApp {
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-        protected dbTarefas2DataSet1(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
+        protected dbTarefas2DataSet(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
                 base(info, context, false) {
             if ((this.IsBinarySerialized(info, context) == true)) {
                 this.InitVars(false);
@@ -275,7 +275,7 @@ namespace CanvasApp {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         public override global::System.Data.DataSet Clone() {
-            dbTarefas2DataSet1 cln = ((dbTarefas2DataSet1)(base.Clone()));
+            dbTarefas2DataSet cln = ((dbTarefas2DataSet)(base.Clone()));
             cln.InitVars();
             cln.SchemaSerializationMode = this.SchemaSerializationMode;
             return cln;
@@ -433,9 +433,9 @@ namespace CanvasApp {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         private void InitClass() {
-            this.DataSetName = "dbTarefas2DataSet1";
+            this.DataSetName = "dbTarefas2DataSet";
             this.Prefix = "";
-            this.Namespace = "http://tempuri.org/dbTarefas2DataSet1.xsd";
+            this.Namespace = "http://tempuri.org/dbTarefas2DataSet.xsd";
             this.EnforceConstraints = true;
             this.SchemaSerializationMode = global::System.Data.SchemaSerializationMode.IncludeSchema;
             this.tableAlarme = new AlarmeDataTable();
@@ -579,7 +579,7 @@ namespace CanvasApp {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         public static global::System.Xml.Schema.XmlSchemaComplexType GetTypedDataSetSchema(global::System.Xml.Schema.XmlSchemaSet xs) {
-            dbTarefas2DataSet1 ds = new dbTarefas2DataSet1();
+            dbTarefas2DataSet ds = new dbTarefas2DataSet();
             global::System.Xml.Schema.XmlSchemaComplexType type = new global::System.Xml.Schema.XmlSchemaComplexType();
             global::System.Xml.Schema.XmlSchemaSequence sequence = new global::System.Xml.Schema.XmlSchemaSequence();
             global::System.Xml.Schema.XmlSchemaAny any = new global::System.Xml.Schema.XmlSchemaAny();
@@ -932,7 +932,7 @@ namespace CanvasApp {
             public static global::System.Xml.Schema.XmlSchemaComplexType GetTypedTableSchema(global::System.Xml.Schema.XmlSchemaSet xs) {
                 global::System.Xml.Schema.XmlSchemaComplexType type = new global::System.Xml.Schema.XmlSchemaComplexType();
                 global::System.Xml.Schema.XmlSchemaSequence sequence = new global::System.Xml.Schema.XmlSchemaSequence();
-                dbTarefas2DataSet1 ds = new dbTarefas2DataSet1();
+                dbTarefas2DataSet ds = new dbTarefas2DataSet();
                 global::System.Xml.Schema.XmlSchemaAny any1 = new global::System.Xml.Schema.XmlSchemaAny();
                 any1.Namespace = "http://www.w3.org/2001/XMLSchema";
                 any1.MinOccurs = new decimal(0);
@@ -1212,7 +1212,7 @@ namespace CanvasApp {
             public static global::System.Xml.Schema.XmlSchemaComplexType GetTypedTableSchema(global::System.Xml.Schema.XmlSchemaSet xs) {
                 global::System.Xml.Schema.XmlSchemaComplexType type = new global::System.Xml.Schema.XmlSchemaComplexType();
                 global::System.Xml.Schema.XmlSchemaSequence sequence = new global::System.Xml.Schema.XmlSchemaSequence();
-                dbTarefas2DataSet1 ds = new dbTarefas2DataSet1();
+                dbTarefas2DataSet ds = new dbTarefas2DataSet();
                 global::System.Xml.Schema.XmlSchemaAny any1 = new global::System.Xml.Schema.XmlSchemaAny();
                 any1.Namespace = "http://www.w3.org/2001/XMLSchema";
                 any1.MinOccurs = new decimal(0);
@@ -1554,7 +1554,7 @@ namespace CanvasApp {
             public static global::System.Xml.Schema.XmlSchemaComplexType GetTypedTableSchema(global::System.Xml.Schema.XmlSchemaSet xs) {
                 global::System.Xml.Schema.XmlSchemaComplexType type = new global::System.Xml.Schema.XmlSchemaComplexType();
                 global::System.Xml.Schema.XmlSchemaSequence sequence = new global::System.Xml.Schema.XmlSchemaSequence();
-                dbTarefas2DataSet1 ds = new dbTarefas2DataSet1();
+                dbTarefas2DataSet ds = new dbTarefas2DataSet();
                 global::System.Xml.Schema.XmlSchemaAny any1 = new global::System.Xml.Schema.XmlSchemaAny();
                 any1.Namespace = "http://www.w3.org/2001/XMLSchema";
                 any1.MinOccurs = new decimal(0);
@@ -1865,7 +1865,7 @@ namespace CanvasApp {
             public static global::System.Xml.Schema.XmlSchemaComplexType GetTypedTableSchema(global::System.Xml.Schema.XmlSchemaSet xs) {
                 global::System.Xml.Schema.XmlSchemaComplexType type = new global::System.Xml.Schema.XmlSchemaComplexType();
                 global::System.Xml.Schema.XmlSchemaSequence sequence = new global::System.Xml.Schema.XmlSchemaSequence();
-                dbTarefas2DataSet1 ds = new dbTarefas2DataSet1();
+                dbTarefas2DataSet ds = new dbTarefas2DataSet();
                 global::System.Xml.Schema.XmlSchemaAny any1 = new global::System.Xml.Schema.XmlSchemaAny();
                 any1.Namespace = "http://www.w3.org/2001/XMLSchema";
                 any1.MinOccurs = new decimal(0);
@@ -2145,7 +2145,7 @@ namespace CanvasApp {
             public static global::System.Xml.Schema.XmlSchemaComplexType GetTypedTableSchema(global::System.Xml.Schema.XmlSchemaSet xs) {
                 global::System.Xml.Schema.XmlSchemaComplexType type = new global::System.Xml.Schema.XmlSchemaComplexType();
                 global::System.Xml.Schema.XmlSchemaSequence sequence = new global::System.Xml.Schema.XmlSchemaSequence();
-                dbTarefas2DataSet1 ds = new dbTarefas2DataSet1();
+                dbTarefas2DataSet ds = new dbTarefas2DataSet();
                 global::System.Xml.Schema.XmlSchemaAny any1 = new global::System.Xml.Schema.XmlSchemaAny();
                 any1.Namespace = "http://www.w3.org/2001/XMLSchema";
                 any1.MinOccurs = new decimal(0);
@@ -2472,7 +2472,7 @@ namespace CanvasApp {
             public static global::System.Xml.Schema.XmlSchemaComplexType GetTypedTableSchema(global::System.Xml.Schema.XmlSchemaSet xs) {
                 global::System.Xml.Schema.XmlSchemaComplexType type = new global::System.Xml.Schema.XmlSchemaComplexType();
                 global::System.Xml.Schema.XmlSchemaSequence sequence = new global::System.Xml.Schema.XmlSchemaSequence();
-                dbTarefas2DataSet1 ds = new dbTarefas2DataSet1();
+                dbTarefas2DataSet ds = new dbTarefas2DataSet();
                 global::System.Xml.Schema.XmlSchemaAny any1 = new global::System.Xml.Schema.XmlSchemaAny();
                 any1.Namespace = "http://www.w3.org/2001/XMLSchema";
                 any1.MinOccurs = new decimal(0);
@@ -2801,7 +2801,7 @@ namespace CanvasApp {
             public static global::System.Xml.Schema.XmlSchemaComplexType GetTypedTableSchema(global::System.Xml.Schema.XmlSchemaSet xs) {
                 global::System.Xml.Schema.XmlSchemaComplexType type = new global::System.Xml.Schema.XmlSchemaComplexType();
                 global::System.Xml.Schema.XmlSchemaSequence sequence = new global::System.Xml.Schema.XmlSchemaSequence();
-                dbTarefas2DataSet1 ds = new dbTarefas2DataSet1();
+                dbTarefas2DataSet ds = new dbTarefas2DataSet();
                 global::System.Xml.Schema.XmlSchemaAny any1 = new global::System.Xml.Schema.XmlSchemaAny();
                 any1.Namespace = "http://www.w3.org/2001/XMLSchema";
                 any1.MinOccurs = new decimal(0);
@@ -3110,7 +3110,7 @@ namespace CanvasApp {
             public static global::System.Xml.Schema.XmlSchemaComplexType GetTypedTableSchema(global::System.Xml.Schema.XmlSchemaSet xs) {
                 global::System.Xml.Schema.XmlSchemaComplexType type = new global::System.Xml.Schema.XmlSchemaComplexType();
                 global::System.Xml.Schema.XmlSchemaSequence sequence = new global::System.Xml.Schema.XmlSchemaSequence();
-                dbTarefas2DataSet1 ds = new dbTarefas2DataSet1();
+                dbTarefas2DataSet ds = new dbTarefas2DataSet();
                 global::System.Xml.Schema.XmlSchemaAny any1 = new global::System.Xml.Schema.XmlSchemaAny();
                 any1.Namespace = "http://www.w3.org/2001/XMLSchema";
                 any1.MinOccurs = new decimal(0);
@@ -3186,9 +3186,9 @@ namespace CanvasApp {
             
             private global::System.Data.DataColumn columnTelefone;
             
-            private global::System.Data.DataColumn columnFoto;
-            
             private global::System.Data.DataColumn columnDataNascimento;
+            
+            private global::System.Data.DataColumn columnFoto;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
@@ -3265,17 +3265,17 @@ namespace CanvasApp {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public global::System.Data.DataColumn FotoColumn {
+            public global::System.Data.DataColumn DataNascimentoColumn {
                 get {
-                    return this.columnFoto;
+                    return this.columnDataNascimento;
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public global::System.Data.DataColumn DataNascimentoColumn {
+            public global::System.Data.DataColumn FotoColumn {
                 get {
-                    return this.columnDataNascimento;
+                    return this.columnFoto;
                 }
             }
             
@@ -3316,7 +3316,7 @@ namespace CanvasApp {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public UsuarioRow AddUsuarioRow(string Nome, string Email, string NomeUsuario, string Telefone, byte[] Foto, System.DateTime DataNascimento) {
+            public UsuarioRow AddUsuarioRow(string Nome, string Email, string NomeUsuario, string Telefone, string DataNascimento, byte[] Foto) {
                 UsuarioRow rowUsuarioRow = ((UsuarioRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
@@ -3324,8 +3324,8 @@ namespace CanvasApp {
                         Email,
                         NomeUsuario,
                         Telefone,
-                        Foto,
-                        DataNascimento};
+                        DataNascimento,
+                        Foto};
                 rowUsuarioRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowUsuarioRow);
                 return rowUsuarioRow;
@@ -3360,8 +3360,8 @@ namespace CanvasApp {
                 this.columnEmail = base.Columns["Email"];
                 this.columnNomeUsuario = base.Columns["NomeUsuario"];
                 this.columnTelefone = base.Columns["Telefone"];
-                this.columnFoto = base.Columns["Foto"];
                 this.columnDataNascimento = base.Columns["DataNascimento"];
+                this.columnFoto = base.Columns["Foto"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -3377,10 +3377,10 @@ namespace CanvasApp {
                 base.Columns.Add(this.columnNomeUsuario);
                 this.columnTelefone = new global::System.Data.DataColumn("Telefone", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnTelefone);
+                this.columnDataNascimento = new global::System.Data.DataColumn("DataNascimento", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnDataNascimento);
                 this.columnFoto = new global::System.Data.DataColumn("Foto", typeof(byte[]), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnFoto);
-                this.columnDataNascimento = new global::System.Data.DataColumn("DataNascimento", typeof(global::System.DateTime), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnDataNascimento);
                 this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint1", new global::System.Data.DataColumn[] {
                                 this.columnCodigo}, true));
                 this.columnCodigo.AutoIncrement = true;
@@ -3397,6 +3397,8 @@ namespace CanvasApp {
                 this.columnNomeUsuario.MaxLength = 20;
                 this.columnTelefone.AllowDBNull = false;
                 this.columnTelefone.MaxLength = 20;
+                this.columnDataNascimento.AllowDBNull = false;
+                this.columnDataNascimento.MaxLength = 11;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -3464,7 +3466,7 @@ namespace CanvasApp {
             public static global::System.Xml.Schema.XmlSchemaComplexType GetTypedTableSchema(global::System.Xml.Schema.XmlSchemaSet xs) {
                 global::System.Xml.Schema.XmlSchemaComplexType type = new global::System.Xml.Schema.XmlSchemaComplexType();
                 global::System.Xml.Schema.XmlSchemaSequence sequence = new global::System.Xml.Schema.XmlSchemaSequence();
-                dbTarefas2DataSet1 ds = new dbTarefas2DataSet1();
+                dbTarefas2DataSet ds = new dbTarefas2DataSet();
                 global::System.Xml.Schema.XmlSchemaAny any1 = new global::System.Xml.Schema.XmlSchemaAny();
                 any1.Namespace = "http://www.w3.org/2001/XMLSchema";
                 any1.MinOccurs = new decimal(0);
@@ -4472,6 +4474,17 @@ namespace CanvasApp {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
+            public string DataNascimento {
+                get {
+                    return ((string)(this[this.tableUsuario.DataNascimentoColumn]));
+                }
+                set {
+                    this[this.tableUsuario.DataNascimentoColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public byte[] Foto {
                 get {
                     try {
@@ -4488,22 +4501,6 @@ namespace CanvasApp {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public System.DateTime DataNascimento {
-                get {
-                    try {
-                        return ((global::System.DateTime)(this[this.tableUsuario.DataNascimentoColumn]));
-                    }
-                    catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'DataNascimento\' in table \'Usuario\' is DBNull.", e);
-                    }
-                }
-                set {
-                    this[this.tableUsuario.DataNascimentoColumn] = value;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public bool IsFotoNull() {
                 return this.IsNull(this.tableUsuario.FotoColumn);
             }
@@ -4512,18 +4509,6 @@ namespace CanvasApp {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public void SetFotoNull() {
                 this[this.tableUsuario.FotoColumn] = global::System.Convert.DBNull;
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public bool IsDataNascimentoNull() {
-                return this.IsNull(this.tableUsuario.DataNascimentoColumn);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public void SetDataNascimentoNull() {
-                this[this.tableUsuario.DataNascimentoColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -4911,7 +4896,7 @@ namespace CanvasApp {
         }
     }
 }
-namespace CanvasApp.dbTarefas2DataSet1TableAdapters {
+namespace CanvasApp.dbTarefas2DataSetTableAdapters {
     
     
     /// <summary>
@@ -5110,7 +5095,7 @@ SELECT Codigo, CodTarefa, CodUsuario, Data, Hora, Repeticao FROM Alarme WHERE (C
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Fill, true)]
-        public virtual int Fill(dbTarefas2DataSet1.AlarmeDataTable dataTable) {
+        public virtual int Fill(dbTarefas2DataSet.AlarmeDataTable dataTable) {
             this.Adapter.SelectCommand = this.CommandCollection[0];
             if ((this.ClearBeforeFill == true)) {
                 dataTable.Clear();
@@ -5123,9 +5108,9 @@ SELECT Codigo, CodTarefa, CodUsuario, Data, Hora, Repeticao FROM Alarme WHERE (C
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Select, true)]
-        public virtual dbTarefas2DataSet1.AlarmeDataTable GetData() {
+        public virtual dbTarefas2DataSet.AlarmeDataTable GetData() {
             this.Adapter.SelectCommand = this.CommandCollection[0];
-            dbTarefas2DataSet1.AlarmeDataTable dataTable = new dbTarefas2DataSet1.AlarmeDataTable();
+            dbTarefas2DataSet.AlarmeDataTable dataTable = new dbTarefas2DataSet.AlarmeDataTable();
             this.Adapter.Fill(dataTable);
             return dataTable;
         }
@@ -5133,14 +5118,14 @@ SELECT Codigo, CodTarefa, CodUsuario, Data, Hora, Repeticao FROM Alarme WHERE (C
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(dbTarefas2DataSet1.AlarmeDataTable dataTable) {
+        public virtual int Update(dbTarefas2DataSet.AlarmeDataTable dataTable) {
             return this.Adapter.Update(dataTable);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(dbTarefas2DataSet1 dataSet) {
+        public virtual int Update(dbTarefas2DataSet dataSet) {
             return this.Adapter.Update(dataSet, "Alarme");
         }
         
@@ -5497,7 +5482,7 @@ SELECT CodUsuario, CodTarefa FROM Items_Favoritos WHERE (CodTarefa = @CodTarefa)
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Fill, true)]
-        public virtual int Fill(dbTarefas2DataSet1.Items_FavoritosDataTable dataTable) {
+        public virtual int Fill(dbTarefas2DataSet.Items_FavoritosDataTable dataTable) {
             this.Adapter.SelectCommand = this.CommandCollection[0];
             if ((this.ClearBeforeFill == true)) {
                 dataTable.Clear();
@@ -5510,9 +5495,9 @@ SELECT CodUsuario, CodTarefa FROM Items_Favoritos WHERE (CodTarefa = @CodTarefa)
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Select, true)]
-        public virtual dbTarefas2DataSet1.Items_FavoritosDataTable GetData() {
+        public virtual dbTarefas2DataSet.Items_FavoritosDataTable GetData() {
             this.Adapter.SelectCommand = this.CommandCollection[0];
-            dbTarefas2DataSet1.Items_FavoritosDataTable dataTable = new dbTarefas2DataSet1.Items_FavoritosDataTable();
+            dbTarefas2DataSet.Items_FavoritosDataTable dataTable = new dbTarefas2DataSet.Items_FavoritosDataTable();
             this.Adapter.Fill(dataTable);
             return dataTable;
         }
@@ -5520,14 +5505,14 @@ SELECT CodUsuario, CodTarefa FROM Items_Favoritos WHERE (CodTarefa = @CodTarefa)
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(dbTarefas2DataSet1.Items_FavoritosDataTable dataTable) {
+        public virtual int Update(dbTarefas2DataSet.Items_FavoritosDataTable dataTable) {
             return this.Adapter.Update(dataTable);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(dbTarefas2DataSet1 dataSet) {
+        public virtual int Update(dbTarefas2DataSet dataSet) {
             return this.Adapter.Update(dataSet, "Items_Favoritos");
         }
         
@@ -5819,7 +5804,7 @@ SELECT Codigo, Texto, Data, CodProjeto, CodUsuario, isFechada FROM Notificacoes 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Fill, true)]
-        public virtual int Fill(dbTarefas2DataSet1.NotificacoesDataTable dataTable) {
+        public virtual int Fill(dbTarefas2DataSet.NotificacoesDataTable dataTable) {
             this.Adapter.SelectCommand = this.CommandCollection[0];
             if ((this.ClearBeforeFill == true)) {
                 dataTable.Clear();
@@ -5832,9 +5817,9 @@ SELECT Codigo, Texto, Data, CodProjeto, CodUsuario, isFechada FROM Notificacoes 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Select, true)]
-        public virtual dbTarefas2DataSet1.NotificacoesDataTable GetData() {
+        public virtual dbTarefas2DataSet.NotificacoesDataTable GetData() {
             this.Adapter.SelectCommand = this.CommandCollection[0];
-            dbTarefas2DataSet1.NotificacoesDataTable dataTable = new dbTarefas2DataSet1.NotificacoesDataTable();
+            dbTarefas2DataSet.NotificacoesDataTable dataTable = new dbTarefas2DataSet.NotificacoesDataTable();
             this.Adapter.Fill(dataTable);
             return dataTable;
         }
@@ -5842,14 +5827,14 @@ SELECT Codigo, Texto, Data, CodProjeto, CodUsuario, isFechada FROM Notificacoes 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(dbTarefas2DataSet1.NotificacoesDataTable dataTable) {
+        public virtual int Update(dbTarefas2DataSet.NotificacoesDataTable dataTable) {
             return this.Adapter.Update(dataTable);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(dbTarefas2DataSet1 dataSet) {
+        public virtual int Update(dbTarefas2DataSet dataSet) {
             return this.Adapter.Update(dataSet, "Notificacoes");
         }
         
@@ -6212,7 +6197,7 @@ SELECT Codigo, Nome, CodUsuario, NaoPertube FROM Projeto WHERE (Codigo = @Codigo
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Fill, true)]
-        public virtual int Fill(dbTarefas2DataSet1.ProjetoDataTable dataTable) {
+        public virtual int Fill(dbTarefas2DataSet.ProjetoDataTable dataTable) {
             this.Adapter.SelectCommand = this.CommandCollection[0];
             if ((this.ClearBeforeFill == true)) {
                 dataTable.Clear();
@@ -6225,9 +6210,9 @@ SELECT Codigo, Nome, CodUsuario, NaoPertube FROM Projeto WHERE (Codigo = @Codigo
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Select, true)]
-        public virtual dbTarefas2DataSet1.ProjetoDataTable GetData() {
+        public virtual dbTarefas2DataSet.ProjetoDataTable GetData() {
             this.Adapter.SelectCommand = this.CommandCollection[0];
-            dbTarefas2DataSet1.ProjetoDataTable dataTable = new dbTarefas2DataSet1.ProjetoDataTable();
+            dbTarefas2DataSet.ProjetoDataTable dataTable = new dbTarefas2DataSet.ProjetoDataTable();
             this.Adapter.Fill(dataTable);
             return dataTable;
         }
@@ -6235,14 +6220,14 @@ SELECT Codigo, Nome, CodUsuario, NaoPertube FROM Projeto WHERE (Codigo = @Codigo
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(dbTarefas2DataSet1.ProjetoDataTable dataTable) {
+        public virtual int Update(dbTarefas2DataSet.ProjetoDataTable dataTable) {
             return this.Adapter.Update(dataTable);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(dbTarefas2DataSet1 dataSet) {
+        public virtual int Update(dbTarefas2DataSet dataSet) {
             return this.Adapter.Update(dataSet, "Projeto");
         }
         
@@ -6539,7 +6524,7 @@ SELECT CodMembro, CodProjeto FROM Projeto_Membros WHERE (CodMembro = @CodMembro)
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Fill, true)]
-        public virtual int Fill(dbTarefas2DataSet1.Projeto_MembrosDataTable dataTable) {
+        public virtual int Fill(dbTarefas2DataSet.Projeto_MembrosDataTable dataTable) {
             this.Adapter.SelectCommand = this.CommandCollection[0];
             if ((this.ClearBeforeFill == true)) {
                 dataTable.Clear();
@@ -6552,9 +6537,9 @@ SELECT CodMembro, CodProjeto FROM Projeto_Membros WHERE (CodMembro = @CodMembro)
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Select, true)]
-        public virtual dbTarefas2DataSet1.Projeto_MembrosDataTable GetData() {
+        public virtual dbTarefas2DataSet.Projeto_MembrosDataTable GetData() {
             this.Adapter.SelectCommand = this.CommandCollection[0];
-            dbTarefas2DataSet1.Projeto_MembrosDataTable dataTable = new dbTarefas2DataSet1.Projeto_MembrosDataTable();
+            dbTarefas2DataSet.Projeto_MembrosDataTable dataTable = new dbTarefas2DataSet.Projeto_MembrosDataTable();
             this.Adapter.Fill(dataTable);
             return dataTable;
         }
@@ -6562,14 +6547,14 @@ SELECT CodMembro, CodProjeto FROM Projeto_Membros WHERE (CodMembro = @CodMembro)
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(dbTarefas2DataSet1.Projeto_MembrosDataTable dataTable) {
+        public virtual int Update(dbTarefas2DataSet.Projeto_MembrosDataTable dataTable) {
             return this.Adapter.Update(dataTable);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(dbTarefas2DataSet1 dataSet) {
+        public virtual int Update(dbTarefas2DataSet dataSet) {
             return this.Adapter.Update(dataSet, "Projeto_Membros");
         }
         
@@ -6856,7 +6841,7 @@ SELECT Codigo, CodProjeto, CodUsuario, Descricao, isConcluida FROM Projeto_Taref
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Fill, true)]
-        public virtual int Fill(dbTarefas2DataSet1.Projeto_TarefasDataTable dataTable) {
+        public virtual int Fill(dbTarefas2DataSet.Projeto_TarefasDataTable dataTable) {
             this.Adapter.SelectCommand = this.CommandCollection[0];
             if ((this.ClearBeforeFill == true)) {
                 dataTable.Clear();
@@ -6869,9 +6854,9 @@ SELECT Codigo, CodProjeto, CodUsuario, Descricao, isConcluida FROM Projeto_Taref
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Select, true)]
-        public virtual dbTarefas2DataSet1.Projeto_TarefasDataTable GetData() {
+        public virtual dbTarefas2DataSet.Projeto_TarefasDataTable GetData() {
             this.Adapter.SelectCommand = this.CommandCollection[0];
-            dbTarefas2DataSet1.Projeto_TarefasDataTable dataTable = new dbTarefas2DataSet1.Projeto_TarefasDataTable();
+            dbTarefas2DataSet.Projeto_TarefasDataTable dataTable = new dbTarefas2DataSet.Projeto_TarefasDataTable();
             this.Adapter.Fill(dataTable);
             return dataTable;
         }
@@ -6879,14 +6864,14 @@ SELECT Codigo, CodProjeto, CodUsuario, Descricao, isConcluida FROM Projeto_Taref
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(dbTarefas2DataSet1.Projeto_TarefasDataTable dataTable) {
+        public virtual int Update(dbTarefas2DataSet.Projeto_TarefasDataTable dataTable) {
             return this.Adapter.Update(dataTable);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(dbTarefas2DataSet1 dataSet) {
+        public virtual int Update(dbTarefas2DataSet dataSet) {
             return this.Adapter.Update(dataSet, "Projeto_Tarefas");
         }
         
@@ -7250,7 +7235,7 @@ SELECT Codigo, CodUsuario, CodTarefa, Comentario, Data FROM Tarefas_Comentarios 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Fill, true)]
-        public virtual int Fill(dbTarefas2DataSet1.Tarefas_ComentariosDataTable dataTable) {
+        public virtual int Fill(dbTarefas2DataSet.Tarefas_ComentariosDataTable dataTable) {
             this.Adapter.SelectCommand = this.CommandCollection[0];
             if ((this.ClearBeforeFill == true)) {
                 dataTable.Clear();
@@ -7263,9 +7248,9 @@ SELECT Codigo, CodUsuario, CodTarefa, Comentario, Data FROM Tarefas_Comentarios 
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Select, true)]
-        public virtual dbTarefas2DataSet1.Tarefas_ComentariosDataTable GetData() {
+        public virtual dbTarefas2DataSet.Tarefas_ComentariosDataTable GetData() {
             this.Adapter.SelectCommand = this.CommandCollection[0];
-            dbTarefas2DataSet1.Tarefas_ComentariosDataTable dataTable = new dbTarefas2DataSet1.Tarefas_ComentariosDataTable();
+            dbTarefas2DataSet.Tarefas_ComentariosDataTable dataTable = new dbTarefas2DataSet.Tarefas_ComentariosDataTable();
             this.Adapter.Fill(dataTable);
             return dataTable;
         }
@@ -7273,14 +7258,14 @@ SELECT Codigo, CodUsuario, CodTarefa, Comentario, Data FROM Tarefas_Comentarios 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(dbTarefas2DataSet1.Tarefas_ComentariosDataTable dataTable) {
+        public virtual int Update(dbTarefas2DataSet.Tarefas_ComentariosDataTable dataTable) {
             return this.Adapter.Update(dataTable);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(dbTarefas2DataSet1 dataSet) {
+        public virtual int Update(dbTarefas2DataSet dataSet) {
             return this.Adapter.Update(dataSet, "Tarefas_Comentarios");
         }
         
@@ -7593,7 +7578,7 @@ SELECT Codigo, Texto, CodTarefa, isConcluida FROM Tarefas_SubTarefas WHERE (Codi
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Fill, true)]
-        public virtual int Fill(dbTarefas2DataSet1.Tarefas_SubTarefasDataTable dataTable) {
+        public virtual int Fill(dbTarefas2DataSet.Tarefas_SubTarefasDataTable dataTable) {
             this.Adapter.SelectCommand = this.CommandCollection[0];
             if ((this.ClearBeforeFill == true)) {
                 dataTable.Clear();
@@ -7606,9 +7591,9 @@ SELECT Codigo, Texto, CodTarefa, isConcluida FROM Tarefas_SubTarefas WHERE (Codi
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Select, true)]
-        public virtual dbTarefas2DataSet1.Tarefas_SubTarefasDataTable GetData() {
+        public virtual dbTarefas2DataSet.Tarefas_SubTarefasDataTable GetData() {
             this.Adapter.SelectCommand = this.CommandCollection[0];
-            dbTarefas2DataSet1.Tarefas_SubTarefasDataTable dataTable = new dbTarefas2DataSet1.Tarefas_SubTarefasDataTable();
+            dbTarefas2DataSet.Tarefas_SubTarefasDataTable dataTable = new dbTarefas2DataSet.Tarefas_SubTarefasDataTable();
             this.Adapter.Fill(dataTable);
             return dataTable;
         }
@@ -7616,14 +7601,14 @@ SELECT Codigo, Texto, CodTarefa, isConcluida FROM Tarefas_SubTarefas WHERE (Codi
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(dbTarefas2DataSet1.Tarefas_SubTarefasDataTable dataTable) {
+        public virtual int Update(dbTarefas2DataSet.Tarefas_SubTarefasDataTable dataTable) {
             return this.Adapter.Update(dataTable);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(dbTarefas2DataSet1 dataSet) {
+        public virtual int Update(dbTarefas2DataSet dataSet) {
             return this.Adapter.Update(dataSet, "Tarefas_SubTarefas");
         }
         
@@ -7903,49 +7888,47 @@ SELECT Codigo, Texto, CodTarefa, isConcluida FROM Tarefas_SubTarefas WHERE (Codi
             tableMapping.ColumnMappings.Add("Email", "Email");
             tableMapping.ColumnMappings.Add("NomeUsuario", "NomeUsuario");
             tableMapping.ColumnMappings.Add("Telefone", "Telefone");
-            tableMapping.ColumnMappings.Add("Foto", "Foto");
             tableMapping.ColumnMappings.Add("DataNascimento", "DataNascimento");
+            tableMapping.ColumnMappings.Add("Foto", "Foto");
             this._adapter.TableMappings.Add(tableMapping);
             this._adapter.DeleteCommand = new global::System.Data.SqlClient.SqlCommand();
             this._adapter.DeleteCommand.Connection = this.Connection;
-            this._adapter.DeleteCommand.CommandText = @"DELETE FROM [dbo].[Usuario] WHERE (([Codigo] = @Original_Codigo) AND ([Nome] = @Original_Nome) AND ([Email] = @Original_Email) AND ([NomeUsuario] = @Original_NomeUsuario) AND ([Telefone] = @Original_Telefone) AND ((@IsNull_DataNascimento = 1 AND [DataNascimento] IS NULL) OR ([DataNascimento] = @Original_DataNascimento)))";
+            this._adapter.DeleteCommand.CommandText = @"DELETE FROM [dbo].[Usuario] WHERE (([Codigo] = @Original_Codigo) AND ([Nome] = @Original_Nome) AND ([Email] = @Original_Email) AND ([NomeUsuario] = @Original_NomeUsuario) AND ([Telefone] = @Original_Telefone) AND ([DataNascimento] = @Original_DataNascimento))";
             this._adapter.DeleteCommand.CommandType = global::System.Data.CommandType.Text;
             this._adapter.DeleteCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Original_Codigo", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Codigo", global::System.Data.DataRowVersion.Original, false, null, "", "", ""));
             this._adapter.DeleteCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Original_Nome", global::System.Data.SqlDbType.VarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Nome", global::System.Data.DataRowVersion.Original, false, null, "", "", ""));
             this._adapter.DeleteCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Original_Email", global::System.Data.SqlDbType.VarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Email", global::System.Data.DataRowVersion.Original, false, null, "", "", ""));
             this._adapter.DeleteCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Original_NomeUsuario", global::System.Data.SqlDbType.VarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "NomeUsuario", global::System.Data.DataRowVersion.Original, false, null, "", "", ""));
             this._adapter.DeleteCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Original_Telefone", global::System.Data.SqlDbType.VarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Telefone", global::System.Data.DataRowVersion.Original, false, null, "", "", ""));
-            this._adapter.DeleteCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@IsNull_DataNascimento", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "DataNascimento", global::System.Data.DataRowVersion.Original, true, null, "", "", ""));
-            this._adapter.DeleteCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Original_DataNascimento", global::System.Data.SqlDbType.Date, 0, global::System.Data.ParameterDirection.Input, 0, 0, "DataNascimento", global::System.Data.DataRowVersion.Original, false, null, "", "", ""));
+            this._adapter.DeleteCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Original_DataNascimento", global::System.Data.SqlDbType.VarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "DataNascimento", global::System.Data.DataRowVersion.Original, false, null, "", "", ""));
             this._adapter.InsertCommand = new global::System.Data.SqlClient.SqlCommand();
             this._adapter.InsertCommand.Connection = this.Connection;
-            this._adapter.InsertCommand.CommandText = @"INSERT INTO [dbo].[Usuario] ([Nome], [Email], [NomeUsuario], [Telefone], [Foto], [DataNascimento]) VALUES (@Nome, @Email, @NomeUsuario, @Telefone, @Foto, @DataNascimento);
-SELECT Codigo, Nome, Email, NomeUsuario, Telefone, Foto, DataNascimento FROM Usuario WHERE (Codigo = SCOPE_IDENTITY())";
+            this._adapter.InsertCommand.CommandText = @"INSERT INTO [dbo].[Usuario] ([Nome], [Email], [NomeUsuario], [Telefone], [DataNascimento], [Foto]) VALUES (@Nome, @Email, @NomeUsuario, @Telefone, @DataNascimento, @Foto);
+SELECT Codigo, Nome, Email, NomeUsuario, Telefone, DataNascimento, Foto FROM Usuario WHERE (Codigo = SCOPE_IDENTITY())";
             this._adapter.InsertCommand.CommandType = global::System.Data.CommandType.Text;
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Nome", global::System.Data.SqlDbType.VarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Nome", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Email", global::System.Data.SqlDbType.VarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Email", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@NomeUsuario", global::System.Data.SqlDbType.VarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "NomeUsuario", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Telefone", global::System.Data.SqlDbType.VarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Telefone", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@DataNascimento", global::System.Data.SqlDbType.VarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "DataNascimento", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Foto", global::System.Data.SqlDbType.VarBinary, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Foto", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@DataNascimento", global::System.Data.SqlDbType.Date, 0, global::System.Data.ParameterDirection.Input, 0, 0, "DataNascimento", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.UpdateCommand = new global::System.Data.SqlClient.SqlCommand();
             this._adapter.UpdateCommand.Connection = this.Connection;
-            this._adapter.UpdateCommand.CommandText = @"UPDATE [dbo].[Usuario] SET [Nome] = @Nome, [Email] = @Email, [NomeUsuario] = @NomeUsuario, [Telefone] = @Telefone, [Foto] = @Foto, [DataNascimento] = @DataNascimento WHERE (([Codigo] = @Original_Codigo) AND ([Nome] = @Original_Nome) AND ([Email] = @Original_Email) AND ([NomeUsuario] = @Original_NomeUsuario) AND ([Telefone] = @Original_Telefone) AND ((@IsNull_DataNascimento = 1 AND [DataNascimento] IS NULL) OR ([DataNascimento] = @Original_DataNascimento)));
-SELECT Codigo, Nome, Email, NomeUsuario, Telefone, Foto, DataNascimento FROM Usuario WHERE (Codigo = @Codigo)";
+            this._adapter.UpdateCommand.CommandText = @"UPDATE [dbo].[Usuario] SET [Nome] = @Nome, [Email] = @Email, [NomeUsuario] = @NomeUsuario, [Telefone] = @Telefone, [DataNascimento] = @DataNascimento, [Foto] = @Foto WHERE (([Codigo] = @Original_Codigo) AND ([Nome] = @Original_Nome) AND ([Email] = @Original_Email) AND ([NomeUsuario] = @Original_NomeUsuario) AND ([Telefone] = @Original_Telefone) AND ([DataNascimento] = @Original_DataNascimento));
+SELECT Codigo, Nome, Email, NomeUsuario, Telefone, DataNascimento, Foto FROM Usuario WHERE (Codigo = @Codigo)";
             this._adapter.UpdateCommand.CommandType = global::System.Data.CommandType.Text;
             this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Nome", global::System.Data.SqlDbType.VarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Nome", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Email", global::System.Data.SqlDbType.VarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Email", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@NomeUsuario", global::System.Data.SqlDbType.VarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "NomeUsuario", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Telefone", global::System.Data.SqlDbType.VarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Telefone", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@DataNascimento", global::System.Data.SqlDbType.VarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "DataNascimento", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Foto", global::System.Data.SqlDbType.VarBinary, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Foto", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@DataNascimento", global::System.Data.SqlDbType.Date, 0, global::System.Data.ParameterDirection.Input, 0, 0, "DataNascimento", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Original_Codigo", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Codigo", global::System.Data.DataRowVersion.Original, false, null, "", "", ""));
             this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Original_Nome", global::System.Data.SqlDbType.VarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Nome", global::System.Data.DataRowVersion.Original, false, null, "", "", ""));
             this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Original_Email", global::System.Data.SqlDbType.VarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Email", global::System.Data.DataRowVersion.Original, false, null, "", "", ""));
             this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Original_NomeUsuario", global::System.Data.SqlDbType.VarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "NomeUsuario", global::System.Data.DataRowVersion.Original, false, null, "", "", ""));
             this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Original_Telefone", global::System.Data.SqlDbType.VarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Telefone", global::System.Data.DataRowVersion.Original, false, null, "", "", ""));
-            this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@IsNull_DataNascimento", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "DataNascimento", global::System.Data.DataRowVersion.Original, true, null, "", "", ""));
-            this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Original_DataNascimento", global::System.Data.SqlDbType.Date, 0, global::System.Data.ParameterDirection.Input, 0, 0, "DataNascimento", global::System.Data.DataRowVersion.Original, false, null, "", "", ""));
+            this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Original_DataNascimento", global::System.Data.SqlDbType.VarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "DataNascimento", global::System.Data.DataRowVersion.Original, false, null, "", "", ""));
             this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Codigo", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 0, 0, "Codigo", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
         }
         
@@ -7962,7 +7945,7 @@ SELECT Codigo, Nome, Email, NomeUsuario, Telefone, Foto, DataNascimento FROM Usu
             this._commandCollection = new global::System.Data.SqlClient.SqlCommand[1];
             this._commandCollection[0] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[0].Connection = this.Connection;
-            this._commandCollection[0].CommandText = "SELECT Codigo, Nome, Email, NomeUsuario, Telefone, Foto, DataNascimento FROM dbo." +
+            this._commandCollection[0].CommandText = "SELECT Codigo, Nome, Email, NomeUsuario, Telefone, DataNascimento, Foto FROM dbo." +
                 "Usuario";
             this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;
         }
@@ -7971,7 +7954,7 @@ SELECT Codigo, Nome, Email, NomeUsuario, Telefone, Foto, DataNascimento FROM Usu
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Fill, true)]
-        public virtual int Fill(dbTarefas2DataSet1.UsuarioDataTable dataTable) {
+        public virtual int Fill(dbTarefas2DataSet.UsuarioDataTable dataTable) {
             this.Adapter.SelectCommand = this.CommandCollection[0];
             if ((this.ClearBeforeFill == true)) {
                 dataTable.Clear();
@@ -7984,9 +7967,9 @@ SELECT Codigo, Nome, Email, NomeUsuario, Telefone, Foto, DataNascimento FROM Usu
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Select, true)]
-        public virtual dbTarefas2DataSet1.UsuarioDataTable GetData() {
+        public virtual dbTarefas2DataSet.UsuarioDataTable GetData() {
             this.Adapter.SelectCommand = this.CommandCollection[0];
-            dbTarefas2DataSet1.UsuarioDataTable dataTable = new dbTarefas2DataSet1.UsuarioDataTable();
+            dbTarefas2DataSet.UsuarioDataTable dataTable = new dbTarefas2DataSet.UsuarioDataTable();
             this.Adapter.Fill(dataTable);
             return dataTable;
         }
@@ -7994,14 +7977,14 @@ SELECT Codigo, Nome, Email, NomeUsuario, Telefone, Foto, DataNascimento FROM Usu
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(dbTarefas2DataSet1.UsuarioDataTable dataTable) {
+        public virtual int Update(dbTarefas2DataSet.UsuarioDataTable dataTable) {
             return this.Adapter.Update(dataTable);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(dbTarefas2DataSet1 dataSet) {
+        public virtual int Update(dbTarefas2DataSet dataSet) {
             return this.Adapter.Update(dataSet, "Usuario");
         }
         
@@ -8024,7 +8007,7 @@ SELECT Codigo, Nome, Email, NomeUsuario, Telefone, Foto, DataNascimento FROM Usu
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Delete, true)]
-        public virtual int Delete(int Original_Codigo, string Original_Nome, string Original_Email, string Original_NomeUsuario, string Original_Telefone, global::System.Nullable<global::System.DateTime> Original_DataNascimento) {
+        public virtual int Delete(int Original_Codigo, string Original_Nome, string Original_Email, string Original_NomeUsuario, string Original_Telefone, string Original_DataNascimento) {
             this.Adapter.DeleteCommand.Parameters[0].Value = ((int)(Original_Codigo));
             if ((Original_Nome == null)) {
                 throw new global::System.ArgumentNullException("Original_Nome");
@@ -8050,13 +8033,11 @@ SELECT Codigo, Nome, Email, NomeUsuario, Telefone, Foto, DataNascimento FROM Usu
             else {
                 this.Adapter.DeleteCommand.Parameters[4].Value = ((string)(Original_Telefone));
             }
-            if ((Original_DataNascimento.HasValue == true)) {
-                this.Adapter.DeleteCommand.Parameters[5].Value = ((object)(0));
-                this.Adapter.DeleteCommand.Parameters[6].Value = ((System.DateTime)(Original_DataNascimento.Value));
+            if ((Original_DataNascimento == null)) {
+                throw new global::System.ArgumentNullException("Original_DataNascimento");
             }
             else {
-                this.Adapter.DeleteCommand.Parameters[5].Value = ((object)(1));
-                this.Adapter.DeleteCommand.Parameters[6].Value = global::System.DBNull.Value;
+                this.Adapter.DeleteCommand.Parameters[5].Value = ((string)(Original_DataNascimento));
             }
             global::System.Data.ConnectionState previousConnectionState = this.Adapter.DeleteCommand.Connection.State;
             if (((this.Adapter.DeleteCommand.Connection.State & global::System.Data.ConnectionState.Open) 
@@ -8078,7 +8059,7 @@ SELECT Codigo, Nome, Email, NomeUsuario, Telefone, Foto, DataNascimento FROM Usu
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Insert, true)]
-        public virtual int Insert(string Nome, string Email, string NomeUsuario, string Telefone, byte[] Foto, global::System.Nullable<global::System.DateTime> DataNascimento) {
+        public virtual int Insert(string Nome, string Email, string NomeUsuario, string Telefone, string DataNascimento, byte[] Foto) {
             if ((Nome == null)) {
                 throw new global::System.ArgumentNullException("Nome");
             }
@@ -8103,17 +8084,17 @@ SELECT Codigo, Nome, Email, NomeUsuario, Telefone, Foto, DataNascimento FROM Usu
             else {
                 this.Adapter.InsertCommand.Parameters[3].Value = ((string)(Telefone));
             }
+            if ((DataNascimento == null)) {
+                throw new global::System.ArgumentNullException("DataNascimento");
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[4].Value = ((string)(DataNascimento));
+            }
             if ((Foto == null)) {
-                this.Adapter.InsertCommand.Parameters[4].Value = global::System.DBNull.Value;
-            }
-            else {
-                this.Adapter.InsertCommand.Parameters[4].Value = ((byte[])(Foto));
-            }
-            if ((DataNascimento.HasValue == true)) {
-                this.Adapter.InsertCommand.Parameters[5].Value = ((System.DateTime)(DataNascimento.Value));
-            }
-            else {
                 this.Adapter.InsertCommand.Parameters[5].Value = global::System.DBNull.Value;
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[5].Value = ((byte[])(Foto));
             }
             global::System.Data.ConnectionState previousConnectionState = this.Adapter.InsertCommand.Connection.State;
             if (((this.Adapter.InsertCommand.Connection.State & global::System.Data.ConnectionState.Open) 
@@ -8135,7 +8116,7 @@ SELECT Codigo, Nome, Email, NomeUsuario, Telefone, Foto, DataNascimento FROM Usu
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Update, true)]
-        public virtual int Update(string Nome, string Email, string NomeUsuario, string Telefone, byte[] Foto, global::System.Nullable<global::System.DateTime> DataNascimento, int Original_Codigo, string Original_Nome, string Original_Email, string Original_NomeUsuario, string Original_Telefone, global::System.Nullable<global::System.DateTime> Original_DataNascimento, int Codigo) {
+        public virtual int Update(string Nome, string Email, string NomeUsuario, string Telefone, string DataNascimento, byte[] Foto, int Original_Codigo, string Original_Nome, string Original_Email, string Original_NomeUsuario, string Original_Telefone, string Original_DataNascimento, int Codigo) {
             if ((Nome == null)) {
                 throw new global::System.ArgumentNullException("Nome");
             }
@@ -8160,17 +8141,17 @@ SELECT Codigo, Nome, Email, NomeUsuario, Telefone, Foto, DataNascimento FROM Usu
             else {
                 this.Adapter.UpdateCommand.Parameters[3].Value = ((string)(Telefone));
             }
+            if ((DataNascimento == null)) {
+                throw new global::System.ArgumentNullException("DataNascimento");
+            }
+            else {
+                this.Adapter.UpdateCommand.Parameters[4].Value = ((string)(DataNascimento));
+            }
             if ((Foto == null)) {
-                this.Adapter.UpdateCommand.Parameters[4].Value = global::System.DBNull.Value;
-            }
-            else {
-                this.Adapter.UpdateCommand.Parameters[4].Value = ((byte[])(Foto));
-            }
-            if ((DataNascimento.HasValue == true)) {
-                this.Adapter.UpdateCommand.Parameters[5].Value = ((System.DateTime)(DataNascimento.Value));
-            }
-            else {
                 this.Adapter.UpdateCommand.Parameters[5].Value = global::System.DBNull.Value;
+            }
+            else {
+                this.Adapter.UpdateCommand.Parameters[5].Value = ((byte[])(Foto));
             }
             this.Adapter.UpdateCommand.Parameters[6].Value = ((int)(Original_Codigo));
             if ((Original_Nome == null)) {
@@ -8197,15 +8178,13 @@ SELECT Codigo, Nome, Email, NomeUsuario, Telefone, Foto, DataNascimento FROM Usu
             else {
                 this.Adapter.UpdateCommand.Parameters[10].Value = ((string)(Original_Telefone));
             }
-            if ((Original_DataNascimento.HasValue == true)) {
-                this.Adapter.UpdateCommand.Parameters[11].Value = ((object)(0));
-                this.Adapter.UpdateCommand.Parameters[12].Value = ((System.DateTime)(Original_DataNascimento.Value));
+            if ((Original_DataNascimento == null)) {
+                throw new global::System.ArgumentNullException("Original_DataNascimento");
             }
             else {
-                this.Adapter.UpdateCommand.Parameters[11].Value = ((object)(1));
-                this.Adapter.UpdateCommand.Parameters[12].Value = global::System.DBNull.Value;
+                this.Adapter.UpdateCommand.Parameters[11].Value = ((string)(Original_DataNascimento));
             }
-            this.Adapter.UpdateCommand.Parameters[13].Value = ((int)(Codigo));
+            this.Adapter.UpdateCommand.Parameters[12].Value = ((int)(Codigo));
             global::System.Data.ConnectionState previousConnectionState = this.Adapter.UpdateCommand.Connection.State;
             if (((this.Adapter.UpdateCommand.Connection.State & global::System.Data.ConnectionState.Open) 
                         != global::System.Data.ConnectionState.Open)) {
@@ -8226,8 +8205,8 @@ SELECT Codigo, Nome, Email, NomeUsuario, Telefone, Foto, DataNascimento FROM Usu
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Update, true)]
-        public virtual int Update(string Nome, string Email, string NomeUsuario, string Telefone, byte[] Foto, global::System.Nullable<global::System.DateTime> DataNascimento, int Original_Codigo, string Original_Nome, string Original_Email, string Original_NomeUsuario, string Original_Telefone, global::System.Nullable<global::System.DateTime> Original_DataNascimento) {
-            return this.Update(Nome, Email, NomeUsuario, Telefone, Foto, DataNascimento, Original_Codigo, Original_Nome, Original_Email, Original_NomeUsuario, Original_Telefone, Original_DataNascimento, Original_Codigo);
+        public virtual int Update(string Nome, string Email, string NomeUsuario, string Telefone, string DataNascimento, byte[] Foto, int Original_Codigo, string Original_Nome, string Original_Email, string Original_NomeUsuario, string Original_Telefone, string Original_DataNascimento) {
+            return this.Update(Nome, Email, NomeUsuario, Telefone, DataNascimento, Foto, Original_Codigo, Original_Nome, Original_Email, Original_NomeUsuario, Original_Telefone, Original_DataNascimento, Original_Codigo);
         }
     }
     
@@ -8506,7 +8485,7 @@ SELECT Codigo, Nome, Email, NomeUsuario, Telefone, Foto, DataNascimento FROM Usu
         ///</summary>
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-        private int UpdateUpdatedRows(dbTarefas2DataSet1 dataSet, global::System.Collections.Generic.List<global::System.Data.DataRow> allChangedRows, global::System.Collections.Generic.List<global::System.Data.DataRow> allAddedRows) {
+        private int UpdateUpdatedRows(dbTarefas2DataSet dataSet, global::System.Collections.Generic.List<global::System.Data.DataRow> allChangedRows, global::System.Collections.Generic.List<global::System.Data.DataRow> allAddedRows) {
             int result = 0;
             if ((this._usuarioTableAdapter != null)) {
                 global::System.Data.DataRow[] updatedRows = dataSet.Usuario.Select(null, null, global::System.Data.DataViewRowState.ModifiedCurrent);
@@ -8597,7 +8576,7 @@ SELECT Codigo, Nome, Email, NomeUsuario, Telefone, Foto, DataNascimento FROM Usu
         ///</summary>
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-        private int UpdateInsertedRows(dbTarefas2DataSet1 dataSet, global::System.Collections.Generic.List<global::System.Data.DataRow> allAddedRows) {
+        private int UpdateInsertedRows(dbTarefas2DataSet dataSet, global::System.Collections.Generic.List<global::System.Data.DataRow> allAddedRows) {
             int result = 0;
             if ((this._usuarioTableAdapter != null)) {
                 global::System.Data.DataRow[] addedRows = dataSet.Usuario.Select(null, null, global::System.Data.DataViewRowState.Added);
@@ -8679,7 +8658,7 @@ SELECT Codigo, Nome, Email, NomeUsuario, Telefone, Foto, DataNascimento FROM Usu
         ///</summary>
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-        private int UpdateDeletedRows(dbTarefas2DataSet1 dataSet, global::System.Collections.Generic.List<global::System.Data.DataRow> allChangedRows) {
+        private int UpdateDeletedRows(dbTarefas2DataSet dataSet, global::System.Collections.Generic.List<global::System.Data.DataRow> allChangedRows) {
             int result = 0;
             if ((this._tarefas_SubTarefasTableAdapter != null)) {
                 global::System.Data.DataRow[] deletedRows = dataSet.Tarefas_SubTarefas.Select(null, null, global::System.Data.DataViewRowState.Deleted);
@@ -8785,7 +8764,7 @@ SELECT Codigo, Nome, Email, NomeUsuario, Telefone, Foto, DataNascimento FROM Usu
         ///</summary>
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-        public virtual int UpdateAll(dbTarefas2DataSet1 dataSet) {
+        public virtual int UpdateAll(dbTarefas2DataSet dataSet) {
             if ((dataSet == null)) {
                 throw new global::System.ArgumentNullException("dataSet");
             }

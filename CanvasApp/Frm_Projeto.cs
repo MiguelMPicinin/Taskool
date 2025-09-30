@@ -642,22 +642,17 @@ namespace CanvasApp
 
         private int ObterQuantidadeTarefasHoje(int usuarioId)
         {
-            DateTime hoje = DateTime.Today;
-            return dbTarefas.ObterTarefasPorPeriodo(usuarioId, hoje, hoje.AddDays(1).AddSeconds(-1)).Count;
+            return dbTarefas.ObterQuantidadeTarefasComAlarmeHoje(usuarioId);
         }
 
         private int ObterQuantidadeTarefasSemana(int usuarioId)
         {
-            DateTime inicioSemana = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
-            DateTime fimSemana = inicioSemana.AddDays(7).AddSeconds(-1);
-            return dbTarefas.ObterTarefasPorPeriodo(usuarioId, inicioSemana, fimSemana).Count;
+            return dbTarefas.ObterQuantidadeTarefasComAlarmeSemana(usuarioId);
         }
 
         private int ObterQuantidadeTarefasMes(int usuarioId)
         {
-            DateTime inicioMes = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
-            DateTime fimMes = inicioMes.AddMonths(1).AddSeconds(-1);
-            return dbTarefas.ObterTarefasPorPeriodo(usuarioId, inicioMes, fimMes).Count;
+            return dbTarefas.ObterQuantidadeTarefasComAlarmeMes(usuarioId);
         }
 
         private void AbrirFavoritos(int usuarioId)
@@ -680,49 +675,52 @@ namespace CanvasApp
 
         private void CarregarTarefasHoje(int usuarioId)
         {
-            DateTime hoje = DateTime.Today;
-            DateTime amanha = hoje.AddDays(1);
+            // DEBUG
+            dbTarefas.DebugAlarmesFiltro(usuarioId, "TODOS OS ALARMES");
 
-            var tarefasHoje = dbTarefas.ObterTarefasPorPeriodo(usuarioId, hoje, amanha);
+            var tarefasHoje = dbTarefas.ObterTarefasComAlarmeHoje(usuarioId);
 
-            this.tarefasPendentes = tarefasHoje.Where(t => !t.isConcluida).ToList();
-            this.tarefasConcluidas = tarefasHoje.Where(t => t.isConcluida).ToList();
+            Console.WriteLine($"Tarefas com alarme para HOJE encontradas: {tarefasHoje.Count}");
+
+            this.tarefasPendentes = tarefasHoje;
+            this.tarefasConcluidas = new List<Projeto_Tarefas>();
             this.isModoFavoritos = false;
             this.projetoSelecionado = null;
+            this.isExibindoConcluidas = false;
 
-            Lbl_Titulo.Text = "Tarefas de Hoje";
+            Lbl_Titulo.Text = "Tarefas com Alarme para Hoje";
             AtualizarInterface();
         }
 
         private void CarregarTarefasSemana(int usuarioId)
         {
-            DateTime inicioSemana = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
-            DateTime fimSemana = inicioSemana.AddDays(7).AddSeconds(-1);
+            var tarefasSemana = dbTarefas.ObterTarefasComAlarmeSemana(usuarioId);
 
-            var tarefasSemana = dbTarefas.ObterTarefasPorPeriodo(usuarioId, inicioSemana, fimSemana);
+            Console.WriteLine($"Tarefas com alarme para SEMANA encontradas: {tarefasSemana.Count}");
 
-            this.tarefasPendentes = tarefasSemana.Where(t => !t.isConcluida).ToList();
-            this.tarefasConcluidas = tarefasSemana.Where(t => t.isConcluida).ToList();
+            this.tarefasPendentes = tarefasSemana;
+            this.tarefasConcluidas = new List<Projeto_Tarefas>();
             this.isModoFavoritos = false;
             this.projetoSelecionado = null;
+            this.isExibindoConcluidas = false;
 
-            Lbl_Titulo.Text = "Tarefas da Semana";
+            Lbl_Titulo.Text = "Tarefas com Alarme para Esta Semana";
             AtualizarInterface();
         }
 
         private void CarregarTarefasMes(int usuarioId)
         {
-            DateTime inicioMes = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
-            DateTime fimMes = inicioMes.AddMonths(1).AddSeconds(-1);
+            var tarefasMes = dbTarefas.ObterTarefasComAlarmeMes(usuarioId);
 
-            var tarefasMes = dbTarefas.ObterTarefasPorPeriodo(usuarioId, inicioMes, fimMes);
+            Console.WriteLine($"Tarefas com alarme para MÊS encontradas: {tarefasMes.Count}");
 
-            this.tarefasPendentes = tarefasMes.Where(t => !t.isConcluida).ToList();
-            this.tarefasConcluidas = tarefasMes.Where(t => t.isConcluida).ToList();
+            this.tarefasPendentes = tarefasMes;
+            this.tarefasConcluidas = new List<Projeto_Tarefas>();
             this.isModoFavoritos = false;
             this.projetoSelecionado = null;
+            this.isExibindoConcluidas = false;
 
-            Lbl_Titulo.Text = "Tarefas do Mês";
+            Lbl_Titulo.Text = "Tarefas com Alarme para Este Mês";
             AtualizarInterface();
         }
 
@@ -821,9 +819,9 @@ namespace CanvasApp
             Lst_ListaTarefas.Left = menuWidth + margin;
             Lst_ListaTarefas.Width = this.Width - menuWidth - (margin * 2);
 
-            // Calcular altura da lista de tarefas (deixar espaço para o Grp_Status)
-            int alturaDisponivel = this.Height - Lst_ListaTarefas.Top - 200; // 200px para o Grp_Status + margens
-            Lst_ListaTarefas.Height = Math.Max(alturaDisponivel, 100); // Mínimo de 100px
+            // Aumentar altura da lista para acomodar itens maiores
+            int alturaDisponivel = this.Height - Lst_ListaTarefas.Top - 220;
+            Lst_ListaTarefas.Height = Math.Max(alturaDisponivel, 120);
 
             // Posicionar Grp_Status à direita do drawer e abaixo da lista de tarefas
             Grp_Status.Left = menuWidth + margin;
@@ -1150,12 +1148,12 @@ namespace CanvasApp
             var panel = new Panel
             {
                 Width = Lst_ListaTarefas.Width - 25,
-                Height = 45,
+                Height = 60,
                 Margin = new Padding(5),
                 BackColor = Color.White,
                 Tag = tarefa,
                 BorderStyle = BorderStyle.FixedSingle,
-                Cursor = Cursors.Hand // Adicionar cursor de mão para indicar que é clicável
+                Cursor = Cursors.Hand
             };
 
             var checkBoxConcluida = new CheckBox
@@ -1168,7 +1166,6 @@ namespace CanvasApp
 
             checkBoxConcluida.CheckedChanged += (sender, e) =>
             {
-                // Impedir que o evento propague para o clique do painel
                 ((CheckBox)sender).Tag = "checkedChanged";
                 dbTarefas.AtualizarStatusTarefa(tarefa.Codigo, checkBoxConcluida.Checked);
 
@@ -1195,8 +1192,27 @@ namespace CanvasApp
                 Location = new Point(40, 13),
                 Font = new Font("Segoe UI", 9, FontStyle.Regular),
                 TextAlign = ContentAlignment.MiddleLeft,
-                Cursor = Cursors.Hand // Adicionar cursor de mão
+                Cursor = Cursors.Hand
             };
+
+            // Adicionar label para mostrar a data do alarme
+            var alarme = dbAlarme.ObterAlarmePorTarefa(tarefa.Codigo);
+            if (alarme != null)
+            {
+                var labelDataAlarme = new Label
+                {
+                    Text = $"Alarme: {alarme.Data:dd/MM/yyyy} às {alarme.Hora:HH:mm}",
+                    AutoSize = true,
+                    Location = new Point(40, 35),
+                    Font = new Font("Segoe UI", 8, FontStyle.Italic),
+                    ForeColor = Color.Gray,
+                    Cursor = Cursors.Hand
+                };
+                panel.Controls.Add(labelDataAlarme);
+
+                // Evento de clique na data do alarme
+                labelDataAlarme.Click += (sender, e) => AbrirDetalhesTarefa(tarefa);
+            }
 
             if (isConcluida)
             {
@@ -1218,14 +1234,12 @@ namespace CanvasApp
                 Tag = new { EstaFavoritado = estaFavoritado, Tarefa = tarefa }
             };
 
-            // Configurar imagem da estrela (ajuste conforme seus recursos)
             picEstrela.Image = estaFavoritado ?
                 Properties.Resources.estrela__1_ :
                 Properties.Resources.estrela;
 
             picEstrela.Click += (sender, e) =>
             {
-                // Impedir que o evento propague para o clique do painel
                 e.GetType().GetProperty("Handled")?.SetValue(e, true);
                 var pictureBox = (PictureBox)sender;
                 var dados = (dynamic)pictureBox.Tag;

@@ -276,33 +276,105 @@ namespace CanvasApp.Classes.Databases
         {
             try
             {
-                var alarmeExistente = ObterAlarmePorTarefa(codTarefa);
-
-                if (alarmeExistente != null)
+                using (SqlConnection conn = GetConnection())
                 {
-                    alarmeExistente.Data = prazo;
-                    alarmeExistente.Hora = horarioLembrete;
-                    alarmeExistente.Repeticao = repeticao;
-                    return AtualizarAlarme(alarmeExistente);
-                }
-                else
-                {
-                    var novoAlarme = new Alarme
+                    // Primeiro verifica se já existe um alarme para esta tarefa
+                    string checkSql = "SELECT COUNT(*) FROM Alarme WHERE CodTarefa = @CodTarefa";
+                    using (SqlCommand checkCmd = new SqlCommand(checkSql, conn))
                     {
-                        CodTarefa = codTarefa,
-                        CodUsuario = codUsuario,
-                        Data = prazo,
-                        Hora = horarioLembrete,
-                        Repeticao = repeticao
-                    };
-                    return InserirAlarme(novoAlarme);
+                        checkCmd.Parameters.AddWithValue("@CodTarefa", codTarefa);
+                        int existe = Convert.ToInt32(checkCmd.ExecuteScalar());
+
+                        if (existe > 0)
+                        {
+                            // Atualiza alarme existente
+                            string updateSql = @"UPDATE Alarme SET Data = @Data, Hora = @Hora, Repeticao = @Repeticao, CodUsuario = @CodUsuario 
+                                               WHERE CodTarefa = @CodTarefa";
+                            using (SqlCommand updateCmd = new SqlCommand(updateSql, conn))
+                            {
+                                updateCmd.Parameters.AddWithValue("@Data", prazo.Date);
+                                updateCmd.Parameters.AddWithValue("@Hora", horarioLembrete);
+                                updateCmd.Parameters.AddWithValue("@Repeticao", repeticao.ToString());
+                                updateCmd.Parameters.AddWithValue("@CodUsuario", codUsuario);
+                                updateCmd.Parameters.AddWithValue("@CodTarefa", codTarefa);
+                                updateCmd.ExecuteNonQuery();
+                            }
+                        }
+                        else
+                        {
+                            // Insere novo alarme
+                            string insertSql = @"INSERT INTO Alarme (CodTarefa, CodUsuario, Data, Hora, Repeticao) 
+                                               VALUES (@CodTarefa, @CodUsuario, @Data, @Hora, @Repeticao)";
+                            using (SqlCommand insertCmd = new SqlCommand(insertSql, conn))
+                            {
+                                insertCmd.Parameters.AddWithValue("@CodTarefa", codTarefa);
+                                insertCmd.Parameters.AddWithValue("@CodUsuario", codUsuario);
+                                insertCmd.Parameters.AddWithValue("@Data", prazo.Date);
+                                insertCmd.Parameters.AddWithValue("@Hora", horarioLembrete);
+                                insertCmd.Parameters.AddWithValue("@Repeticao", repeticao.ToString());
+                                insertCmd.ExecuteNonQuery();
+                            }
+                        }
+
+                        Mensagem = "Prazo e alarme salvos com sucesso!";
+                        return true;
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Mensagem = "Erro ao definir prazo e lembrete: " + ex.Message;
+                Console.WriteLine("ERRO AlarmeDB.DefinirPrazoELembrete: " + ex.Message);
                 return false;
             }
+        }
+
+        public List<Alarme> ObterAlarmesPorPeriodo(int usuarioId, DateTime inicio, DateTime fim)
+        {
+            List<Alarme> alarmes = new List<Alarme>();
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = @"
+                        SELECT A.* 
+                        FROM Alarme A
+                        INNER JOIN Projeto_Tarefas PT ON A.CodTarefa = PT.Codigo
+                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId
+                        AND A.Data >= @inicio AND A.Data < @fim
+                        AND PT.isConcluida = 0
+                        ORDER BY A.Data ASC, A.Hora ASC";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        cmd.Parameters.AddWithValue("@inicio", inicio);
+                        cmd.Parameters.AddWithValue("@fim", fim);
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                alarmes.Add(new Alarme
+                                {
+                                    Codigo = Convert.ToInt32(reader["Codigo"]),
+                                    CodTarefa = Convert.ToInt32(reader["CodTarefa"]),
+                                    CodUsuario = Convert.ToInt32(reader["CodUsuario"]),
+                                    Data = Convert.ToDateTime(reader["Data"]),
+                                    Hora = Convert.ToDateTime(reader["Hora"]),
+                                    Repeticao = (RepeticaoAlarme)Enum.Parse(typeof(RepeticaoAlarme), reader["Repeticao"].ToString())
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao obter alarmes por período: " + ex.Message;
+            }
+            return alarmes;
         }
 
         public bool ResetarConfiguracoesTarefa(int codTarefa)
@@ -312,9 +384,7 @@ namespace CanvasApp.Classes.Databases
                 var alarme = ObterAlarmePorTarefa(codTarefa);
                 if (alarme != null)
                 {
-                    alarme.Repeticao = RepeticaoAlarme.N;
-                    alarme.Hora = new DateTime(alarme.Data.Year, alarme.Data.Month, alarme.Data.Day, 9, 0, 0);
-                    return AtualizarAlarme(alarme);
+                    return ExcluirAlarme(alarme.Codigo);
                 }
                 return true;
             }

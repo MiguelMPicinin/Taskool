@@ -237,9 +237,9 @@ namespace CanvasApp
                     if (sucesso)
                     {
                         MessageBox.Show("Usuário cadastrado com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        this.Close();
                         Frm_Autenticacao fa = new Frm_Autenticacao();
                         fa.ShowDialog();
-                        this.Close();
                     }
                     else
                     {

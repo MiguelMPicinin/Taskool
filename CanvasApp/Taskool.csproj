@@ -212,10 +212,10 @@
     <Compile Include="Classes\ManipulaçãoDados\Tarefas.cs" />
     <Compile Include="Classes\ManipulaçãoDados\Usuarios.cs" />
     <Compile Include="Classes\Tema.cs" />
-    <Compile Include="dbTarefas2DataSet1.Designer.cs">
+    <Compile Include="dbTarefas2DataSet.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>dbTarefas2DataSet1.xsd</DependentUpon>
+      <DependentUpon>dbTarefas2DataSet.xsd</DependentUpon>
     </Compile>
     <Compile Include="Frm_CriarProjeto.cs">
       <SubType>Form</SubType>
@@ -274,16 +274,16 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="dbTarefas2DataSet1.xsc">
-      <DependentUpon>dbTarefas2DataSet1.xsd</DependentUpon>
+    <None Include="dbTarefas2DataSet.xsc">
+      <DependentUpon>dbTarefas2DataSet.xsd</DependentUpon>
     </None>
-    <None Include="dbTarefas2DataSet1.xsd">
+    <None Include="dbTarefas2DataSet.xsd">
       <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>dbTarefas2DataSet1.Designer.cs</LastGenOutput>
+      <LastGenOutput>dbTarefas2DataSet.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </None>
-    <None Include="dbTarefas2DataSet1.xss">
-      <DependentUpon>dbTarefas2DataSet1.xsd</DependentUpon>
+    <None Include="dbTarefas2DataSet.xss">
+      <DependentUpon>dbTarefas2DataSet.xsd</DependentUpon>
     </None>
     <None Include="Mensagens\mensagens.json" />
     <None Include="packages.config" />

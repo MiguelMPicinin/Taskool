@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
 
 namespace CanvasApp.Classes.Databases
 {
@@ -320,14 +321,12 @@ namespace CanvasApp.Classes.Databases
                     string query = @"
                         SELECT DISTINCT PT.Codigo, PT.Descricao, PT.isConcluida, PT.CodProjeto, PT.CodUsuario
                         FROM Projeto_Tarefas PT
+                        INNER JOIN Alarme A ON PT.Codigo = A.CodTarefa
                         INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
                         WHERE PM.CodMembro = @usuarioId
+                        AND A.Data BETWEEN @inicio AND @fim
                         AND PT.isConcluida = 0
-                        AND EXISTS (
-                            SELECT 1 FROM Alarme A 
-                            WHERE A.CodTarefa = PT.Codigo 
-                            AND A.Data BETWEEN @inicio AND @fim
-                        )";
+                        ORDER BY A.Data ASC, PT.Codigo DESC";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
@@ -355,28 +354,89 @@ namespace CanvasApp.Classes.Databases
             catch (Exception ex)
             {
                 Mensagem = "Erro ao buscar tarefas por período: " + ex.Message;
+                Console.WriteLine("ERRO em ObterTarefasPorPeriodo: " + ex.Message);
             }
 
             return tarefas;
         }
 
+        public void DebugAlarmesPeriodo(int usuarioId, DateTime inicio, DateTime fim)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                        SELECT 
+                            PT.Codigo as TarefaCodigo,
+                            PT.Descricao as TarefaDescricao,
+                            A.Data as AlarmeData,
+                            A.Hora as AlarmeHora,
+                            PT.CodUsuario,
+                            PM.CodMembro,
+                            PT.isConcluida
+                        FROM Projeto_Tarefas PT
+                        INNER JOIN Alarme A ON PT.Codigo = A.CodTarefa
+                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId
+                        AND A.Data BETWEEN @inicio AND @fim
+                        ORDER BY A.Data";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        cmd.Parameters.AddWithValue("@inicio", inicio);
+                        cmd.Parameters.AddWithValue("@fim", fim);
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            Console.WriteLine($"=== DEBUG ALARMES PERÍODO: {inicio:dd/MM/yyyy} - {fim:dd/MM/yyyy} ===");
+                            int count = 0;
+                            while (reader.Read())
+                            {
+                                count++;
+                                Console.WriteLine($"Tarefa {count}: {reader["TarefaCodigo"]} - {reader["TarefaDescricao"]}");
+                                Console.WriteLine($"  Alarme: {reader["AlarmeData"]:dd/MM/yyyy} {reader["AlarmeHora"]:HH:mm}");
+                                Console.WriteLine($"  Usuário: {reader["CodUsuario"]}, Membro: {reader["CodMembro"]}, Concluída: {reader["isConcluida"]}");
+                                Console.WriteLine("---");
+                            }
+
+                            if (count == 0)
+                            {
+                                Console.WriteLine("NENHUMA TAREFA ENCONTRADA com alarme neste período!");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Total encontrado: {count} tarefas");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Erro no debug: " + ex.Message);
+            }
+        }
+
         public int ObterQuantidadeTarefasHoje(int usuarioId)
         {
             DateTime hoje = DateTime.Today;
-            return ObterTarefasPorPeriodo(usuarioId, hoje, hoje.AddDays(1).AddSeconds(-1)).Count;
+            DateTime amanha = hoje.AddDays(1);
+            return ObterTarefasPorPeriodo(usuarioId, hoje, amanha).Count;
         }
 
         public int ObterQuantidadeTarefasSemana(int usuarioId)
         {
             DateTime inicioSemana = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
-            DateTime fimSemana = inicioSemana.AddDays(7).AddSeconds(-1);
+            DateTime fimSemana = inicioSemana.AddDays(7);
             return ObterTarefasPorPeriodo(usuarioId, inicioSemana, fimSemana).Count;
         }
 
         public int ObterQuantidadeTarefasMes(int usuarioId)
         {
             DateTime inicioMes = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
-            DateTime fimMes = inicioMes.AddMonths(1).AddSeconds(-1);
+            DateTime fimMes = inicioMes.AddMonths(1);
             return ObterTarefasPorPeriodo(usuarioId, inicioMes, fimMes).Count;
         }
 
@@ -408,14 +468,13 @@ namespace CanvasApp.Classes.Databases
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Mensagem = "Erro ao buscar tarefas: " + ex.Message;
+                Mensagem = "Erro ao buscar tarefas";
             }
             return lista;
         }
 
-        // NOVOS MÉTODOS ADICIONADOS
         public object ObterInformacoesCompletasTarefa(int codTarefa)
         {
             var tarefa = ObterTarefaPorCodigo(codTarefa);
@@ -493,7 +552,7 @@ namespace CanvasApp.Classes.Databases
             }
         }
 
-        private Projeto_Tarefas ObterTarefaPorCodigo(int codigo)
+        public Projeto_Tarefas ObterTarefaPorCodigo(int codigo)
         {
             try
             {
@@ -550,29 +609,43 @@ namespace CanvasApp.Classes.Databases
                                     Descricao = reader["Descricao"].ToString(),
                                     isConcluida = Convert.ToBoolean(reader["isConcluida"]),
                                     CodProjeto = Convert.ToInt32(reader["CodProjeto"]),
-                                    CodUsuario = reader["CodUsuario"]?.ToString()
+                                    CodUsuario = reader["CodUsuario"]?.ToString(),
                                 });
                             }
                         }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Mensagem = "Erro ao obter tarefas do usuário: " + ex.Message;
+                Mensagem = "Erro ao obter tarefas do usuário";
             }
             return tarefas;
         }
 
         public bool DefinirPrazoELembreteTarefa(int codTarefa, string codUsuario, DateTime prazo, DateTime horarioLembrete, RepeticaoAlarme repeticao)
         {
-            int usuarioId;
-            if (!int.TryParse(codUsuario, out usuarioId))
+            try
             {
-                Mensagem = "Código de usuário inválido";
+                // Converter código do usuário para int
+                if (!int.TryParse(codUsuario, out int usuarioId))
+                {
+                    Mensagem = "Código de usuário inválido";
+                    return false;
+                }
+
+                // DEBUG
+                Console.WriteLine($"Definindo prazo - Tarefa: {codTarefa}, Usuario: {usuarioId}, " +
+                                 $"Data: {prazo:dd/MM/yyyy}, Hora: {horarioLembrete:HH:mm}");
+
+                return _alarmeDB.DefinirPrazoELembrete(codTarefa, usuarioId, prazo, horarioLembrete, repeticao);
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao definir prazo e lembrete: " + ex.Message;
+                Console.WriteLine("ERRO TarefasDB.DefinirPrazoELembreteTarefa: " + ex.Message);
                 return false;
             }
-            return _alarmeDB.DefinirPrazoELembrete(codTarefa, usuarioId, prazo, horarioLembrete, repeticao);
         }
 
         public bool ResetarConfiguracoesTarefa(int codTarefa)
@@ -580,7 +653,6 @@ namespace CanvasApp.Classes.Databases
             return _alarmeDB.ResetarConfiguracoesTarefa(codTarefa);
         }
 
-        // Adicione este método na classe TarefasDB
         public bool AtribuirTarefaUsuario(int codTarefa, string codUsuario)
         {
             try
@@ -604,6 +676,169 @@ namespace CanvasApp.Classes.Databases
             {
                 Mensagem = "Erro ao atribuir tarefa: " + ex.Message;
                 return false;
+            }
+        }
+
+        // =========================================================================
+        // MÉTODOS PARA FILTRO POR ALARME - CORRIGIDOS
+        // =========================================================================
+
+        public List<Projeto_Tarefas> ObterTarefasComAlarmeHoje(int usuarioId)
+        {
+            return ObterTarefasComAlarmePorPeriodo(usuarioId, DateTime.Today, DateTime.Today.AddDays(1));
+        }
+
+        public List<Projeto_Tarefas> ObterTarefasComAlarmeSemana(int usuarioId)
+        {
+            DateTime hoje = DateTime.Today;
+            DateTime inicioSemana = hoje.AddDays(-(int)hoje.DayOfWeek);
+            DateTime fimSemana = inicioSemana.AddDays(7);
+            return ObterTarefasComAlarmePorPeriodo(usuarioId, inicioSemana, fimSemana);
+        }
+
+        public List<Projeto_Tarefas> ObterTarefasComAlarmeMes(int usuarioId)
+        {
+            DateTime hoje = DateTime.Today;
+            DateTime inicioMes = new DateTime(hoje.Year, hoje.Month, 1);
+            DateTime fimMes = inicioMes.AddMonths(1);
+            return ObterTarefasComAlarmePorPeriodo(usuarioId, inicioMes, fimMes);
+        }
+
+        private List<Projeto_Tarefas> ObterTarefasComAlarmePorPeriodo(int usuarioId, DateTime inicio, DateTime fim)
+        {
+            List<Projeto_Tarefas> tarefas = new List<Projeto_Tarefas>();
+
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                        SELECT DISTINCT 
+                            PT.Codigo, 
+                            PT.Descricao, 
+                            PT.isConcluida, 
+                            PT.CodProjeto, 
+                            PT.CodUsuario,
+                            A.Data as DataAlarme,
+                            A.Hora as HoraAlarme
+                        FROM Projeto_Tarefas PT
+                        INNER JOIN Alarme A ON PT.Codigo = A.CodTarefa
+                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId
+                        AND A.Data >= @inicio AND A.Data < @fim
+                        AND PT.isConcluida = 0
+                        ORDER BY A.Data ASC, A.Hora ASC";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        cmd.Parameters.AddWithValue("@inicio", inicio);
+                        cmd.Parameters.AddWithValue("@fim", fim);
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                var tarefa = new Projeto_Tarefas
+                                {
+                                    Codigo = Convert.ToInt32(reader["Codigo"]),
+                                    Descricao = reader["Descricao"].ToString(),
+                                    isConcluida = Convert.ToBoolean(reader["isConcluida"]),
+                                    CodProjeto = Convert.ToInt32(reader["CodProjeto"]),
+                                    CodUsuario = reader["CodUsuario"]?.ToString()
+                                };
+
+                                // Adicionar informações do alarme para debug
+                                Console.WriteLine($"Tarefa {tarefa.Codigo}: {tarefa.Descricao} - " +
+                                                $"Alarme: {Convert.ToDateTime(reader["DataAlarme"]):dd/MM/yyyy} " +
+                                                $"{Convert.ToDateTime(reader["HoraAlarme"]):HH:mm}");
+
+                                tarefas.Add(tarefa);
+                            }
+                        }
+                    }
+                }
+
+                Console.WriteLine($"Encontradas {tarefas.Count} tarefas com alarme no período {inicio:dd/MM/yyyy} a {fim:dd/MM/yyyy}");
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao buscar tarefas com alarme: " + ex.Message;
+                Console.WriteLine("ERRO em ObterTarefasComAlarmePorPeriodo: " + ex.Message);
+            }
+
+            return tarefas;
+        }
+
+        // Métodos para obter quantidades (usados no menu lateral)
+        public int ObterQuantidadeTarefasComAlarmeHoje(int usuarioId)
+        {
+            return ObterTarefasComAlarmeHoje(usuarioId).Count;
+        }
+
+        public int ObterQuantidadeTarefasComAlarmeSemana(int usuarioId)
+        {
+            return ObterTarefasComAlarmeSemana(usuarioId).Count;
+        }
+
+        public int ObterQuantidadeTarefasComAlarmeMes(int usuarioId)
+        {
+            return ObterTarefasComAlarmeMes(usuarioId).Count;
+        }
+
+        // Método de debug
+        public void DebugAlarmesFiltro(int usuarioId, string filtro)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                        SELECT 
+                            PT.Codigo as TarefaCodigo,
+                            PT.Descricao as TarefaDescricao,
+                            A.Data as AlarmeData,
+                            A.Hora as AlarmeHora,
+                            PT.isConcluida
+                        FROM Projeto_Tarefas PT
+                        INNER JOIN Alarme A ON PT.Codigo = A.CodTarefa
+                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId
+                        AND PT.isConcluida = 0
+                        ORDER BY A.Data";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            Console.WriteLine($"=== DEBUG ALARMES ({filtro}) ===");
+                            int count = 0;
+                            while (reader.Read())
+                            {
+                                count++;
+                                Console.WriteLine($"Tarefa {count}: {reader["TarefaCodigo"]} - {reader["TarefaDescricao"]}");
+                                Console.WriteLine($"  Alarme: {Convert.ToDateTime(reader["AlarmeData"]):dd/MM/yyyy} {Convert.ToDateTime(reader["AlarmeHora"]):HH:mm}");
+                                Console.WriteLine($"  Concluída: {reader["isConcluida"]}");
+                                Console.WriteLine("---");
+                            }
+
+                            if (count == 0)
+                            {
+                                Console.WriteLine($"NENHUMA TAREFA ENCONTRADA com alarme para {filtro}!");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Total de tarefas com alarme: {count}");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Erro no debug de alarmes: " + ex.Message);
             }
         }
     }

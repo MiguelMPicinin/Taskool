@@ -645,24 +645,23 @@ namespace Home
             return dbFavoritos.ObterTarefasFavoritas(usuarioId).Count;
         }
 
+        // =========================================================================
+        // MÉTODOS MODIFICADOS PARA FILTRO POR ALARME NA HOME
+        // =========================================================================
+
         private int ObterQuantidadeTarefasHoje(int usuarioId)
         {
-            DateTime hoje = DateTime.Today;
-            return dbTarefas.ObterTarefasPorPeriodo(usuarioId, hoje, hoje.AddDays(1).AddSeconds(-1)).Count;
+            return dbTarefas.ObterQuantidadeTarefasComAlarmeHoje(usuarioId);
         }
 
         private int ObterQuantidadeTarefasSemana(int usuarioId)
         {
-            DateTime inicioSemana = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
-            DateTime fimSemana = inicioSemana.AddDays(7).AddSeconds(-1);
-            return dbTarefas.ObterTarefasPorPeriodo(usuarioId, inicioSemana, fimSemana).Count;
+            return dbTarefas.ObterQuantidadeTarefasComAlarmeSemana(usuarioId);
         }
 
         private int ObterQuantidadeTarefasMes(int usuarioId)
         {
-            DateTime inicioMes = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
-            DateTime fimMes = inicioMes.AddMonths(1).AddSeconds(-1);
-            return dbTarefas.ObterTarefasPorPeriodo(usuarioId, inicioMes, fimMes).Count;
+            return dbTarefas.ObterQuantidadeTarefasComAlarmeMes(usuarioId);
         }
 
         private void AbrirFavoritos(int usuarioId)
@@ -685,17 +684,77 @@ namespace Home
 
         private void CarregarTarefasHoje(int usuarioId)
         {
-            MessageBox.Show("Carregando tarefas de hoje...");
+            // DEBUG
+            dbTarefas.DebugAlarmesFiltro(usuarioId, "TODOS OS ALARMES");
+
+            var tarefasHoje = dbTarefas.ObterTarefasComAlarmeHoje(usuarioId);
+
+            Console.WriteLine($"Tarefas com alarme para HOJE encontradas: {tarefasHoje.Count}");
+
+            if (tarefasHoje.Any())
+            {
+                this.Hide();
+                Frm_Projeto frmTarefasHoje = new Frm_Projeto(tarefasHoje, usuarioId);
+                frmTarefasHoje.ShowDialog();
+                this.Show();
+                CarregarMenuLateral();
+            }
+            else
+            {
+                MessageBox.Show("Nenhuma tarefa com alarme para hoje encontrada.", "Informação",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         private void CarregarTarefasSemana(int usuarioId)
         {
-            MessageBox.Show("Carregando tarefas da semana...");
+            var tarefasSemana = dbTarefas.ObterTarefasComAlarmeSemana(usuarioId);
+
+            Console.WriteLine($"Tarefas com alarme para SEMANA encontradas: {tarefasSemana.Count}");
+
+            if (tarefasSemana.Any())
+            {
+                this.Hide();
+                Frm_Projeto frmTarefasSemana = new Frm_Projeto(tarefasSemana, usuarioId);
+                frmTarefasSemana.ShowDialog();
+                this.Show();
+                CarregarMenuLateral();
+            }
+            else
+            {
+                MessageBox.Show("Nenhuma tarefa com alarme para esta semana encontrada.", "Informação",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         private void CarregarTarefasMes(int usuarioId)
         {
-            MessageBox.Show("Carregando tarefas do mês...");
+            var tarefasMes = dbTarefas.ObterTarefasComAlarmeMes(usuarioId);
+
+            Console.WriteLine($"Tarefas com alarme para MÊS encontradas: {tarefasMes.Count}");
+
+            if (tarefasMes.Any())
+            {
+                this.Hide();
+                Frm_Projeto frmTarefasMes = new Frm_Projeto(tarefasMes, usuarioId);
+                frmTarefasMes.ShowDialog();
+                this.Show();
+                CarregarMenuLateral();
+            }
+            else
+            {
+                MessageBox.Show("Nenhuma tarefa com alarme para este mês encontrada.", "Informação",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void AbrirFormProjeto(Projetos projeto, int usuarioId)
+        {
+            this.Hide();
+            Frm_Projeto frmProjeto = new Frm_Projeto(projeto, usuarioId);
+            frmProjeto.ShowDialog();
+            this.Show();
+            CarregarMenuLateral();
         }
 
         private void InitializeUI()
@@ -937,15 +996,6 @@ namespace Home
         private void Btn_EditarDados_Click(object sender, EventArgs e)
         {
             MessageBox.Show("Funcionalidade de edição de dados será implementada em breve.");
-        }
-
-        private void AbrirFormProjeto(Projetos projeto, int usuarioId)
-        {
-            this.Hide();
-            Frm_Projeto frmProjeto = new Frm_Projeto(projeto, usuarioId);
-            frmProjeto.ShowDialog();
-            this.Show();
-            CarregarMenuLateral();
         }
 
         private void Lbl_NomeMusica_Click(object sender, EventArgs e)

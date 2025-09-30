@@ -163,29 +163,39 @@ namespace CanvasApp.Forms
 
         private void CarregarPrazoAlarme()
         {
-            var alarme = _alarmeDB.ObterAlarmePorTarefa(tarefaAtual.Codigo);
-
-            if (alarme != null)
+            try
             {
-                Dtp_Prazo.Value = alarme.Data;
-                Lbl_DefinirDataLembrete.Text = "Prazo e Lembrete Definidos";
+                var alarme = _alarmeDB.ObterAlarmePorTarefa(tarefaAtual.Codigo);
 
-                // Usar o método existente para obter descrição do prazo
-                Lbl_PrazoExtenso.Text = _alarmeDB.ObterDescricaoPrazo(alarme.Data);
-                Lbl_PrazoExtenso.Visible = true;
-                Btn_FecharData.Visible = true;
+                if (alarme != null)
+                {
+                    Dtp_Prazo.Value = alarme.Data;
+                    Lbl_DefinirDataLembrete.Text = "Prazo e Lembrete Definidos";
 
-                // Carregar hora do alarme e repetição se existirem
-                if (alarme.Hora != DateTime.MinValue)
-                    Dtp_HoraAlarme.Value = alarme.Hora;
+                    // Usar o método existente para obter descrição do prazo
+                    Lbl_PrazoExtenso.Text = _alarmeDB.ObterDescricaoPrazo(alarme.Data);
+                    Lbl_PrazoExtenso.Visible = true;
+                    Btn_FecharData.Visible = true;
 
-                Cbo_Repeticao.SelectedIndex = (int)alarme.Repeticao;
+                    // Carregar hora do alarme e repetição se existirem
+                    if (alarme.Hora != DateTime.MinValue)
+                        Dtp_HoraAlarme.Value = alarme.Hora;
+
+                    Cbo_Repeticao.SelectedIndex = (int)alarme.Repeticao;
+
+                    Console.WriteLine($"Alarme carregado: Tarefa {tarefaAtual.Codigo}, Data: {alarme.Data:dd/MM/yyyy}, Hora: {alarme.Hora:HH:mm}");
+                }
+                else
+                {
+                    Lbl_DefinirDataLembrete.Text = "Definir Data e Lembrete";
+                    Lbl_PrazoExtenso.Visible = false;
+                    Btn_FecharData.Visible = false;
+                    Console.WriteLine($"Nenhum alarme encontrado para tarefa {tarefaAtual.Codigo}");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Lbl_DefinirDataLembrete.Text = "Definir Data e Lembrete";
-                Lbl_PrazoExtenso.Visible = false;
-                Btn_FecharData.Visible = false;
+                Console.WriteLine($"Erro ao carregar prazo e alarme: {ex.Message}");
             }
         }
 
@@ -197,21 +207,36 @@ namespace CanvasApp.Forms
 
         private void Btn_SalvarDataAlarme_Click(object sender, EventArgs e)
         {
-            var repeticao = (RepeticaoAlarme)Cbo_Repeticao.SelectedIndex;
-            if (_tarefasDB.DefinirPrazoELembreteTarefa(
-                tarefaAtual.Codigo,
-                usuarioLogado.Codigo,
-                Dtp_Prazo.Value,
-                Dtp_HoraAlarme.Value,
-                repeticao))
+            try
             {
-                MessageBox.Show("Prazo e alarme salvos com sucesso!", "Sucesso",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-                CarregarPrazoAlarme();
+                var repeticao = (RepeticaoAlarme)Cbo_Repeticao.SelectedIndex;
+
+                // DEBUG: Verificar os valores antes de salvar
+                Console.WriteLine($"Salvando alarme - Tarefa: {tarefaAtual.Codigo}, " +
+                                 $"Data: {Dtp_Prazo.Value:dd/MM/yyyy}, " +
+                                 $"Hora: {Dtp_HoraAlarme.Value:HH:mm}, " +
+                                 $"Repetição: {repeticao}");
+
+                if (_tarefasDB.DefinirPrazoELembreteTarefa(
+                    tarefaAtual.Codigo,
+                    usuarioLogado.Codigo,
+                    Dtp_Prazo.Value,
+                    Dtp_HoraAlarme.Value,
+                    repeticao))
+                {
+                    MessageBox.Show("Prazo e alarme salvos com sucesso!", "Sucesso",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    CarregarPrazoAlarme();
+                }
+                else
+                {
+                    MessageBox.Show(_tarefasDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show(_tarefasDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao salvar alarme: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -609,6 +634,11 @@ namespace CanvasApp.Forms
         private void Bin_FecharJanela_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void Frm_TarefasDetalhes_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
