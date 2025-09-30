@@ -635,93 +635,196 @@ namespace CanvasApp
             AbrirFormProjeto(projeto, usuarioId);
         }
 
+        // =========================================================================
+        // MÉTODOS AUXILIARES PARA QUANTIDADES NO MENU LATERAL - CORRIGIDOS
+        // =========================================================================
+
         private int ObterQuantidadeFavoritas(int usuarioId)
         {
-            return dbFavoritos.ObterTarefasFavoritas(usuarioId).Count;
+            try
+            {
+                return dbFavoritos.ObterTarefasFavoritas(usuarioId).Count;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao obter quantidade de favoritas: {ex.Message}");
+                return 0;
+            }
         }
 
         private int ObterQuantidadeTarefasHoje(int usuarioId)
         {
-            return dbTarefas.ObterQuantidadeTarefasComAlarmeHoje(usuarioId);
+            try
+            {
+                return dbTarefas.ObterQuantidadeTarefasComAlarmeHoje(usuarioId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao obter quantidade de tarefas hoje: {ex.Message}");
+                return 0;
+            }
         }
 
         private int ObterQuantidadeTarefasSemana(int usuarioId)
         {
-            return dbTarefas.ObterQuantidadeTarefasComAlarmeSemana(usuarioId);
+            try
+            {
+                return dbTarefas.ObterQuantidadeTarefasComAlarmeSemana(usuarioId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao obter quantidade de tarefas semana: {ex.Message}");
+                return 0;
+            }
         }
 
         private int ObterQuantidadeTarefasMes(int usuarioId)
         {
-            return dbTarefas.ObterQuantidadeTarefasComAlarmeMes(usuarioId);
+            try
+            {
+                return dbTarefas.ObterQuantidadeTarefasComAlarmeMes(usuarioId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao obter quantidade de tarefas mês: {ex.Message}");
+                return 0;
+            }
         }
 
         private void AbrirFavoritos(int usuarioId)
         {
-            var favoritos = dbFavoritos.ObterTarefasFavoritas(usuarioId);
+            try
+            {
+                var favoritos = dbFavoritos.ObterTarefasFavoritas(usuarioId);
 
-            if (favoritos.Any())
-            {
-                this.Hide();
-                Frm_Projeto frmFavoritos = new Frm_Projeto(favoritos, usuarioId);
-                frmFavoritos.ShowDialog();
-                this.Show();
-                CarregarMenuLateral();
+                if (favoritos.Any())
+                {
+                    this.Hide();
+                    Frm_Projeto frmFavoritos = new Frm_Projeto(favoritos, usuarioId);
+                    frmFavoritos.ShowDialog();
+                    this.Show();
+                    CarregarMenuLateral();
+                }
+                else
+                {
+                    MessageBox.Show("Você ainda não marcou nenhuma tarefa como favorita.", "Informação",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Você ainda não marcou nenhuma tarefa como favorita.");
+                MessageBox.Show($"Erro ao carregar favoritos: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
+        // =========================================================================
+        // MÉTODOS PARA FILTRO POR ALARME NO Frm_Projeto - CORRIGIDOS
+        // =========================================================================
+
         private void CarregarTarefasHoje(int usuarioId)
         {
-            // DEBUG
-            dbTarefas.DebugAlarmesFiltro(usuarioId, "TODOS OS ALARMES");
+            try
+            {
+                Console.WriteLine($"=== INICIANDO FILTRO HOJE NO PROJETO - Usuário: {usuarioId} ===");
 
-            var tarefasHoje = dbTarefas.ObterTarefasComAlarmeHoje(usuarioId);
+                // Executar diagnóstico completo para debug
+                dbTarefas.DiagnosticoCompletoBrasil(usuarioId);
 
-            Console.WriteLine($"Tarefas com alarme para HOJE encontradas: {tarefasHoje.Count}");
+                var tarefasHoje = dbTarefas.ObterTarefasComAlarmeHoje(usuarioId);
 
-            this.tarefasPendentes = tarefasHoje;
-            this.tarefasConcluidas = new List<Projeto_Tarefas>();
-            this.isModoFavoritos = false;
-            this.projetoSelecionado = null;
-            this.isExibindoConcluidas = false;
+                Console.WriteLine($"Tarefas com alarme para HOJE encontradas: {tarefasHoje.Count}");
 
-            Lbl_Titulo.Text = "Tarefas com Alarme para Hoje";
-            AtualizarInterface();
+                this.tarefasPendentes = tarefasHoje;
+                this.tarefasConcluidas = new List<Projeto_Tarefas>();
+                this.isModoFavoritos = false;
+                this.projetoSelecionado = null;
+                this.isExibindoConcluidas = false;
+
+                Lbl_Titulo.Text = "Tarefas com Alarme para Hoje";
+                AtualizarInterface();
+
+                // Mostrar mensagem se não houver tarefas
+                if (!tarefasHoje.Any())
+                {
+                    MessageBox.Show("Nenhuma tarefa com alarme para hoje encontrada.", "Informação",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao carregar tarefas de hoje: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Console.WriteLine($"ERRO DETALHADO CarregarTarefasHoje: {ex}");
+            }
         }
 
         private void CarregarTarefasSemana(int usuarioId)
         {
-            var tarefasSemana = dbTarefas.ObterTarefasComAlarmeSemana(usuarioId);
+            try
+            {
+                Console.WriteLine($"=== INICIANDO FILTRO SEMANA NO PROJETO - Usuário: {usuarioId} ===");
 
-            Console.WriteLine($"Tarefas com alarme para SEMANA encontradas: {tarefasSemana.Count}");
+                var tarefasSemana = dbTarefas.ObterTarefasComAlarmeSemana(usuarioId);
 
-            this.tarefasPendentes = tarefasSemana;
-            this.tarefasConcluidas = new List<Projeto_Tarefas>();
-            this.isModoFavoritos = false;
-            this.projetoSelecionado = null;
-            this.isExibindoConcluidas = false;
+                Console.WriteLine($"Tarefas com alarme para SEMANA encontradas: {tarefasSemana.Count}");
 
-            Lbl_Titulo.Text = "Tarefas com Alarme para Esta Semana";
-            AtualizarInterface();
+                this.tarefasPendentes = tarefasSemana;
+                this.tarefasConcluidas = new List<Projeto_Tarefas>();
+                this.isModoFavoritos = false;
+                this.projetoSelecionado = null;
+                this.isExibindoConcluidas = false;
+
+                Lbl_Titulo.Text = "Tarefas com Alarme para Esta Semana";
+                AtualizarInterface();
+
+                // Mostrar mensagem se não houver tarefas
+                if (!tarefasSemana.Any())
+                {
+                    MessageBox.Show("Nenhuma tarefa com alarme para esta semana encontrada.", "Informação",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao carregar tarefas da semana: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Console.WriteLine($"ERRO DETALHADO CarregarTarefasSemana: {ex}");
+            }
         }
 
         private void CarregarTarefasMes(int usuarioId)
         {
-            var tarefasMes = dbTarefas.ObterTarefasComAlarmeMes(usuarioId);
+            try
+            {
+                Console.WriteLine($"=== INICIANDO FILTRO MÊS NO PROJETO - Usuário: {usuarioId} ===");
 
-            Console.WriteLine($"Tarefas com alarme para MÊS encontradas: {tarefasMes.Count}");
+                var tarefasMes = dbTarefas.ObterTarefasComAlarmeMes(usuarioId);
 
-            this.tarefasPendentes = tarefasMes;
-            this.tarefasConcluidas = new List<Projeto_Tarefas>();
-            this.isModoFavoritos = false;
-            this.projetoSelecionado = null;
-            this.isExibindoConcluidas = false;
+                Console.WriteLine($"Tarefas com alarme para MÊS encontradas: {tarefasMes.Count}");
 
-            Lbl_Titulo.Text = "Tarefas com Alarme para Este Mês";
-            AtualizarInterface();
+                this.tarefasPendentes = tarefasMes;
+                this.tarefasConcluidas = new List<Projeto_Tarefas>();
+                this.isModoFavoritos = false;
+                this.projetoSelecionado = null;
+                this.isExibindoConcluidas = false;
+
+                Lbl_Titulo.Text = "Tarefas com Alarme para Este Mês";
+                AtualizarInterface();
+
+                // Mostrar mensagem se não houver tarefas
+                if (!tarefasMes.Any())
+                {
+                    MessageBox.Show("Nenhuma tarefa com alarme para este mês encontrada.", "Informação",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao carregar tarefas do mês: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Console.WriteLine($"ERRO DETALHADO CarregarTarefasMes: {ex}");
+            }
         }
 
         private void AbrirFormProjeto(Projetos projeto, int usuarioId)
@@ -1145,136 +1248,157 @@ namespace CanvasApp
 
         private Control CriarItemTarefa(Projeto_Tarefas tarefa, bool isConcluida)
         {
-            var panel = new Panel
+            try
             {
-                Width = Lst_ListaTarefas.Width - 25,
-                Height = 60,
-                Margin = new Padding(5),
-                BackColor = Color.White,
-                Tag = tarefa,
-                BorderStyle = BorderStyle.FixedSingle,
-                Cursor = Cursors.Hand
-            };
-
-            var checkBoxConcluida = new CheckBox
-            {
-                Width = 20,
-                Height = 20,
-                Location = new Point(10, 12),
-                Checked = isConcluida
-            };
-
-            checkBoxConcluida.CheckedChanged += (sender, e) =>
-            {
-                ((CheckBox)sender).Tag = "checkedChanged";
-                dbTarefas.AtualizarStatusTarefa(tarefa.Codigo, checkBoxConcluida.Checked);
-
-                if (checkBoxConcluida.Checked)
+                var panel = new Panel
                 {
-                    tarefasPendentes.Remove(tarefa);
-                    tarefasConcluidas.Add(tarefa);
-                }
-                else
-                {
-                    tarefasConcluidas.Remove(tarefa);
-                    tarefasPendentes.Add(tarefa);
-                }
-                AtualizarInterface();
-            };
-            panel.Controls.Add(checkBoxConcluida);
-
-            var labelDescricao = new Label
-            {
-                Text = tarefa.Descricao,
-                AutoSize = false,
-                Width = panel.Width - 80,
-                Height = 20,
-                Location = new Point(40, 13),
-                Font = new Font("Segoe UI", 9, FontStyle.Regular),
-                TextAlign = ContentAlignment.MiddleLeft,
-                Cursor = Cursors.Hand
-            };
-
-            // Adicionar label para mostrar a data do alarme
-            var alarme = dbAlarme.ObterAlarmePorTarefa(tarefa.Codigo);
-            if (alarme != null)
-            {
-                var labelDataAlarme = new Label
-                {
-                    Text = $"Alarme: {alarme.Data:dd/MM/yyyy} às {alarme.Hora:HH:mm}",
-                    AutoSize = true,
-                    Location = new Point(40, 35),
-                    Font = new Font("Segoe UI", 8, FontStyle.Italic),
-                    ForeColor = Color.Gray,
+                    Width = Lst_ListaTarefas.Width - 25,
+                    Height = 60,
+                    Margin = new Padding(5),
+                    BackColor = Color.White,
+                    Tag = tarefa,
+                    BorderStyle = BorderStyle.FixedSingle,
                     Cursor = Cursors.Hand
                 };
-                panel.Controls.Add(labelDataAlarme);
 
-                // Evento de clique na data do alarme
-                labelDataAlarme.Click += (sender, e) => AbrirDetalhesTarefa(tarefa);
-            }
-
-            if (isConcluida)
-            {
-                labelDescricao.Font = new Font(labelDescricao.Font, FontStyle.Strikeout);
-                labelDescricao.ForeColor = Color.Gray;
-            }
-
-            panel.Controls.Add(labelDescricao);
-
-            bool estaFavoritado = dbFavoritos.EhFavorito(usuarioLogadoId, tarefa.Codigo);
-
-            var picEstrela = new PictureBox
-            {
-                Width = 20,
-                Height = 20,
-                Location = new Point(panel.Width - 35, 12),
-                SizeMode = PictureBoxSizeMode.StretchImage,
-                Cursor = Cursors.Hand,
-                Tag = new { EstaFavoritado = estaFavoritado, Tarefa = tarefa }
-            };
-
-            picEstrela.Image = estaFavoritado ?
-                Properties.Resources.estrela__1_ :
-                Properties.Resources.estrela;
-
-            picEstrela.Click += (sender, e) =>
-            {
-                e.GetType().GetProperty("Handled")?.SetValue(e, true);
-                var pictureBox = (PictureBox)sender;
-                var dados = (dynamic)pictureBox.Tag;
-                bool novoEstado = !dados.EstaFavoritado;
-                Projeto_Tarefas tarefaClicada = dados.Tarefa;
-
-                if (novoEstado)
+                var checkBoxConcluida = new CheckBox
                 {
-                    if (dbFavoritos.AdicionarFavorito(usuarioLogadoId, tarefaClicada.Codigo))
+                    Width = 20,
+                    Height = 20,
+                    Location = new Point(10, 12),
+                    Checked = isConcluida
+                };
+
+                checkBoxConcluida.CheckedChanged += (sender, e) =>
+                {
+                    ((CheckBox)sender).Tag = "checkedChanged";
+                    dbTarefas.AtualizarStatusTarefa(tarefa.Codigo, checkBoxConcluida.Checked);
+
+                    if (checkBoxConcluida.Checked)
                     {
-                        pictureBox.Image = Properties.Resources.estrela__1_;
-                        pictureBox.Tag = new { EstaFavoritado = true, Tarefa = tarefaClicada };
+                        tarefasPendentes.Remove(tarefa);
+                        tarefasConcluidas.Add(tarefa);
+                    }
+                    else
+                    {
+                        tarefasConcluidas.Remove(tarefa);
+                        tarefasPendentes.Add(tarefa);
+                    }
+                    AtualizarInterface();
+                };
+                panel.Controls.Add(checkBoxConcluida);
+
+                var labelDescricao = new Label
+                {
+                    Text = tarefa.Descricao,
+                    AutoSize = false,
+                    Width = panel.Width - 80,
+                    Height = 20,
+                    Location = new Point(40, 13),
+                    Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                    TextAlign = ContentAlignment.MiddleLeft,
+                    Cursor = Cursors.Hand
+                };
+
+                // Adicionar label para mostrar a data do alarme
+                try
+                {
+                    var alarme = dbAlarme.ObterAlarmePorTarefa(tarefa.Codigo);
+                    if (alarme != null)
+                    {
+                        Console.WriteLine($"Alarme encontrado para tarefa {tarefa.Codigo}: {alarme.Data:dd/MM/yyyy} {alarme.Hora:HH:mm}");
+
+                        var labelDataAlarme = new Label
+                        {
+                            Text = $"Alarme: {alarme.Data:dd/MM/yyyy} às {alarme.Hora:HH:mm}",
+                            AutoSize = true,
+                            Location = new Point(40, 35),
+                            Font = new Font("Segoe UI", 8, FontStyle.Italic),
+                            ForeColor = Color.Gray,
+                            Cursor = Cursors.Hand
+                        };
+                        panel.Controls.Add(labelDataAlarme);
+
+                        // Evento de clique na data do alarme
+                        labelDataAlarme.Click += (sender, e) => AbrirDetalhesTarefa(tarefa);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Nenhum alarme encontrado para tarefa {tarefa.Codigo}");
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    if (dbFavoritos.RemoverFavorito(usuarioLogadoId, tarefaClicada.Codigo))
-                    {
-                        pictureBox.Image = Properties.Resources.estrela;
-                        pictureBox.Tag = new { EstaFavoritado = false, Tarefa = tarefaClicada };
-                    }
+                    Console.WriteLine($"Erro ao carregar alarme da tarefa {tarefa.Codigo}: {ex.Message}");
                 }
-            };
 
-            panel.Controls.Add(picEstrela);
+                if (isConcluida)
+                {
+                    labelDescricao.Font = new Font(labelDescricao.Font, FontStyle.Strikeout);
+                    labelDescricao.ForeColor = Color.Gray;
+                }
 
-            // Adicionar evento de clique para abrir os detalhes da tarefa
-            panel.Click += (sender, e) => AbrirDetalhesTarefa(tarefa);
-            labelDescricao.Click += (sender, e) => AbrirDetalhesTarefa(tarefa);
+                panel.Controls.Add(labelDescricao);
 
-            // Adicionar evento de duplo clique para abrir os detalhes
-            panel.DoubleClick += (sender, e) => AbrirDetalhesTarefa(tarefa);
-            labelDescricao.DoubleClick += (sender, e) => AbrirDetalhesTarefa(tarefa);
+                bool estaFavoritado = dbFavoritos.EhFavorito(usuarioLogadoId, tarefa.Codigo);
 
-            return panel;
+                var picEstrela = new PictureBox
+                {
+                    Width = 20,
+                    Height = 20,
+                    Location = new Point(panel.Width - 35, 12),
+                    SizeMode = PictureBoxSizeMode.StretchImage,
+                    Cursor = Cursors.Hand,
+                    Tag = new { EstaFavoritado = estaFavoritado, Tarefa = tarefa }
+                };
+
+                picEstrela.Image = estaFavoritado ?
+                    Properties.Resources.estrela__1_ :
+                    Properties.Resources.estrela;
+
+                picEstrela.Click += (sender, e) =>
+                {
+                    e.GetType().GetProperty("Handled")?.SetValue(e, true);
+                    var pictureBox = (PictureBox)sender;
+                    var dados = (dynamic)pictureBox.Tag;
+                    bool novoEstado = !dados.EstaFavoritado;
+                    Projeto_Tarefas tarefaClicada = dados.Tarefa;
+
+                    if (novoEstado)
+                    {
+                        if (dbFavoritos.AdicionarFavorito(usuarioLogadoId, tarefaClicada.Codigo))
+                        {
+                            pictureBox.Image = Properties.Resources.estrela__1_;
+                            pictureBox.Tag = new { EstaFavoritado = true, Tarefa = tarefaClicada };
+                        }
+                    }
+                    else
+                    {
+                        if (dbFavoritos.RemoverFavorito(usuarioLogadoId, tarefaClicada.Codigo))
+                        {
+                            pictureBox.Image = Properties.Resources.estrela;
+                            pictureBox.Tag = new { EstaFavoritado = false, Tarefa = tarefaClicada };
+                        }
+                    }
+                };
+
+                panel.Controls.Add(picEstrela);
+
+                // Adicionar evento de clique para abrir os detalhes da tarefa
+                panel.Click += (sender, e) => AbrirDetalhesTarefa(tarefa);
+                labelDescricao.Click += (sender, e) => AbrirDetalhesTarefa(tarefa);
+
+                // Adicionar evento de duplo clique para abrir os detalhes
+                panel.DoubleClick += (sender, e) => AbrirDetalhesTarefa(tarefa);
+                labelDescricao.DoubleClick += (sender, e) => AbrirDetalhesTarefa(tarefa);
+
+                return panel;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao criar item de tarefa: {ex.Message}");
+                return new Panel { Width = Lst_ListaTarefas.Width - 25, Height = 60 };
+            }
         }
 
         private void AbrirDetalhesTarefa(Projeto_Tarefas tarefa)

@@ -18,6 +18,79 @@ namespace CanvasApp.Classes.Databases
             _timerVerificacao.Start();
         }
 
+        // =========================================================================
+        // MÉTODOS CORRIGIDOS PARA FUSO HORÁRIO BRASIL
+        // =========================================================================
+
+        /// <summary>
+        /// Obtém data atual do servidor SQL (Brasil UTC-3)
+        /// </summary>
+        private DateTime ObterDataAtualServidor()
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = "SELECT CAST(GETDATE() as DATE) as DataAtual";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                DateTime dataServidor = Convert.ToDateTime(reader["DataAtual"]);
+                                Console.WriteLine($"✅ AlarmeDB - Data servidor: {dataServidor:dd/MM/yyyy}");
+                                return dataServidor;
+                            }
+                        }
+                    }
+                }
+                return DateTime.Today;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ AlarmeDB - Erro: {ex.Message}");
+                return DateTime.Today;
+            }
+        }
+
+        /// <summary>
+        /// Converte hora do banco para DateTime considerando fuso Brasil
+        /// </summary>
+        private DateTime ConverterHoraBrasil(object horaValue)
+        {
+            try
+            {
+                DateTime dataBase = ObterDataAtualServidor();
+
+                if (horaValue is TimeSpan timeSpan)
+                {
+                    return dataBase.Add(timeSpan);
+                }
+                else if (horaValue is DateTime dateTime)
+                {
+                    return dateTime;
+                }
+                else if (horaValue != DBNull.Value && horaValue != null)
+                {
+                    return Convert.ToDateTime(horaValue);
+                }
+                else
+                {
+                    return dataBase.AddHours(9);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erro ao converter hora: {ex.Message}");
+                return ObterDataAtualServidor().AddHours(9);
+            }
+        }
+
+        // =========================================================================
+        // MÉTODOS PRINCIPAIS CORRIGIDOS
+        // =========================================================================
+
         public bool InserirAlarme(Alarme alarme)
         {
             try
@@ -31,7 +104,7 @@ namespace CanvasApp.Classes.Databases
                         cmd.Parameters.AddWithValue("@CodTarefa", alarme.CodTarefa);
                         cmd.Parameters.AddWithValue("@CodUsuario", alarme.CodUsuario);
                         cmd.Parameters.AddWithValue("@Data", alarme.Data);
-                        cmd.Parameters.AddWithValue("@Hora", alarme.Hora);
+                        cmd.Parameters.AddWithValue("@Hora", alarme.Hora.TimeOfDay);
                         cmd.Parameters.AddWithValue("@Repeticao", alarme.Repeticao.ToString());
                         cmd.ExecuteNonQuery();
                         Mensagem = "Alarme inserido com sucesso.";
@@ -57,7 +130,7 @@ namespace CanvasApp.Classes.Databases
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@Data", alarme.Data);
-                        cmd.Parameters.AddWithValue("@Hora", alarme.Hora);
+                        cmd.Parameters.AddWithValue("@Hora", alarme.Hora.TimeOfDay);
                         cmd.Parameters.AddWithValue("@Repeticao", alarme.Repeticao.ToString());
                         cmd.Parameters.AddWithValue("@Codigo", alarme.Codigo);
                         cmd.ExecuteNonQuery();
@@ -110,18 +183,25 @@ namespace CanvasApp.Classes.Databases
                         {
                             if (reader.Read())
                             {
-                                return new Alarme
+                                DateTime horaDateTime = ConverterHoraBrasil(reader["Hora"]);
+
+                                var alarme = new Alarme
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
                                     CodTarefa = Convert.ToInt32(reader["CodTarefa"]),
                                     CodUsuario = Convert.ToInt32(reader["CodUsuario"]),
                                     Data = Convert.ToDateTime(reader["Data"]),
-                                    Hora = Convert.ToDateTime(reader["Hora"]),
+                                    Hora = horaDateTime,
                                     Repeticao = (RepeticaoAlarme)Enum.Parse(typeof(RepeticaoAlarme), reader["Repeticao"].ToString())
                                 };
+
+                                Console.WriteLine($"✅ Alarme encontrado: Tarefa {codTarefa}");
+                                Console.WriteLine($"   Data: {alarme.Data:dd/MM/yyyy}, Hora: {alarme.Hora:HH:mm}");
+                                return alarme;
                             }
                             else
                             {
+                                Console.WriteLine($"ℹ️  Nenhum alarme para tarefa {codTarefa}");
                                 return null;
                             }
                         }
@@ -131,6 +211,7 @@ namespace CanvasApp.Classes.Databases
             catch (Exception ex)
             {
                 Mensagem = "Erro ao obter alarme: " + ex.Message;
+                Console.WriteLine($"❌ ERRO ObterAlarmePorTarefa: {ex.Message}");
                 return null;
             }
         }
@@ -140,23 +221,27 @@ namespace CanvasApp.Classes.Databases
             List<Alarme> alarmes = new List<Alarme>();
             try
             {
+                DateTime dataAtual = ObterDataAtualServidor();
+
                 using (SqlConnection conn = GetConnection())
                 {
                     string sql = "SELECT * FROM Alarme WHERE Data >= @DataAtual";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
-                        cmd.Parameters.AddWithValue("@DataAtual", DateTime.Today);
+                        cmd.Parameters.AddWithValue("@DataAtual", dataAtual);
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
                             {
+                                DateTime horaDateTime = ConverterHoraBrasil(reader["Hora"]);
+
                                 alarmes.Add(new Alarme
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
                                     CodTarefa = Convert.ToInt32(reader["CodTarefa"]),
                                     CodUsuario = Convert.ToInt32(reader["CodUsuario"]),
                                     Data = Convert.ToDateTime(reader["Data"]),
-                                    Hora = Convert.ToDateTime(reader["Hora"]),
+                                    Hora = horaDateTime,
                                     Repeticao = (RepeticaoAlarme)Enum.Parse(typeof(RepeticaoAlarme), reader["Repeticao"].ToString())
                                 });
                             }
@@ -188,9 +273,12 @@ namespace CanvasApp.Classes.Databases
 
         private bool DeveDispararAlarme(Alarme alarme, DateTime agora)
         {
-            return alarme.Data.Date == agora.Date &&
-                   alarme.Hora.Hour == agora.Hour &&
-                   alarme.Hora.Minute == agora.Minute;
+            // Combina data do alarme com hora do alarme
+            DateTime dataHoraAlarme = alarme.Data.Date.Add(alarme.Hora.TimeOfDay);
+
+            return dataHoraAlarme.Date == agora.Date &&
+                   dataHoraAlarme.Hour == agora.Hour &&
+                   dataHoraAlarme.Minute == agora.Minute;
         }
 
         private void DispararNotificacao(Alarme alarme)
@@ -263,10 +351,12 @@ namespace CanvasApp.Classes.Databases
 
         public string ObterDescricaoPrazo(DateTime prazo)
         {
-            if (prazo.Date == DateTime.Today) return "Para hoje";
-            if (prazo.Date == DateTime.Today.AddDays(1)) return "Para amanhã";
+            DateTime hoje = ObterDataAtualServidor();
 
-            var diferenca = (prazo.Date - DateTime.Today).Days;
+            if (prazo.Date == hoje) return "Para hoje";
+            if (prazo.Date == hoje.AddDays(1)) return "Para amanhã";
+
+            var diferenca = (prazo.Date - hoje).Days;
             if (diferenca <= 7) return $"Para {prazo.ToString("dddd", new System.Globalization.CultureInfo("pt-BR"))}";
 
             return $"Para {prazo:dd/MM/yyyy}";
@@ -278,25 +368,27 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
-                    // Primeiro verifica se já existe um alarme para esta tarefa
-                    string checkSql = "SELECT COUNT(*) FROM Alarme WHERE CodTarefa = @CodTarefa";
+                    // Verifica se já existe alarme
+                    string checkSql = "SELECT Codigo FROM Alarme WHERE CodTarefa = @CodTarefa";
                     using (SqlCommand checkCmd = new SqlCommand(checkSql, conn))
                     {
                         checkCmd.Parameters.AddWithValue("@CodTarefa", codTarefa);
-                        int existe = Convert.ToInt32(checkCmd.ExecuteScalar());
+                        var result = checkCmd.ExecuteScalar();
+                        bool existe = result != null && result != DBNull.Value;
 
-                        if (existe > 0)
+                        if (existe)
                         {
+                            int codAlarme = Convert.ToInt32(result);
                             // Atualiza alarme existente
                             string updateSql = @"UPDATE Alarme SET Data = @Data, Hora = @Hora, Repeticao = @Repeticao, CodUsuario = @CodUsuario 
-                                               WHERE CodTarefa = @CodTarefa";
+                                               WHERE Codigo = @CodAlarme";
                             using (SqlCommand updateCmd = new SqlCommand(updateSql, conn))
                             {
                                 updateCmd.Parameters.AddWithValue("@Data", prazo.Date);
-                                updateCmd.Parameters.AddWithValue("@Hora", horarioLembrete);
+                                updateCmd.Parameters.AddWithValue("@Hora", horarioLembrete.TimeOfDay);
                                 updateCmd.Parameters.AddWithValue("@Repeticao", repeticao.ToString());
                                 updateCmd.Parameters.AddWithValue("@CodUsuario", codUsuario);
-                                updateCmd.Parameters.AddWithValue("@CodTarefa", codTarefa);
+                                updateCmd.Parameters.AddWithValue("@CodAlarme", codAlarme);
                                 updateCmd.ExecuteNonQuery();
                             }
                         }
@@ -310,13 +402,14 @@ namespace CanvasApp.Classes.Databases
                                 insertCmd.Parameters.AddWithValue("@CodTarefa", codTarefa);
                                 insertCmd.Parameters.AddWithValue("@CodUsuario", codUsuario);
                                 insertCmd.Parameters.AddWithValue("@Data", prazo.Date);
-                                insertCmd.Parameters.AddWithValue("@Hora", horarioLembrete);
+                                insertCmd.Parameters.AddWithValue("@Hora", horarioLembrete.TimeOfDay);
                                 insertCmd.Parameters.AddWithValue("@Repeticao", repeticao.ToString());
                                 insertCmd.ExecuteNonQuery();
                             }
                         }
 
                         Mensagem = "Prazo e alarme salvos com sucesso!";
+                        Console.WriteLine($"✅ Alarme salvo: Tarefa={codTarefa}, Data={prazo:dd/MM/yyyy}, Hora={horarioLembrete:HH:mm}");
                         return true;
                     }
                 }
@@ -356,13 +449,15 @@ namespace CanvasApp.Classes.Databases
                         {
                             while (reader.Read())
                             {
+                                DateTime horaDateTime = ConverterHoraBrasil(reader["Hora"]);
+
                                 alarmes.Add(new Alarme
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
                                     CodTarefa = Convert.ToInt32(reader["CodTarefa"]),
                                     CodUsuario = Convert.ToInt32(reader["CodUsuario"]),
                                     Data = Convert.ToDateTime(reader["Data"]),
-                                    Hora = Convert.ToDateTime(reader["Hora"]),
+                                    Hora = horaDateTime,
                                     Repeticao = (RepeticaoAlarme)Enum.Parse(typeof(RepeticaoAlarme), reader["Repeticao"].ToString())
                                 });
                             }

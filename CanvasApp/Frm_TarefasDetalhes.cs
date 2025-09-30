@@ -19,7 +19,6 @@ namespace CanvasApp.Forms
         private readonly UsuarioDB _usuarioDB;
 
         // Controles criados programaticamente
-        private Button btnSalvarDataAlarme;
         private Button btnAtribuirUsuario;
         private Label lblUsuarioAtribuido;
         private Button btnAdicionarSubtarefa;
@@ -55,17 +54,9 @@ namespace CanvasApp.Forms
             Lbl_DefinirDataLembrete.Click += Lbl_DefinirDataLembrete_Click;
             Btn_FecharData.Click += Bin_FecharData_Click;
 
-            // Adicionar botão salvar data/alarme programaticamente
-            btnSalvarDataAlarme = new Button
-            {
-                Text = "Salvar",
-                Size = new Size(60, 25),
-                Location = new Point(Dtp_Prazo.Left, Dtp_Prazo.Bottom + 5),
-                Visible = true,
-                Name = "Btn_SalvarDataAlarme"
-            };
-            btnSalvarDataAlarme.Click += Btn_SalvarDataAlarme_Click;
-            this.Controls.Add(btnSalvarDataAlarme);
+            // CONFIGURAR O BOTÃO DO DESIGNER - CORRIGIDO
+            Btn_SalvarData.Click += Btn_SalvarData_Click;
+            Btn_SalvarData.Visible = true;
 
             Cbo_Repeticao.Items.AddRange(new string[] {
                 "Nunca repetir", "Repetir todos os dias", "Repetir toda semana", "Repetir todo mês"
@@ -146,7 +137,7 @@ namespace CanvasApp.Forms
         }
 
         // =========================================================================
-        // A. PRAZO, LEMBRETE E ALARME
+        // A. PRAZO, LEMBRETE E ALARME - CORRIGIDO
         // =========================================================================
 
         private void MostrarSelecaoDataAlarme()
@@ -156,9 +147,8 @@ namespace CanvasApp.Forms
             Dtp_HoraAlarme.Visible = true;
             Cbo_Repeticao.Visible = true;
 
-            // Encontrar e mostrar o botão salvar
-            if (btnSalvarDataAlarme != null)
-                btnSalvarDataAlarme.Visible = true;
+            // Mostrar o botão do designer
+            Btn_SalvarData.Visible = true;
         }
 
         private void CarregarPrazoAlarme()
@@ -169,7 +159,33 @@ namespace CanvasApp.Forms
 
                 if (alarme != null)
                 {
+                    // CORREÇÃO: Garantir que os valores são atualizados nos controles
                     Dtp_Prazo.Value = alarme.Data;
+
+                    // CORREÇÃO: Tratamento robusto para valores de hora
+                    if (alarme.Hora != DateTime.MinValue && alarme.Hora.Year > 1900)
+                    {
+                        Dtp_HoraAlarme.Value = alarme.Hora;
+                    }
+                    else
+                    {
+                        Dtp_HoraAlarme.Value = DateTime.Now.Date.AddHours(9); // Hora padrão
+                    }
+
+                    // CORREÇÃO: Garantir que o combobox está com o valor correto
+                    if (Cbo_Repeticao.Items.Count > 0)
+                    {
+                        int indexRepeticao = (int)alarme.Repeticao;
+                        if (indexRepeticao >= 0 && indexRepeticao < Cbo_Repeticao.Items.Count)
+                        {
+                            Cbo_Repeticao.SelectedIndex = indexRepeticao;
+                        }
+                        else
+                        {
+                            Cbo_Repeticao.SelectedIndex = 0;
+                        }
+                    }
+
                     Lbl_DefinirDataLembrete.Text = "Prazo e Lembrete Definidos";
 
                     // Usar o método existente para obter descrição do prazo
@@ -177,25 +193,28 @@ namespace CanvasApp.Forms
                     Lbl_PrazoExtenso.Visible = true;
                     Btn_FecharData.Visible = true;
 
-                    // Carregar hora do alarme e repetição se existirem
-                    if (alarme.Hora != DateTime.MinValue)
-                        Dtp_HoraAlarme.Value = alarme.Hora;
-
-                    Cbo_Repeticao.SelectedIndex = (int)alarme.Repeticao;
-
-                    Console.WriteLine($"Alarme carregado: Tarefa {tarefaAtual.Codigo}, Data: {alarme.Data:dd/MM/yyyy}, Hora: {alarme.Hora:HH:mm}");
+                    Console.WriteLine($"Alarme carregado: Tarefa {tarefaAtual.Codigo}, Data: {alarme.Data:dd/MM/yyyy}, Hora: {alarme.Hora:HH:mm}, Repetição: {alarme.Repeticao}");
                 }
                 else
                 {
                     Lbl_DefinirDataLembrete.Text = "Definir Data e Lembrete";
                     Lbl_PrazoExtenso.Visible = false;
                     Btn_FecharData.Visible = false;
+
+                    // CORREÇÃO: Resetar para valores padrão quando não há alarme
+                    Dtp_Prazo.Value = DateTime.Now.Date;
+                    Dtp_HoraAlarme.Value = DateTime.Now.Date.AddHours(9);
+                    if (Cbo_Repeticao.Items.Count > 0)
+                        Cbo_Repeticao.SelectedIndex = 0;
+
                     Console.WriteLine($"Nenhum alarme encontrado para tarefa {tarefaAtual.Codigo}");
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Erro ao carregar prazo e alarme: {ex.Message}");
+                MessageBox.Show($"Erro ao carregar prazo: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -205,7 +224,13 @@ namespace CanvasApp.Forms
             Lbl_DefinirDataLembrete.Text = "Ajustar Prazo e Alarme";
         }
 
-        private void Btn_SalvarDataAlarme_Click(object sender, EventArgs e)
+        // MÉTODO CORRIGIDO - USANDO O BOTÃO DO DESIGNER
+        private void Btn_SalvarData_Click(object sender, EventArgs e)
+        {
+            SalvarDataAlarme();
+        }
+
+        private void SalvarDataAlarme()
         {
             try
             {
@@ -215,45 +240,97 @@ namespace CanvasApp.Forms
                 Console.WriteLine($"Salvando alarme - Tarefa: {tarefaAtual.Codigo}, " +
                                  $"Data: {Dtp_Prazo.Value:dd/MM/yyyy}, " +
                                  $"Hora: {Dtp_HoraAlarme.Value:HH:mm}, " +
-                                 $"Repetição: {repeticao}");
+                                 $"Repetição: {repeticao}, " +
+                                 $"Usuário: {usuarioLogado.Codigo}");
 
-                if (_tarefasDB.DefinirPrazoELembreteTarefa(
+                // Verificar se os valores são válidos
+                if (Dtp_Prazo.Value < DateTime.Today)
+                {
+                    MessageBox.Show("A data não pode ser anterior a hoje!", "Data Inválida",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // CORREÇÃO: Converter o código do usuário de string para int
+                if (!int.TryParse(usuarioLogado.Codigo, out int codUsuarioInt))
+                {
+                    MessageBox.Show("Código de usuário inválido!", "Erro",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Usar o método correto do AlarmeDB para salvar
+                if (_alarmeDB.DefinirPrazoELembrete(
                     tarefaAtual.Codigo,
-                    usuarioLogado.Codigo,
+                    codUsuarioInt,
                     Dtp_Prazo.Value,
                     Dtp_HoraAlarme.Value,
                     repeticao))
                 {
                     MessageBox.Show("Prazo e alarme salvos com sucesso!", "Sucesso",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    // CORREÇÃO: Atualizar imediatamente os controles com os valores salvos
                     CarregarPrazoAlarme();
+
+                    // Debug para verificar se foi salvo
+                    var alarmeVerificado = _alarmeDB.ObterAlarmePorTarefa(tarefaAtual.Codigo);
+                    if (alarmeVerificado != null)
+                    {
+                        Console.WriteLine($"Alarme verificado após salvar: Data: {alarmeVerificado.Data:dd/MM/yyyy}, Hora: {alarmeVerificado.Hora:HH:mm}");
+
+                        // CORREÇÃO: Forçar atualização visual dos controles
+                        Dtp_Prazo.Value = alarmeVerificado.Data;
+                        Dtp_HoraAlarme.Value = alarmeVerificado.Hora;
+                        Cbo_Repeticao.SelectedIndex = (int)alarmeVerificado.Repeticao;
+                    }
+                    else
+                    {
+                        Console.WriteLine("ALARME NÃO ENCONTRADO APÓS SALVAR!");
+                    }
                 }
                 else
                 {
-                    MessageBox.Show(_tarefasDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Erro ao salvar alarme: {_alarmeDB.Mensagem}", "Erro",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Erro ao salvar alarme: {ex.Message}", "Erro",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Console.WriteLine($"ERRO DETALHADO ao salvar alarme: {ex}");
             }
         }
 
         private void Bin_FecharData_Click(object sender, EventArgs e)
         {
+            RemoverDataAlarme();
+        }
+
+        private void RemoverDataAlarme()
+        {
             if (MessageBox.Show("Deseja remover o Prazo e o Alarme?", "Confirmar",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
-                if (_tarefasDB.ResetarConfiguracoesTarefa(tarefaAtual.Codigo))
+                try
                 {
-                    CarregarPrazoAlarme();
-                    MessageBox.Show("Prazo e alarme removidos com sucesso!", "Sucesso",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (_alarmeDB.ResetarConfiguracoesTarefa(tarefaAtual.Codigo))
+                    {
+                        CarregarPrazoAlarme();
+                        MessageBox.Show("Prazo e alarme removidos com sucesso!", "Sucesso",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Erro ao remover alarme: {_alarmeDB.Mensagem}", "Erro",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    MessageBox.Show(_alarmeDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Erro ao remover alarme: {ex.Message}", "Erro",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -264,14 +341,37 @@ namespace CanvasApp.Forms
 
         private void CarregarSubtarefas()
         {
-            Flw_Subtarefas.Controls.Clear();
-
-            // Carregar subtarefas do banco
-            var listaSubtarefas = _subtarefasDB.ObterSubtarefasPorTarefa(tarefaAtual.Codigo);
-
-            foreach (var sub in listaSubtarefas)
+            try
             {
-                AdicionarControleSubtarefa(sub);
+                Flw_Subtarefas.Controls.Clear();
+
+                // Carregar subtarefas do banco
+                var listaSubtarefas = _subtarefasDB.ObterSubtarefasPorTarefa(tarefaAtual.Codigo);
+
+                foreach (var sub in listaSubtarefas)
+                {
+                    AdicionarControleSubtarefa(sub);
+                }
+
+                // Mostrar mensagem se não houver subtarefas
+                if (!listaSubtarefas.Any())
+                {
+                    var lblSemSubtarefas = new Label
+                    {
+                        Text = "Nenhuma subtarefa adicionada",
+                        Font = new Font("Segoe UI", 9, FontStyle.Italic),
+                        ForeColor = Color.Gray,
+                        TextAlign = ContentAlignment.MiddleCenter,
+                        Dock = DockStyle.Fill
+                    };
+                    Flw_Subtarefas.Controls.Add(lblSemSubtarefas);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao carregar subtarefas: {ex.Message}");
+                MessageBox.Show($"Erro ao carregar subtarefas: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -286,87 +386,129 @@ namespace CanvasApp.Forms
 
         private void AdicionarNovaSubtarefa()
         {
-            var novaSub = new Tarefas_SubTarefas
+            try
             {
-                CodTarefa = tarefaAtual.Codigo,
-                Texto = Txt_NovaSubtarefa.Text.Trim(),
-                isConcluida = false
-            };
+                if (string.IsNullOrWhiteSpace(Txt_NovaSubtarefa.Text))
+                {
+                    MessageBox.Show("Digite uma descrição para a subtarefa!", "Aviso",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
-            if (_subtarefasDB.InserirSubtarefa(novaSub))
-            {
-                CarregarSubtarefas(); // Recarregar do banco
-                Txt_NovaSubtarefa.Clear();
+                var novaSub = new Tarefas_SubTarefas
+                {
+                    CodTarefa = tarefaAtual.Codigo,
+                    Texto = Txt_NovaSubtarefa.Text.Trim(),
+                    isConcluida = false
+                };
+
+                if (_subtarefasDB.InserirSubtarefa(novaSub))
+                {
+                    CarregarSubtarefas(); // Recarregar do banco
+                    Txt_NovaSubtarefa.Clear();
+                    Txt_NovaSubtarefa.Focus();
+                }
+                else
+                {
+                    MessageBox.Show(_subtarefasDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show(_subtarefasDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao adicionar subtarefa: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void AdicionarControleSubtarefa(Tarefas_SubTarefas sub)
         {
-            Panel pnlSub = new Panel
+            try
             {
-                Height = 35,
-                Width = Flw_Subtarefas.Width - 20,
-                Tag = sub.Codigo,
-                Margin = new Padding(0, 3, 0, 3),
-                BackColor = Color.White,
-                BorderStyle = BorderStyle.FixedSingle
-            };
-
-            CheckBox chk = new CheckBox
-            {
-                Checked = sub.isConcluida,
-                Text = sub.Texto,
-                Location = new Point(8, 8),
-                AutoSize = true,
-                Font = new Font("Segoe UI", 9),
-                Tag = sub.Codigo
-            };
-
-            chk.CheckedChanged += (s, e) =>
-            {
-                sub.isConcluida = chk.Checked;
-                if (!_subtarefasDB.AtualizarSubtarefa(sub))
+                Panel pnlSub = new Panel
                 {
-                    MessageBox.Show(_subtarefasDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            };
+                    Height = 35,
+                    Width = Flw_Subtarefas.Width - 25,
+                    Tag = sub.Codigo,
+                    Margin = new Padding(0, 3, 0, 3),
+                    BackColor = Color.White,
+                    BorderStyle = BorderStyle.FixedSingle
+                };
 
-            Button btnExcluir = new Button
-            {
-                Text = "×",
-                Size = new Size(25, 25),
-                Location = new Point(pnlSub.Width - 30, 5),
-                Tag = sub.Codigo,
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                ForeColor = Color.Red,
-                BackColor = Color.Transparent,
-                FlatStyle = FlatStyle.Flat
-            };
-
-            btnExcluir.FlatAppearance.BorderSize = 0;
-            btnExcluir.Click += (s, e) =>
-            {
-                if (MessageBox.Show("Deseja excluir esta subtarefa?", "Confirmar",
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                CheckBox chk = new CheckBox
                 {
-                    if (_subtarefasDB.ExcluirSubtarefa(sub.Codigo))
-                    {
-                        CarregarSubtarefas(); // Recarregar do banco
-                    }
-                    else
-                    {
-                        MessageBox.Show(_subtarefasDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-            };
+                    Checked = sub.isConcluida,
+                    Text = sub.Texto,
+                    Location = new Point(8, 8),
+                    AutoSize = true,
+                    Font = new Font("Segoe UI", 9),
+                    Tag = sub.Codigo
+                };
 
-            pnlSub.Controls.Add(chk);
-            pnlSub.Controls.Add(btnExcluir);
-            Flw_Subtarefas.Controls.Add(pnlSub);
+                chk.CheckedChanged += (s, e) =>
+                {
+                    try
+                    {
+                        sub.isConcluida = chk.Checked;
+                        if (!_subtarefasDB.AtualizarSubtarefa(sub))
+                        {
+                            MessageBox.Show(_subtarefasDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            // Reverter a mudança visual em caso de erro
+                            chk.Checked = !chk.Checked;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Erro ao atualizar subtarefa: {ex.Message}", "Erro",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                };
+
+                Button btnExcluir = new Button
+                {
+                    Text = "×",
+                    Size = new Size(25, 25),
+                    Location = new Point(pnlSub.Width - 35, 5),
+                    Tag = sub.Codigo,
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                    ForeColor = Color.Red,
+                    BackColor = Color.Transparent,
+                    FlatStyle = FlatStyle.Flat,
+                    Cursor = Cursors.Hand
+                };
+
+                btnExcluir.FlatAppearance.BorderSize = 0;
+                btnExcluir.Click += (s, e) =>
+                {
+                    if (MessageBox.Show("Deseja excluir esta subtarefa?", "Confirmar",
+                        MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        try
+                        {
+                            if (_subtarefasDB.ExcluirSubtarefa(sub.Codigo))
+                            {
+                                CarregarSubtarefas(); // Recarregar do banco
+                            }
+                            else
+                            {
+                                MessageBox.Show(_subtarefasDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Erro ao excluir subtarefa: {ex.Message}", "Erro",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                };
+
+                pnlSub.Controls.Add(chk);
+                pnlSub.Controls.Add(btnExcluir);
+                Flw_Subtarefas.Controls.Add(pnlSub);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao criar controle de subtarefa: {ex.Message}");
+            }
         }
 
         // =========================================================================
@@ -375,43 +517,66 @@ namespace CanvasApp.Forms
 
         private void CarregarComentarios()
         {
-            // Carregar comentários do banco - método atualizado para usar dados reais
-            var comentarios = _comentariosDB.ObterComentariosPorTarefa(tarefaAtual.Codigo);
+            try
+            {
+                // Carregar comentários do banco - método atualizado para usar dados reais
+                var comentarios = _comentariosDB.ObterComentariosPorTarefa(tarefaAtual.Codigo);
 
-            // Atualizar contador no botão de abrir chat
-            Btn_AbrirChat.Text = $"Comentários ({comentarios.Count})";
+                // Atualizar contador no botão de abrir chat
+                Btn_AbrirChat.Text = $"Comentários ({comentarios.Count})";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao carregar comentários: {ex.Message}");
+            }
         }
 
         private void AtualizarPreviewComentarios()
         {
-            var comentarios = _comentariosDB.ObterComentariosPorTarefa(tarefaAtual.Codigo);
-            int contagem = comentarios.Count;
-
-            // Atualizar botão com a contagem
-            Btn_AbrirChat.Text = $"Comentários ({contagem})";
-
-            if (contagem > 0)
+            try
             {
-                var ultimo = comentarios.OrderByDescending(c => c.Codigo).First();
-                var usuario = _usuarioDB.ObterUsuarioPorCodigo(ultimo.CodUsuario);
-                string nomeUsuario = usuario?.NomeUsuario ?? "Usuário";
+                var comentarios = _comentariosDB.ObterComentariosPorTarefa(tarefaAtual.Codigo);
+                int contagem = comentarios.Count;
 
-                string previewTexto = ultimo.Comentario.Length > 35 ?
-                    ultimo.Comentario.Substring(0, 35) + "..." : ultimo.Comentario;
+                // Atualizar botão com a contagem
+                Btn_AbrirChat.Text = $"Comentários ({contagem})";
 
-                Lbl_PreviewComentarios.Text = $"{nomeUsuario}: {previewTexto}";
+                if (contagem > 0)
+                {
+                    var ultimo = comentarios.OrderByDescending(c => c.Codigo).First();
+                    var usuario = _usuarioDB.ObterUsuarioPorCodigo(ultimo.CodUsuario);
+                    string nomeUsuario = usuario?.NomeUsuario ?? "Usuário";
+
+                    string previewTexto = ultimo.Comentario.Length > 35 ?
+                        ultimo.Comentario.Substring(0, 35) + "..." : ultimo.Comentario;
+
+                    Lbl_PreviewComentarios.Text = $"{nomeUsuario}: {previewTexto}";
+                }
+                else
+                {
+                    Lbl_PreviewComentarios.Text = "Nenhum comentário ainda.";
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Lbl_PreviewComentarios.Text = "Nenhum comentário ainda.";
+                Console.WriteLine($"Erro ao atualizar preview de comentários: {ex.Message}");
+                Lbl_PreviewComentarios.Text = "Erro ao carregar comentários.";
             }
         }
 
         private void Btn_AbrirChat_Click(object sender, EventArgs e)
         {
-            CarregarComentariosNoChat();
-            Pnl_ChatComentarios.Visible = true;
-            Pnl_ChatComentarios.BringToFront();
+            try
+            {
+                CarregarComentariosNoChat();
+                Pnl_ChatComentarios.Visible = true;
+                Pnl_ChatComentarios.BringToFront();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao abrir chat: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void Bin_FecharChat_Click(object sender, EventArgs e)
@@ -421,20 +586,45 @@ namespace CanvasApp.Forms
 
         private void CarregarComentariosNoChat()
         {
-            Flw_ChatComentarios.Controls.Clear();
-
-            var comentarios = _comentariosDB.ObterComentariosPorTarefa(tarefaAtual.Codigo);
-
-            foreach (var com in comentarios.OrderBy(c => c.Codigo))
+            try
             {
-                AdicionarControleComentario(com);
+                Flw_ChatComentarios.Controls.Clear();
+
+                var comentarios = _comentariosDB.ObterComentariosPorTarefa(tarefaAtual.Codigo);
+
+                foreach (var com in comentarios.OrderBy(c => c.Codigo))
+                {
+                    AdicionarControleComentario(com);
+                }
+
+                // Rolagem automática para o final
+                if (Flw_ChatComentarios.Controls.Count > 0)
+                {
+                    Flw_ChatComentarios.ScrollControlIntoView(
+                        Flw_ChatComentarios.Controls[Flw_ChatComentarios.Controls.Count - 1]);
+                }
+
+                // Mostrar mensagem se não houver comentários
+                if (!comentarios.Any())
+                {
+                    var lblSemComentarios = new Label
+                    {
+                        Text = "Nenhum comentário ainda. Seja o primeiro a comentar!",
+                        Font = new Font("Segoe UI", 10, FontStyle.Italic),
+                        ForeColor = Color.Gray,
+                        TextAlign = ContentAlignment.MiddleCenter,
+                        Dock = DockStyle.Fill,
+                        AutoSize = false,
+                        Height = 50
+                    };
+                    Flw_ChatComentarios.Controls.Add(lblSemComentarios);
+                }
             }
-
-            // Rolagem automática para o final
-            if (Flw_ChatComentarios.Controls.Count > 0)
+            catch (Exception ex)
             {
-                Flw_ChatComentarios.ScrollControlIntoView(
-                    Flw_ChatComentarios.Controls[Flw_ChatComentarios.Controls.Count - 1]);
+                Console.WriteLine($"Erro ao carregar comentários no chat: {ex.Message}");
+                MessageBox.Show($"Erro ao carregar comentários: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -454,97 +644,112 @@ namespace CanvasApp.Forms
 
         private void EnviarComentario()
         {
-            if (string.IsNullOrWhiteSpace(Txt_NovoComentarioChat.Text))
+            try
             {
-                MessageBox.Show("Digite um comentário antes de enviar.", "Aviso",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+                if (string.IsNullOrWhiteSpace(Txt_NovoComentarioChat.Text))
+                {
+                    MessageBox.Show("Digite um comentário antes de enviar.", "Aviso",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
-            var novoCom = new Tarefas_Comentarios
-            {
-                CodTarefa = tarefaAtual.Codigo,
-                CodUsuario = usuarioLogado.Codigo,
-                Comentario = Txt_NovoComentarioChat.Text.Trim(),
-                Data = DateTime.Now
-            };
+                var novoCom = new Tarefas_Comentarios
+                {
+                    CodTarefa = tarefaAtual.Codigo,
+                    CodUsuario = usuarioLogado.Codigo,
+                    Comentario = Txt_NovoComentarioChat.Text.Trim(),
+                    Data = DateTime.Now
+                };
 
-            if (_comentariosDB.InserirComentario(novoCom))
-            {
-                CarregarComentariosNoChat();
-                Txt_NovoComentarioChat.Clear();
-                AtualizarPreviewComentarios();
-                CarregarComentarios();
+                if (_comentariosDB.InserirComentario(novoCom))
+                {
+                    CarregarComentariosNoChat();
+                    Txt_NovoComentarioChat.Clear();
+                    AtualizarPreviewComentarios();
+                    CarregarComentarios();
+                }
+                else
+                {
+                    MessageBox.Show(_comentariosDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show(_comentariosDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao enviar comentário: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void AdicionarControleComentario(Tarefas_Comentarios com)
         {
-            Panel pnlCom = new Panel
+            try
             {
-                Width = Flw_ChatComentarios.Width - 25,
-                Margin = new Padding(5),
-                BorderStyle = BorderStyle.FixedSingle,
-                Tag = com.Codigo,
-                BackColor = com.CodUsuario == usuarioLogado.Codigo ?
-                    Color.LightCyan : Color.White
-            };
+                Panel pnlCom = new Panel
+                {
+                    Width = Flw_ChatComentarios.Width - 25,
+                    Margin = new Padding(5),
+                    BorderStyle = BorderStyle.FixedSingle,
+                    Tag = com.Codigo,
+                    BackColor = com.CodUsuario == usuarioLogado.Codigo ?
+                        Color.LightCyan : Color.White
+                };
 
-            var usuario = _usuarioDB.ObterUsuarioPorCodigo(com.CodUsuario);
-            string nomeUsuario = usuario?.NomeUsuario ?? "Usuário";
-            string dataFormatada = com.Data.ToString("dd/MM/yyyy HH:mm");
+                var usuario = _usuarioDB.ObterUsuarioPorCodigo(com.CodUsuario);
+                string nomeUsuario = usuario?.NomeUsuario ?? "Usuário";
+                string dataFormatada = com.Data.ToString("dd/MM/yyyy HH:mm");
 
-            Label lblInicial = new Label
-            {
-                Text = nomeUsuario.Substring(0, 1).ToUpper(),
-                Location = new Point(8, 8),
-                Size = new Size(25, 25),
-                BackColor = Color.LightBlue,
-                TextAlign = ContentAlignment.MiddleCenter,
-                Font = new Font("Segoe UI", 9, FontStyle.Bold),
-                ForeColor = Color.White
-            };
+                Label lblInicial = new Label
+                {
+                    Text = nomeUsuario.Substring(0, 1).ToUpper(),
+                    Location = new Point(8, 8),
+                    Size = new Size(25, 25),
+                    BackColor = Color.LightBlue,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                    ForeColor = Color.White
+                };
 
-            Label lblHeader = new Label
-            {
-                Text = $"{nomeUsuario} - {dataFormatada}",
-                Location = new Point(40, 8),
-                AutoSize = true,
-                Font = new Font("Segoe UI", 8, FontStyle.Bold),
-                ForeColor = Color.DarkGray
-            };
+                Label lblHeader = new Label
+                {
+                    Text = $"{nomeUsuario} - {dataFormatada}",
+                    Location = new Point(40, 8),
+                    AutoSize = true,
+                    Font = new Font("Segoe UI", 8, FontStyle.Bold),
+                    ForeColor = Color.DarkGray
+                };
 
-            TextBox txtComentario = new TextBox
-            {
-                Text = com.Comentario,
-                Location = new Point(40, 30),
-                Size = new Size(pnlCom.Width - 50, 0),
-                BorderStyle = BorderStyle.None,
-                Font = new Font("Segoe UI", 9),
-                BackColor = pnlCom.BackColor,
-                Multiline = true,
-                ReadOnly = true,
-                ScrollBars = ScrollBars.None
-            };
+                TextBox txtComentario = new TextBox
+                {
+                    Text = com.Comentario,
+                    Location = new Point(40, 30),
+                    Size = new Size(pnlCom.Width - 50, 0),
+                    BorderStyle = BorderStyle.None,
+                    Font = new Font("Segoe UI", 9),
+                    BackColor = pnlCom.BackColor,
+                    Multiline = true,
+                    ReadOnly = true,
+                    ScrollBars = ScrollBars.None
+                };
 
-            // Ajustar altura do TextBox baseado no conteúdo
-            using (Graphics g = CreateGraphics())
-            {
-                SizeF size = g.MeasureString(txtComentario.Text, txtComentario.Font, txtComentario.Width);
-                txtComentario.Height = (int)Math.Ceiling(size.Height) + 10;
+                // Ajustar altura do TextBox baseado no conteúdo
+                using (Graphics g = CreateGraphics())
+                {
+                    SizeF size = g.MeasureString(txtComentario.Text, txtComentario.Font, txtComentario.Width);
+                    txtComentario.Height = (int)Math.Ceiling(size.Height) + 10;
+                }
+
+                pnlCom.Height = txtComentario.Bottom + 10;
+
+                pnlCom.Controls.Add(lblInicial);
+                pnlCom.Controls.Add(lblHeader);
+                pnlCom.Controls.Add(txtComentario);
+
+                Flw_ChatComentarios.Controls.Add(pnlCom);
             }
-
-            pnlCom.Height = txtComentario.Bottom + 10;
-
-            pnlCom.Controls.Add(lblInicial);
-            pnlCom.Controls.Add(lblHeader);
-            pnlCom.Controls.Add(txtComentario);
-
-            Flw_ChatComentarios.Controls.Add(pnlCom);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao criar controle de comentário: {ex.Message}");
+            }
         }
 
         // =========================================================================
@@ -553,81 +758,104 @@ namespace CanvasApp.Forms
 
         private void CarregarAtribuicao()
         {
-            if (!string.IsNullOrEmpty(tarefaAtual.CodUsuario))
+            try
             {
-                var usuario = _usuarioDB.ObterUsuarioPorCodigo(tarefaAtual.CodUsuario);
-                if (usuario != null)
+                if (!string.IsNullOrEmpty(tarefaAtual.CodUsuario))
                 {
-                    Pct_Colaborador.Text = _usuarioDB.ObterInicialUsuario(usuario);
-                    Pct_Colaborador.BackColor = Color.LightBlue;
-                    Pct_Colaborador.Tag = tarefaAtual.CodUsuario;
-
-                    ToolTip tt = new ToolTip();
-                    tt.SetToolTip(Pct_Colaborador, $"Atribuído a: {usuario.NomeUsuario}");
-
-                    Pct_Colaborador.Visible = true;
-
-                    // Atualizar label de usuário atribuído
-                    if (lblUsuarioAtribuido != null)
+                    var usuario = _usuarioDB.ObterUsuarioPorCodigo(tarefaAtual.CodUsuario);
+                    if (usuario != null)
                     {
-                        lblUsuarioAtribuido.Text = usuario.NomeUsuario;
-                        lblUsuarioAtribuido.ForeColor = Color.Black;
+                        Pct_Colaborador.Text = _usuarioDB.ObterInicialUsuario(usuario);
+                        Pct_Colaborador.BackColor = Color.LightBlue;
+                        Pct_Colaborador.Tag = tarefaAtual.CodUsuario;
+
+                        ToolTip tt = new ToolTip();
+                        tt.SetToolTip(Pct_Colaborador, $"Atribuído a: {usuario.NomeUsuario}");
+
+                        Pct_Colaborador.Visible = true;
+
+                        // Atualizar label de usuário atribuído
+                        if (lblUsuarioAtribuido != null)
+                        {
+                            lblUsuarioAtribuido.Text = usuario.NomeUsuario;
+                            lblUsuarioAtribuido.ForeColor = Color.Black;
+                        }
+                        return;
                     }
-                    return;
+                }
+
+                Pct_Colaborador.Visible = false;
+                if (lblUsuarioAtribuido != null)
+                {
+                    lblUsuarioAtribuido.Text = "Não atribuído";
+                    lblUsuarioAtribuido.ForeColor = Color.Gray;
                 }
             }
-
-            Pct_Colaborador.Visible = false;
-            if (lblUsuarioAtribuido != null)
+            catch (Exception ex)
             {
-                lblUsuarioAtribuido.Text = "Não atribuído";
-                lblUsuarioAtribuido.ForeColor = Color.Gray;
+                Console.WriteLine($"Erro ao carregar atribuição: {ex.Message}");
             }
         }
 
         private void Btn_AtribuirUsuario_Click(object sender, EventArgs e)
         {
-            // Método simplificado para atribuir usuário - seleção por input box
-            string codUsuario = Microsoft.VisualBasic.Interaction.InputBox(
-                "Digite o código do usuário para atribuir esta tarefa:",
-                "Atribuir Tarefa",
-                "");
-
-            if (!string.IsNullOrEmpty(codUsuario))
+            try
             {
-                // Verificar se o usuário existe
-                var usuario = _usuarioDB.ObterUsuarioPorCodigo(codUsuario);
-                if (usuario != null)
+                // Método simplificado para atribuir usuário - seleção por input box
+                string codUsuario = Microsoft.VisualBasic.Interaction.InputBox(
+                    "Digite o código do usuário para atribuir esta tarefa:",
+                    "Atribuir Tarefa",
+                    "");
+
+                if (!string.IsNullOrEmpty(codUsuario))
                 {
-                    if (_tarefasDB.AtribuirTarefaUsuario(tarefaAtual.Codigo, codUsuario))
+                    // Verificar se o usuário existe
+                    var usuario = _usuarioDB.ObterUsuarioPorCodigo(codUsuario);
+                    if (usuario != null)
                     {
-                        tarefaAtual.CodUsuario = codUsuario;
-                        CarregarAtribuicao();
-                        MessageBox.Show($"Tarefa atribuída a {usuario.NomeUsuario} com sucesso!",
-                            "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        if (_tarefasDB.AtribuirTarefaUsuario(tarefaAtual.Codigo, codUsuario))
+                        {
+                            tarefaAtual.CodUsuario = codUsuario;
+                            CarregarAtribuicao();
+                            MessageBox.Show($"Tarefa atribuída a {usuario.NomeUsuario} com sucesso!",
+                                "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        else
+                        {
+                            MessageBox.Show(_tarefasDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
                     }
                     else
                     {
-                        MessageBox.Show(_tarefasDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Usuário não encontrado!", "Erro",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
-                else
-                {
-                    MessageBox.Show("Usuário não encontrado!", "Erro",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao atribuir usuário: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void Pct_Colaborador_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(tarefaAtual.CodUsuario)) return;
-
-            var usuario = _usuarioDB.ObterUsuarioPorCodigo(tarefaAtual.CodUsuario);
-            if (usuario != null)
+            try
             {
-                MessageBox.Show($"Usuário atribuído: {usuario.NomeUsuario}\nCódigo: {usuario.Codigo}",
-                    "Informações do Usuário", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (string.IsNullOrEmpty(tarefaAtual.CodUsuario)) return;
+
+                var usuario = _usuarioDB.ObterUsuarioPorCodigo(tarefaAtual.CodUsuario);
+                if (usuario != null)
+                {
+                    MessageBox.Show($"Usuário atribuído: {usuario.NomeUsuario}\nCódigo: {usuario.Codigo}",
+                        "Informações do Usuário", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao exibir informações do usuário: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -636,9 +864,62 @@ namespace CanvasApp.Forms
             this.Close();
         }
 
+        // =========================================================================
+        // NOVOS MÉTODOS AUXILIARES
+        // =========================================================================
+
+        private void ValidarCamposData()
+        {
+            // Validar se a data não é anterior a hoje
+            if (Dtp_Prazo.Value < DateTime.Today)
+            {
+                MessageBox.Show("A data não pode ser anterior a hoje!", "Data Inválida",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Dtp_Prazo.Value = DateTime.Today;
+            }
+        }
+
+        private void Dtp_Prazo_ValueChanged(object sender, EventArgs e)
+        {
+            ValidarCamposData();
+        }
+
+        // =========================================================================
+        // EVENTOS DO FORMULÁRIO
+        // =========================================================================
+
         private void Frm_TarefasDetalhes_Load(object sender, EventArgs e)
         {
+            // Configurar eventos adicionais
+            Dtp_Prazo.ValueChanged += Dtp_Prazo_ValueChanged;
 
+            // Centralizar formulário na tela
+            this.StartPosition = FormStartPosition.CenterScreen;
+
+            // Focar no campo de título
+            Txt_TituloTarefa.Focus();
         }
+
+        private void Frm_TarefasDetalhes_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Limpar recursos se necessário
+            if (lblUsuarioAtribuido != null)
+            {
+                lblUsuarioAtribuido.Dispose();
+            }
+            if (btnAtribuirUsuario != null)
+            {
+                btnAtribuirUsuario.Dispose();
+            }
+            if (btnAdicionarSubtarefa != null)
+            {
+                btnAdicionarSubtarefa.Dispose();
+            }
+        }
+
+        // Eventos vazios necessários do designer
+        private void Txt_TituloTarefa_TextChanged(object sender, EventArgs e) { }
+        private void Dtp_HoraAlarme_ValueChanged(object sender, EventArgs e) { }
+        private void Cbo_Repeticao_SelectedIndexChanged(object sender, EventArgs e) { }
     }
 }

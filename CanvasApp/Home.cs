@@ -640,111 +640,185 @@ namespace Home
             AbrirFormProjeto(projeto, usuarioId);
         }
 
+        // =========================================================================
+        // MÉTODOS MODIFICADOS PARA FILTRO POR ALARME NA HOME - CORRIGIDOS
+        // =========================================================================
+
         private int ObterQuantidadeFavoritas(int usuarioId)
         {
-            return dbFavoritos.ObterTarefasFavoritas(usuarioId).Count;
+            try
+            {
+                return dbFavoritos.ObterTarefasFavoritas(usuarioId).Count;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao obter quantidade de favoritas: {ex.Message}");
+                return 0;
+            }
         }
-
-        // =========================================================================
-        // MÉTODOS MODIFICADOS PARA FILTRO POR ALARME NA HOME
-        // =========================================================================
 
         private int ObterQuantidadeTarefasHoje(int usuarioId)
         {
-            return dbTarefas.ObterQuantidadeTarefasComAlarmeHoje(usuarioId);
+            try
+            {
+                return dbTarefas.ObterQuantidadeTarefasComAlarmeHoje(usuarioId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao obter quantidade de tarefas hoje: {ex.Message}");
+                return 0;
+            }
         }
 
         private int ObterQuantidadeTarefasSemana(int usuarioId)
         {
-            return dbTarefas.ObterQuantidadeTarefasComAlarmeSemana(usuarioId);
+            try
+            {
+                return dbTarefas.ObterQuantidadeTarefasComAlarmeSemana(usuarioId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao obter quantidade de tarefas semana: {ex.Message}");
+                return 0;
+            }
         }
 
         private int ObterQuantidadeTarefasMes(int usuarioId)
         {
-            return dbTarefas.ObterQuantidadeTarefasComAlarmeMes(usuarioId);
+            try
+            {
+                return dbTarefas.ObterQuantidadeTarefasComAlarmeMes(usuarioId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao obter quantidade de tarefas mês: {ex.Message}");
+                return 0;
+            }
         }
 
         private void AbrirFavoritos(int usuarioId)
         {
-            var favoritos = dbFavoritos.ObterTarefasFavoritas(usuarioId);
+            try
+            {
+                var favoritos = dbFavoritos.ObterTarefasFavoritas(usuarioId);
 
-            if (favoritos.Any())
-            {
-                this.Hide();
-                Frm_Projeto frmFavoritos = new Frm_Projeto(favoritos, usuarioId);
-                frmFavoritos.ShowDialog();
-                this.Show();
-                CarregarMenuLateral();
+                if (favoritos.Any())
+                {
+                    this.Hide();
+                    Frm_Projeto frmFavoritos = new Frm_Projeto(favoritos, usuarioId);
+                    frmFavoritos.ShowDialog();
+                    this.Show();
+                    CarregarMenuLateral();
+                }
+                else
+                {
+                    MessageBox.Show("Você ainda não marcou nenhuma tarefa como favorita.", "Informação",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Você ainda não marcou nenhuma tarefa como favorita.");
+                MessageBox.Show($"Erro ao carregar favoritos: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void CarregarTarefasHoje(int usuarioId)
         {
-            // DEBUG
-            dbTarefas.DebugAlarmesFiltro(usuarioId, "TODOS OS ALARMES");
-
-            var tarefasHoje = dbTarefas.ObterTarefasComAlarmeHoje(usuarioId);
-
-            Console.WriteLine($"Tarefas com alarme para HOJE encontradas: {tarefasHoje.Count}");
-
-            if (tarefasHoje.Any())
+            try
             {
-                this.Hide();
-                Frm_Projeto frmTarefasHoje = new Frm_Projeto(tarefasHoje, usuarioId);
-                frmTarefasHoje.ShowDialog();
-                this.Show();
-                CarregarMenuLateral();
+                Console.WriteLine($"=== INICIANDO FILTRO HOJE - Usuário: {usuarioId} ===");
+
+                // Executar diagnóstico completo para debug
+                dbTarefas.DiagnosticoCompletoBrasil(usuarioId);
+
+                var tarefasHoje = dbTarefas.ObterTarefasComAlarmeHoje(usuarioId);
+
+                Console.WriteLine($"Tarefas com alarme para HOJE encontradas: {tarefasHoje.Count}");
+
+                if (tarefasHoje.Any())
+                {
+                    this.Hide();
+                    Frm_Projeto frmTarefasHoje = new Frm_Projeto(tarefasHoje, usuarioId);
+                    frmTarefasHoje.ShowDialog();
+                    this.Show();
+                    CarregarMenuLateral();
+                }
+                else
+                {
+                    MessageBox.Show("Nenhuma tarefa com alarme para hoje encontrada.", "Informação",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Nenhuma tarefa com alarme para hoje encontrada.", "Informação",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"Erro ao carregar tarefas de hoje: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Console.WriteLine($"ERRO DETALHADO CarregarTarefasHoje: {ex}");
             }
         }
 
         private void CarregarTarefasSemana(int usuarioId)
         {
-            var tarefasSemana = dbTarefas.ObterTarefasComAlarmeSemana(usuarioId);
-
-            Console.WriteLine($"Tarefas com alarme para SEMANA encontradas: {tarefasSemana.Count}");
-
-            if (tarefasSemana.Any())
+            try
             {
-                this.Hide();
-                Frm_Projeto frmTarefasSemana = new Frm_Projeto(tarefasSemana, usuarioId);
-                frmTarefasSemana.ShowDialog();
-                this.Show();
-                CarregarMenuLateral();
+                Console.WriteLine($"=== INICIANDO FILTRO SEMANA - Usuário: {usuarioId} ===");
+
+                var tarefasSemana = dbTarefas.ObterTarefasComAlarmeSemana(usuarioId);
+
+                Console.WriteLine($"Tarefas com alarme para SEMANA encontradas: {tarefasSemana.Count}");
+
+                if (tarefasSemana.Any())
+                {
+                    this.Hide();
+                    Frm_Projeto frmTarefasSemana = new Frm_Projeto(tarefasSemana, usuarioId);
+                    frmTarefasSemana.ShowDialog();
+                    this.Show();
+                    CarregarMenuLateral();
+                }
+                else
+                {
+                    MessageBox.Show("Nenhuma tarefa com alarme para esta semana encontrada.", "Informação",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Nenhuma tarefa com alarme para esta semana encontrada.", "Informação",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"Erro ao carregar tarefas da semana: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Console.WriteLine($"ERRO DETALHADO CarregarTarefasSemana: {ex}");
             }
         }
 
         private void CarregarTarefasMes(int usuarioId)
         {
-            var tarefasMes = dbTarefas.ObterTarefasComAlarmeMes(usuarioId);
-
-            Console.WriteLine($"Tarefas com alarme para MÊS encontradas: {tarefasMes.Count}");
-
-            if (tarefasMes.Any())
+            try
             {
-                this.Hide();
-                Frm_Projeto frmTarefasMes = new Frm_Projeto(tarefasMes, usuarioId);
-                frmTarefasMes.ShowDialog();
-                this.Show();
-                CarregarMenuLateral();
+                Console.WriteLine($"=== INICIANDO FILTRO MÊS - Usuário: {usuarioId} ===");
+
+                var tarefasMes = dbTarefas.ObterTarefasComAlarmeMes(usuarioId);
+
+                Console.WriteLine($"Tarefas com alarme para MÊS encontradas: {tarefasMes.Count}");
+
+                if (tarefasMes.Any())
+                {
+                    this.Hide();
+                    Frm_Projeto frmTarefasMes = new Frm_Projeto(tarefasMes, usuarioId);
+                    frmTarefasMes.ShowDialog();
+                    this.Show();
+                    CarregarMenuLateral();
+                }
+                else
+                {
+                    MessageBox.Show("Nenhuma tarefa com alarme para este mês encontrada.", "Informação",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Nenhuma tarefa com alarme para este mês encontrada.", "Informação",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"Erro ao carregar tarefas do mês: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Console.WriteLine($"ERRO DETALHADO CarregarTarefasMes: {ex}");
             }
         }
 
