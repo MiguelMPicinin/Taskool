@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Frm_Projeto));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.Pnl_Titulo = new System.Windows.Forms.Panel();
             this.Lbl_Titulo = new System.Windows.Forms.Label();
             this.Txt_Tarefa = new System.Windows.Forms.TextBox();
@@ -151,26 +151,28 @@
             // 
             // Grp_Status
             // 
+            this.Grp_Status.Controls.Add(this.Lbl_Concluidas);
             this.Grp_Status.Controls.Add(this.Flw_Concluidos);
             this.Grp_Status.Controls.Add(this.Flw_Pendentes);
             this.Grp_Status.Controls.Add(this.Pnl_Grafico);
             this.Grp_Status.Controls.Add(this.Pnl_Header);
-            this.Grp_Status.Location = new System.Drawing.Point(159, 321);
+            this.Grp_Status.Controls.Add(this.Lbl_Pendentes);
+            this.Grp_Status.Location = new System.Drawing.Point(160, 317);
             this.Grp_Status.Name = "Grp_Status";
-            this.Grp_Status.Size = new System.Drawing.Size(617, 131);
+            this.Grp_Status.Size = new System.Drawing.Size(617, 138);
             this.Grp_Status.TabIndex = 9;
             this.Grp_Status.TabStop = false;
             // 
             // Flw_Concluidos
             // 
-            this.Flw_Concluidos.Location = new System.Drawing.Point(109, 89);
+            this.Flw_Concluidos.Location = new System.Drawing.Point(109, 100);
             this.Flw_Concluidos.Name = "Flw_Concluidos";
             this.Flw_Concluidos.Size = new System.Drawing.Size(492, 33);
             this.Flw_Concluidos.TabIndex = 3;
             // 
             // Flw_Pendentes
             // 
-            this.Flw_Pendentes.Location = new System.Drawing.Point(109, 48);
+            this.Flw_Pendentes.Location = new System.Drawing.Point(109, 51);
             this.Flw_Pendentes.Name = "Flw_Pendentes";
             this.Flw_Pendentes.Size = new System.Drawing.Size(492, 33);
             this.Flw_Pendentes.TabIndex = 2;
@@ -186,17 +188,17 @@
             // 
             // Chrt_Tarefas
             // 
-            chartArea2.Name = "ChartArea1";
-            this.Chrt_Tarefas.ChartAreas.Add(chartArea2);
+            chartArea3.Name = "ChartArea1";
+            this.Chrt_Tarefas.ChartAreas.Add(chartArea3);
             this.Chrt_Tarefas.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend2.Name = "Legend1";
-            this.Chrt_Tarefas.Legends.Add(legend2);
+            legend3.Name = "Legend1";
+            this.Chrt_Tarefas.Legends.Add(legend3);
             this.Chrt_Tarefas.Location = new System.Drawing.Point(0, 0);
             this.Chrt_Tarefas.Name = "Chrt_Tarefas";
-            series2.ChartArea = "ChartArea1";
-            series2.Legend = "Legend1";
-            series2.Name = "Series1";
-            this.Chrt_Tarefas.Series.Add(series2);
+            series3.ChartArea = "ChartArea1";
+            series3.Legend = "Legend1";
+            series3.Name = "Series1";
+            this.Chrt_Tarefas.Series.Add(series3);
             this.Chrt_Tarefas.Size = new System.Drawing.Size(96, 82);
             this.Chrt_Tarefas.TabIndex = 4;
             this.Chrt_Tarefas.Text = "chart1";
@@ -206,7 +208,7 @@
             this.Pnl_Header.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.Pnl_Header.Controls.Add(this.Lbl_Status);
             this.Pnl_Header.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.Pnl_Header.Location = new System.Drawing.Point(0, 7);
+            this.Pnl_Header.Location = new System.Drawing.Point(1, 4);
             this.Pnl_Header.Name = "Pnl_Header";
             this.Pnl_Header.Size = new System.Drawing.Size(617, 33);
             this.Pnl_Header.TabIndex = 0;
@@ -217,27 +219,28 @@
             this.Lbl_Status.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Lbl_Status.Location = new System.Drawing.Point(275, 4);
             this.Lbl_Status.Name = "Lbl_Status";
-            this.Lbl_Status.Size = new System.Drawing.Size(70, 25);
+            this.Lbl_Status.Size = new System.Drawing.Size(73, 25);
             this.Lbl_Status.TabIndex = 0;
-            this.Lbl_Status.Text = "label2";
+            this.Lbl_Status.Text = "Status";
             // 
             // Lbl_Concluidas
             // 
             this.Lbl_Concluidas.AutoSize = true;
-            this.Lbl_Concluidas.Location = new System.Drawing.Point(260, 405);
+            this.Lbl_Concluidas.Location = new System.Drawing.Point(102, 85);
             this.Lbl_Concluidas.Name = "Lbl_Concluidas";
-            this.Lbl_Concluidas.Size = new System.Drawing.Size(35, 13);
+            this.Lbl_Concluidas.Size = new System.Drawing.Size(59, 13);
             this.Lbl_Concluidas.TabIndex = 11;
-            this.Lbl_Concluidas.Text = "label2";
+            this.Lbl_Concluidas.Text = "Concluidas";
             // 
             // Lbl_Pendentes
             // 
             this.Lbl_Pendentes.AutoSize = true;
-            this.Lbl_Pendentes.Location = new System.Drawing.Point(258, 361);
+            this.Lbl_Pendentes.Location = new System.Drawing.Point(103, 36);
             this.Lbl_Pendentes.Name = "Lbl_Pendentes";
-            this.Lbl_Pendentes.Size = new System.Drawing.Size(35, 13);
+            this.Lbl_Pendentes.Size = new System.Drawing.Size(58, 13);
             this.Lbl_Pendentes.TabIndex = 10;
-            this.Lbl_Pendentes.Text = "label2";
+            this.Lbl_Pendentes.Text = "Pendentes";
+            this.Lbl_Pendentes.Click += new System.EventHandler(this.Lbl_Pendentes_Click);
             // 
             // Pnl_MenuLateral1
             // 
@@ -345,8 +348,6 @@
             this.Controls.Add(this.Pnl_MenuLateral1);
             this.Controls.Add(this.Lbl_Triste);
             this.Controls.Add(this.Pic_Tristesa);
-            this.Controls.Add(this.Lbl_Concluidas);
-            this.Controls.Add(this.Lbl_Pendentes);
             this.Controls.Add(this.Grp_Status);
             this.Controls.Add(this.Lnk_TarefasConcluidas);
             this.Controls.Add(this.Lst_ListaTarefas);
@@ -360,6 +361,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.Pic_IconPlus)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Pic_Tristesa)).EndInit();
             this.Grp_Status.ResumeLayout(false);
+            this.Grp_Status.PerformLayout();
             this.Pnl_Grafico.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.Chrt_Tarefas)).EndInit();
             this.Pnl_Header.ResumeLayout(false);

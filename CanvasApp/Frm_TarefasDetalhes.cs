@@ -3,6 +3,7 @@ using CanvasApp.Classes.Databases.UsuarioCL;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -17,11 +18,12 @@ namespace CanvasApp.Forms
         private readonly SubtarefasDB _subtarefasDB;
         private readonly ComentariosDB _comentariosDB;
         private readonly UsuarioDB _usuarioDB;
+        private readonly MembrosDB _membrosDB;
 
         // Controles criados programaticamente
-        private Button btnAtribuirUsuario;
-        private Label lblUsuarioAtribuido;
         private Button btnAdicionarSubtarefa;
+        private ListBox Lst_SugestoesResponsavel;
+        private List<Usuario> responsaveisAdicionados = new List<Usuario>();
 
         public Frm_TarefasDetalhes(Projeto_Tarefas tarefa)
         {
@@ -38,8 +40,8 @@ namespace CanvasApp.Forms
             // Inicializar TarefasDB com as dependências necessárias
             var notificacoesDB = new NotificacoesDB();
             var projetosDB = new ProjetosDB();
-            var membrosDB = new MembrosDB(notificacoesDB, projetosDB, _usuarioDB);
-            _tarefasDB = new TarefasDB(notificacoesDB, projetosDB, _usuarioDB, membrosDB, _alarmeDB, _subtarefasDB, _comentariosDB);
+            _membrosDB = new MembrosDB(notificacoesDB, projetosDB, _usuarioDB);
+            _tarefasDB = new TarefasDB(notificacoesDB, projetosDB, _usuarioDB, _membrosDB, _alarmeDB, _subtarefasDB, _comentariosDB);
 
             ConfigurarLayoutDetalhes();
             CarregarDadosTarefa();
@@ -90,33 +92,8 @@ namespace CanvasApp.Forms
             Btn_EnviarComentario.Click += Bin_EnviarComentario_Click;
             Txt_NovoComentarioChat.KeyDown += Txt_NovoComentarioChat_KeyDown;
 
-            // --- Seção Atribuição ---
-            // Adicionar botão de atribuição programaticamente
-            btnAtribuirUsuario = new Button
-            {
-                Text = "Atribuir Usuário",
-                Size = new Size(100, 25),
-                Location = new Point(Pct_Colaborador.Right + 10, Pct_Colaborador.Top),
-                Visible = true,
-                Name = "Btn_AtribuirUsuario"
-            };
-            btnAtribuirUsuario.Click += Btn_AtribuirUsuario_Click;
-            this.Controls.Add(btnAtribuirUsuario);
-
-            // Adicionar label de usuário atribuído programaticamente
-            lblUsuarioAtribuido = new Label
-            {
-                Text = "Não atribuído",
-                Location = new Point(Pct_Colaborador.Left, Pct_Colaborador.Bottom + 5),
-                AutoSize = true,
-                Visible = true,
-                Name = "Lbl_UsuarioAtribuido",
-                Font = new Font("Segoe UI", 9),
-                ForeColor = Color.Gray
-            };
-            this.Controls.Add(lblUsuarioAtribuido);
-
-            Pct_Colaborador.Click += Pct_Colaborador_Click;
+            // --- Seção Responsáveis ---
+            ConfigurarSelecaoResponsaveis();
 
             // Configuração do Painel de Chat (Oculto inicialmente)
             Pnl_ChatComentarios.Visible = false;
@@ -126,6 +103,44 @@ namespace CanvasApp.Forms
             MostrarSelecaoDataAlarme();
         }
 
+        private void ConfigurarSelecaoResponsaveis()
+        {
+            // --- Configurar ListBox de Sugestões (inicialmente oculta) ---
+            Lst_SugestoesResponsavel = new ListBox
+            {
+                Visible = false,
+                Location = new Point(Txt_Responsavel.Left, Txt_Responsavel.Bottom + 2),
+                Width = Txt_Responsavel.Width,
+                Height = 100,
+                Font = new Font("Segoe UI", 9),
+                BorderStyle = BorderStyle.FixedSingle,
+                SelectionMode = SelectionMode.One
+            };
+            Lst_SugestoesResponsavel.KeyDown += Lst_SugestoesResponsavel_KeyDown;
+            Lst_SugestoesResponsavel.DoubleClick += Lst_SugestoesResponsavel_DoubleClick;
+
+            // Adicionar ao mesmo container do Txt_Responsavel para garantir posicionamento correto
+            if (Txt_Responsavel.Parent != null)
+            {
+                Txt_Responsavel.Parent.Controls.Add(Lst_SugestoesResponsavel);
+            }
+            Lst_SugestoesResponsavel.BringToFront();
+
+            // --- Configurar eventos do TextBox de pesquisa ---
+            Txt_Responsavel.TextChanged += Txt_Responsavel_TextChanged;
+            Txt_Responsavel.KeyDown += Txt_Responsavel_KeyDown;
+            Txt_Responsavel.Enter += Txt_Responsavel_Enter;
+            Txt_Responsavel.Leave += Txt_Responsavel_Leave;
+
+            // --- Configurar Panel de Figuras para layout horizontal ---
+            Pnl_FigurasResponsaveis.FlowDirection = FlowDirection.LeftToRight;
+            Pnl_FigurasResponsaveis.WrapContents = true;
+            Pnl_FigurasResponsaveis.AutoScroll = true;
+
+            // Carregar responsáveis existentes
+            CarregarResponsaveisExistentes();
+        }
+
         private void CarregarDadosTarefa()
         {
             Txt_TituloTarefa.Text = tarefaAtual.Descricao;
@@ -133,7 +148,6 @@ namespace CanvasApp.Forms
             CarregarSubtarefas();
             CarregarComentarios();
             AtualizarPreviewComentarios();
-            CarregarAtribuicao();
         }
 
         // =========================================================================
@@ -753,120 +767,420 @@ namespace CanvasApp.Forms
         }
 
         // =========================================================================
-        // D. ATRIBUIÇÃO DE USUÁRIO
+        // D. RESPONSÁVEIS (NOVA FUNCIONALIDADE CORRIGIDA)
         // =========================================================================
 
-        private void CarregarAtribuicao()
+        private void Txt_Responsavel_TextChanged(object sender, EventArgs e)
         {
+            string textoBusca = Txt_Responsavel.Text.Trim();
+
+            if (string.IsNullOrEmpty(textoBusca))
+            {
+                Lst_SugestoesResponsavel.Visible = false;
+                return;
+            }
+
             try
             {
-                if (!string.IsNullOrEmpty(tarefaAtual.CodUsuario))
+                // Buscar apenas membros do projeto atual
+                var membrosProjeto = _membrosDB.ObterMembrosProjeto(tarefaAtual.CodProjeto);
+
+                // Filtrar membros pelo texto de busca e remover já adicionados
+                var resultados = membrosProjeto
+                    .Where(u => (u.Nome?.IndexOf(textoBusca, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                               (u.NomeUsuario?.IndexOf(textoBusca, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                               (u.Email?.IndexOf(textoBusca, StringComparison.OrdinalIgnoreCase) >= 0))
+                    .Where(u => !responsaveisAdicionados.Any(r => r.Codigo == u.Codigo))
+                    .ToList();
+
+                Lst_SugestoesResponsavel.Items.Clear();
+
+                foreach (var usuario in resultados)
                 {
-                    var usuario = _usuarioDB.ObterUsuarioPorCodigo(tarefaAtual.CodUsuario);
-                    if (usuario != null)
-                    {
-                        Pct_Colaborador.Text = _usuarioDB.ObterInicialUsuario(usuario);
-                        Pct_Colaborador.BackColor = Color.LightBlue;
-                        Pct_Colaborador.Tag = tarefaAtual.CodUsuario;
-
-                        ToolTip tt = new ToolTip();
-                        tt.SetToolTip(Pct_Colaborador, $"Atribuído a: {usuario.NomeUsuario}");
-
-                        Pct_Colaborador.Visible = true;
-
-                        // Atualizar label de usuário atribuído
-                        if (lblUsuarioAtribuido != null)
-                        {
-                            lblUsuarioAtribuido.Text = usuario.NomeUsuario;
-                            lblUsuarioAtribuido.ForeColor = Color.Black;
-                        }
-                        return;
-                    }
+                    Lst_SugestoesResponsavel.Items.Add(usuario);
                 }
 
-                Pct_Colaborador.Visible = false;
-                if (lblUsuarioAtribuido != null)
-                {
-                    lblUsuarioAtribuido.Text = "Não atribuído";
-                    lblUsuarioAtribuido.ForeColor = Color.Gray;
-                }
+                Lst_SugestoesResponsavel.Visible = resultados.Any();
+
+                // Reposicionar a lista abaixo do TextBox
+                Lst_SugestoesResponsavel.Location = new Point(Txt_Responsavel.Left, Txt_Responsavel.Bottom + 2);
+                Lst_SugestoesResponsavel.Width = Txt_Responsavel.Width;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao carregar atribuição: {ex.Message}");
+                Console.WriteLine($"Erro ao buscar membros: {ex.Message}");
+                Lst_SugestoesResponsavel.Visible = false;
             }
         }
 
-        private void Btn_AtribuirUsuario_Click(object sender, EventArgs e)
+        private void Txt_Responsavel_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.SuppressKeyPress = true;
+
+                if (Lst_SugestoesResponsavel.Visible && Lst_SugestoesResponsavel.Items.Count > 0)
+                {
+                    // Se não tem item selecionado, seleciona o primeiro
+                    if (Lst_SugestoesResponsavel.SelectedItem == null)
+                        Lst_SugestoesResponsavel.SelectedIndex = 0;
+
+                    AdicionarResponsavel(Lst_SugestoesResponsavel.SelectedItem as Usuario);
+                }
+                else if (!string.IsNullOrWhiteSpace(Txt_Responsavel.Text))
+                {
+                    // Tentar encontrar usuário pelo texto digitado
+                    var membrosProjeto = _membrosDB.ObterMembrosProjeto(tarefaAtual.CodProjeto);
+                    var usuarioEncontrado = membrosProjeto
+                        .FirstOrDefault(u => (u.Nome?.Equals(Txt_Responsavel.Text.Trim(), StringComparison.OrdinalIgnoreCase) == true) ||
+                                           (u.NomeUsuario?.Equals(Txt_Responsavel.Text.Trim(), StringComparison.OrdinalIgnoreCase) == true) ||
+                                           (u.Email?.Equals(Txt_Responsavel.Text.Trim(), StringComparison.OrdinalIgnoreCase) == true));
+
+                    if (usuarioEncontrado != null && !responsaveisAdicionados.Any(r => r.Codigo == usuarioEncontrado.Codigo))
+                    {
+                        AdicionarResponsavel(usuarioEncontrado);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Usuário não encontrado ou já adicionado.", "Aviso",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
+            }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                Lst_SugestoesResponsavel.Visible = false;
+                Txt_Responsavel.Clear();
+            }
+            else if (e.KeyCode == Keys.Down && Lst_SugestoesResponsavel.Visible && Lst_SugestoesResponsavel.Items.Count > 0)
+            {
+                Lst_SugestoesResponsavel.Focus();
+                if (Lst_SugestoesResponsavel.SelectedIndex == -1)
+                    Lst_SugestoesResponsavel.SelectedIndex = 0;
+            }
+        }
+
+        private void Lst_SugestoesResponsavel_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter && Lst_SugestoesResponsavel.SelectedItem != null)
+            {
+                AdicionarResponsavel(Lst_SugestoesResponsavel.SelectedItem as Usuario);
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+            }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                Lst_SugestoesResponsavel.Visible = false;
+                Txt_Responsavel.Focus();
+                Txt_Responsavel.Clear();
+            }
+        }
+
+        private void Lst_SugestoesResponsavel_DoubleClick(object sender, EventArgs e)
+        {
+            if (Lst_SugestoesResponsavel.SelectedItem != null)
+            {
+                AdicionarResponsavel(Lst_SugestoesResponsavel.SelectedItem as Usuario);
+            }
+        }
+
+        private void Txt_Responsavel_Enter(object sender, EventArgs e)
+        {
+            // Garantir que a lista está posicionada corretamente
+            Lst_SugestoesResponsavel.Location = new Point(Txt_Responsavel.Left, Txt_Responsavel.Bottom + 2);
+            Lst_SugestoesResponsavel.Width = Txt_Responsavel.Width;
+        }
+
+        private void Txt_Responsavel_Leave(object sender, EventArgs e)
+        {
+            // Esconder a lista de sugestões quando o campo perde o foco (com delay para permitir clique na lista)
+            System.Threading.Tasks.Task.Delay(150).ContinueWith(t =>
+            {
+                if (this.IsHandleCreated && !Lst_SugestoesResponsavel.Focused)
+                {
+                    this.Invoke(new Action(() => Lst_SugestoesResponsavel.Visible = false));
+                }
+            });
+        }
+
+        private void AdicionarResponsavel(Usuario usuario)
+        {
+            if (usuario == null) return;
+
+            try
+            {
+                // Verificar se o usuário já foi adicionado
+                if (responsaveisAdicionados.Any(r => r.Codigo == usuario.Codigo))
+                {
+                    MessageBox.Show("Este usuário já foi adicionado como responsável.", "Aviso",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Adicionar à lista local
+                responsaveisAdicionados.Add(usuario);
+
+                // Atualizar interface
+                AtualizarFigurasResponsaveis();
+
+                // Atualizar no banco de dados
+                if (!_tarefasDB.AtribuirTarefaUsuario(tarefaAtual.Codigo, usuario.Codigo))
+                {
+                    MessageBox.Show($"Erro ao atribuir tarefa: {_tarefasDB.Mensagem}", "Erro",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // Reverter na interface em caso de erro
+                    responsaveisAdicionados.Remove(usuario);
+                    AtualizarFigurasResponsaveis();
+                    return;
+                }
+
+                // Atualizar a tarefa atual
+                tarefaAtual.CodUsuario = usuario.Codigo;
+
+                // Limpar campo de pesquisa
+                Txt_Responsavel.Clear();
+                Lst_SugestoesResponsavel.Visible = false;
+                Txt_Responsavel.Focus();
+
+                Console.WriteLine($"Usuário {usuario.Nome} adicionado como responsável da tarefa {tarefaAtual.Codigo}");
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao adicionar responsável: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void RemoverResponsavel(Usuario usuario)
         {
             try
             {
-                // Método simplificado para atribuir usuário - seleção por input box
-                string codUsuario = Microsoft.VisualBasic.Interaction.InputBox(
-                    "Digite o código do usuário para atribuir esta tarefa:",
-                    "Atribuir Tarefa",
-                    "");
-
-                if (!string.IsNullOrEmpty(codUsuario))
+                if (MessageBox.Show($"Deseja remover {usuario.Nome} como responsável?", "Confirmar",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                    // Verificar se o usuário existe
-                    var usuario = _usuarioDB.ObterUsuarioPorCodigo(codUsuario);
-                    if (usuario != null)
+                    // Remover da lista local
+                    responsaveisAdicionados.RemoveAll(r => r.Codigo == usuario.Codigo);
+
+                    // Atualizar interface
+                    AtualizarFigurasResponsaveis();
+
+                    // Se era o único responsável, limpar no banco
+                    if (responsaveisAdicionados.Count == 0)
                     {
-                        if (_tarefasDB.AtribuirTarefaUsuario(tarefaAtual.Codigo, codUsuario))
+                        if (!_tarefasDB.AtribuirTarefaUsuario(tarefaAtual.Codigo, null))
                         {
-                            tarefaAtual.CodUsuario = codUsuario;
-                            CarregarAtribuicao();
-                            MessageBox.Show($"Tarefa atribuída a {usuario.NomeUsuario} com sucesso!",
-                                "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            MessageBox.Show($"Erro ao remover responsável: {_tarefasDB.Mensagem}", "Erro",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                         else
                         {
-                            MessageBox.Show(_tarefasDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            tarefaAtual.CodUsuario = null;
                         }
                     }
                     else
                     {
-                        MessageBox.Show("Usuário não encontrado!", "Erro",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        // Se havia múltiplos responsáveis, manter o primeiro como principal
+                        var primeiroResponsavel = responsaveisAdicionados.First();
+                        if (!_tarefasDB.AtribuirTarefaUsuario(tarefaAtual.Codigo, primeiroResponsavel.Codigo))
+                        {
+                            MessageBox.Show($"Erro ao atualizar responsável principal: {_tarefasDB.Mensagem}", "Erro",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        else
+                        {
+                            tarefaAtual.CodUsuario = primeiroResponsavel.Codigo;
+                        }
                     }
+
+                    Console.WriteLine($"Usuário {usuario.Nome} removido como responsável da tarefa {tarefaAtual.Codigo}");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao atribuir usuário: {ex.Message}", "Erro",
+                MessageBox.Show($"Erro ao remover responsável: {ex.Message}", "Erro",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void Pct_Colaborador_Click(object sender, EventArgs e)
+        private void AtualizarFigurasResponsaveis()
+        {
+            Pnl_FigurasResponsaveis.Controls.Clear();
+
+            foreach (var responsavel in responsaveisAdicionados)
+            {
+                AdicionarFiguraResponsavel(responsavel);
+            }
+
+            // Mostrar mensagem se não houver responsáveis
+            if (!responsaveisAdicionados.Any())
+            {
+                var lblSemResponsaveis = new Label
+                {
+                    Text = "Nenhum responsável",
+                    Font = new Font("Segoe UI", 9, FontStyle.Italic),
+                    ForeColor = Color.Gray,
+                    AutoSize = true
+                };
+                Pnl_FigurasResponsaveis.Controls.Add(lblSemResponsaveis);
+            }
+        }
+
+        private void AdicionarFiguraResponsavel(Usuario usuario)
         {
             try
             {
-                if (string.IsNullOrEmpty(tarefaAtual.CodUsuario)) return;
-
-                var usuario = _usuarioDB.ObterUsuarioPorCodigo(tarefaAtual.CodUsuario);
-                if (usuario != null)
+                var panel = new Panel
                 {
-                    MessageBox.Show($"Usuário atribuído: {usuario.NomeUsuario}\nCódigo: {usuario.Codigo}",
-                        "Informações do Usuário", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
+                    Width = 45,
+                    Height = 60,
+                    Margin = new Padding(5),
+                    Tag = usuario
+                };
+
+                // Criar círculo com a inicial
+                var circulo = new Panel
+                {
+                    Width = 40,
+                    Height = 40,
+                    BackColor = ObterCorAleatoria(usuario.Codigo),
+                    Location = new Point(2, 0)
+                };
+
+                // Deixar o círculo redondo
+                GraphicsPath path = new GraphicsPath();
+                path.AddEllipse(0, 0, circulo.Width, circulo.Height);
+                circulo.Region = new Region(path);
+
+                // Label com a inicial
+                var lblInicial = new Label
+                {
+                    Text = ObterInicialUsuario(usuario.Nome),
+                    Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                    ForeColor = Color.White,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Dock = DockStyle.Fill,
+                    BackColor = Color.Transparent
+                };
+                circulo.Controls.Add(lblInicial);
+
+                // Label com o nome (abreviado)
+                var lblNome = new Label
+                {
+                    Text = AbreviarNome(usuario.Nome),
+                    Font = new Font("Segoe UI", 7),
+                    ForeColor = Color.Gray,
+                    TextAlign = ContentAlignment.TopCenter,
+                    Location = new Point(0, 42),
+                    Width = 45,
+                    Height = 15,
+                    AutoSize = false
+                };
+
+                // Botão de remover (X)
+                var btnRemover = new Button
+                {
+                    Text = "×",
+                    Size = new Size(16, 16),
+                    Location = new Point(27, -2),
+                    Tag = usuario,
+                    Font = new Font("Segoe UI", 8, FontStyle.Bold),
+                    ForeColor = Color.Red,
+                    BackColor = Color.White,
+                    FlatStyle = FlatStyle.Flat,
+                    Cursor = Cursors.Hand
+                };
+                btnRemover.FlatAppearance.BorderSize = 0;
+                btnRemover.FlatAppearance.MouseOverBackColor = Color.FromArgb(255, 200, 200);
+                btnRemover.Click += (s, e) => RemoverResponsavel(usuario);
+
+                panel.Controls.Add(circulo);
+                panel.Controls.Add(lblNome);
+                panel.Controls.Add(btnRemover);
+
+                // ToolTip com nome completo
+                var toolTip = new ToolTip();
+                toolTip.SetToolTip(panel, usuario.Nome);
+                toolTip.SetToolTip(circulo, usuario.Nome);
+                toolTip.SetToolTip(lblNome, usuario.Nome);
+
+                Pnl_FigurasResponsaveis.Controls.Add(panel);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao exibir informações do usuário: {ex.Message}", "Erro",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Console.WriteLine($"Erro ao criar figura do responsável: {ex.Message}");
             }
         }
+
+        private void CarregarResponsaveisExistentes()
+        {
+            try
+            {
+                responsaveisAdicionados.Clear();
+
+                // Carregar responsável atual da tarefa
+                if (!string.IsNullOrEmpty(tarefaAtual.CodUsuario))
+                {
+                    var usuarioResponsavel = _usuarioDB.ObterUsuarioPorCodigo(tarefaAtual.CodUsuario);
+                    if (usuarioResponsavel != null)
+                    {
+                        responsaveisAdicionados.Add(usuarioResponsavel);
+                    }
+                }
+
+                AtualizarFigurasResponsaveis();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao carregar responsáveis existentes: {ex.Message}");
+            }
+        }
+
+        // Métodos auxiliares para responsáveis
+        private string ObterInicialUsuario(string nome)
+        {
+            if (string.IsNullOrEmpty(nome)) return "?";
+            return nome.Substring(0, 1).ToUpper();
+        }
+
+        private string AbreviarNome(string nome)
+        {
+            if (string.IsNullOrEmpty(nome)) return "";
+
+            var partes = nome.Split(' ');
+            if (partes.Length == 1)
+                return nome.Length > 6 ? nome.Substring(0, 6) + "..." : nome;
+
+            return $"{partes[0]} {partes[1][0]}.";
+        }
+
+        private Color ObterCorAleatoria(string seed)
+        {
+            // Usar o código do usuário como seed para cor consistente
+            int hash = seed.GetHashCode();
+            Random rnd = new Random(hash);
+
+            Color[] cores = {
+                Color.FromArgb(74, 124, 255),   // Azul
+                Color.FromArgb(255, 87, 87),    // Vermelho
+                Color.FromArgb(50, 200, 100),   // Verde
+                Color.FromArgb(255, 160, 0),    // Laranja
+                Color.FromArgb(160, 90, 255),   // Roxo
+                Color.FromArgb(0, 200, 200),    // Ciano
+                Color.FromArgb(255, 100, 200)   // Rosa
+            };
+
+            return cores[Math.Abs(hash) % cores.Length];
+        }
+
+        // =========================================================================
+        // EVENTOS DO FORMULÁRIO
+        // =========================================================================
 
         private void Bin_FecharJanela_Click(object sender, EventArgs e)
         {
             this.Close();
         }
-
-        // =========================================================================
-        // NOVOS MÉTODOS AUXILIARES
-        // =========================================================================
 
         private void ValidarCamposData()
         {
@@ -884,10 +1198,6 @@ namespace CanvasApp.Forms
             ValidarCamposData();
         }
 
-        // =========================================================================
-        // EVENTOS DO FORMULÁRIO
-        // =========================================================================
-
         private void Frm_TarefasDetalhes_Load(object sender, EventArgs e)
         {
             // Configurar eventos adicionais
@@ -903,17 +1213,13 @@ namespace CanvasApp.Forms
         private void Frm_TarefasDetalhes_FormClosing(object sender, FormClosingEventArgs e)
         {
             // Limpar recursos se necessário
-            if (lblUsuarioAtribuido != null)
-            {
-                lblUsuarioAtribuido.Dispose();
-            }
-            if (btnAtribuirUsuario != null)
-            {
-                btnAtribuirUsuario.Dispose();
-            }
             if (btnAdicionarSubtarefa != null)
             {
                 btnAdicionarSubtarefa.Dispose();
+            }
+            if (Lst_SugestoesResponsavel != null)
+            {
+                Lst_SugestoesResponsavel.Dispose();
             }
         }
 

@@ -52,16 +52,15 @@
             this.Lbl_PrazoExtenso = new System.Windows.Forms.Label();
             this.Lbl_DefinirDataLembrete = new System.Windows.Forms.Label();
             this.Pnl_ChatComentarios = new System.Windows.Forms.Panel();
-            this.button1 = new System.Windows.Forms.Button();
             this.Lbl_TituloChat = new System.Windows.Forms.Label();
             this.Btn_EnviarComentario = new System.Windows.Forms.Button();
             this.Txt_NovoComentarioChat = new System.Windows.Forms.TextBox();
             this.Flw_ChatComentarios = new System.Windows.Forms.FlowLayoutPanel();
             this.Btn_FecharChat = new System.Windows.Forms.Button();
             this.Pnl_Responsaveis = new System.Windows.Forms.Panel();
-            this.Pnl_FigurasResponsaveis = new System.Windows.Forms.Panel();
             this.Txt_Responsavel = new System.Windows.Forms.TextBox();
             this.Lbl_Titulo5 = new System.Windows.Forms.Label();
+            this.Pnl_FigurasResponsaveis = new System.Windows.Forms.FlowLayoutPanel();
             this.Pnl_Cabecalho.SuspendLayout();
             this.Pnl_Conteudo.SuspendLayout();
             this.Pnl_Comentarios.SuspendLayout();
@@ -298,7 +297,6 @@
             // 
             this.Pnl_ChatComentarios.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.Pnl_ChatComentarios.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.Pnl_ChatComentarios.Controls.Add(this.button1);
             this.Pnl_ChatComentarios.Controls.Add(this.Lbl_TituloChat);
             this.Pnl_ChatComentarios.Controls.Add(this.Btn_EnviarComentario);
             this.Pnl_ChatComentarios.Controls.Add(this.Txt_NovoComentarioChat);
@@ -308,15 +306,6 @@
             this.Pnl_ChatComentarios.Name = "Pnl_ChatComentarios";
             this.Pnl_ChatComentarios.Size = new System.Drawing.Size(410, 550);
             this.Pnl_ChatComentarios.TabIndex = 2;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(0, 0);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 5;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
             // 
             // Lbl_TituloChat
             // 
@@ -370,15 +359,8 @@
             this.Pnl_Responsaveis.Controls.Add(this.Lbl_Titulo5);
             this.Pnl_Responsaveis.Location = new System.Drawing.Point(0, 531);
             this.Pnl_Responsaveis.Name = "Pnl_Responsaveis";
-            this.Pnl_Responsaveis.Size = new System.Drawing.Size(434, 106);
+            this.Pnl_Responsaveis.Size = new System.Drawing.Size(434, 139);
             this.Pnl_Responsaveis.TabIndex = 3;
-            // 
-            // Pnl_FigurasResponsaveis
-            // 
-            this.Pnl_FigurasResponsaveis.Location = new System.Drawing.Point(11, 57);
-            this.Pnl_FigurasResponsaveis.Name = "Pnl_FigurasResponsaveis";
-            this.Pnl_FigurasResponsaveis.Size = new System.Drawing.Size(401, 41);
-            this.Pnl_FigurasResponsaveis.TabIndex = 5;
             // 
             // Txt_Responsavel
             // 
@@ -398,11 +380,18 @@
             this.Lbl_Titulo5.TabIndex = 3;
             this.Lbl_Titulo5.Text = "Seção de Responsaveis";
             // 
+            // Pnl_FigurasResponsaveis
+            // 
+            this.Pnl_FigurasResponsaveis.Location = new System.Drawing.Point(10, 56);
+            this.Pnl_FigurasResponsaveis.Name = "Pnl_FigurasResponsaveis";
+            this.Pnl_FigurasResponsaveis.Size = new System.Drawing.Size(416, 73);
+            this.Pnl_FigurasResponsaveis.TabIndex = 5;
+            // 
             // Frm_TarefasDetalhes
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(434, 635);
+            this.ClientSize = new System.Drawing.Size(434, 672);
             this.Controls.Add(this.Pnl_ChatComentarios);
             this.Controls.Add(this.Pnl_Conteudo);
             this.Controls.Add(this.Pnl_Cabecalho);
@@ -460,10 +449,9 @@
         private System.Windows.Forms.Button Btn_FecharChat;
         private System.Windows.Forms.Label Lbl_TituloChat;
         private System.Windows.Forms.Panel Pnl_Responsaveis;
-        private System.Windows.Forms.Panel Pnl_FigurasResponsaveis;
         private System.Windows.Forms.TextBox Txt_Responsavel;
         private System.Windows.Forms.Label Lbl_Titulo5;
         private System.Windows.Forms.Button Btn_SalvarData;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.FlowLayoutPanel Pnl_FigurasResponsaveis;
     }
 }

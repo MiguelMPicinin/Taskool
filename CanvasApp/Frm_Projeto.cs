@@ -4,6 +4,7 @@ using CanvasApp.Forms;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
@@ -264,23 +265,16 @@ namespace CanvasApp
 
         private void ConfigurarMenuLateral()
         {
-            // Configurar largura reduzida (200px)
-            Pnl_MenuLateral1.Width = 200;
-
             // Configurar cores claras para o drawer
             Pnl_MenuLateral1.BackColor = Color.FromArgb(250, 250, 250);
             Pnl_MenuLateral1.BorderStyle = BorderStyle.FixedSingle;
             Pnl_MenuLateral1.AutoScroll = false;
 
             // Configurar PictureBox e Label do título fixos no topo
-            pictureBox1.Location = new Point(10, 10);
-            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.BackColor = Color.Transparent;
 
-            Lbl_TituloMenu.Location = new Point(40, 12);
             Lbl_TituloMenu.ForeColor = Color.FromArgb(64, 64, 64);
             Lbl_TituloMenu.Font = new Font("Segoe UI", 12, FontStyle.Bold);
-            Lbl_TituloMenu.AutoSize = true;
             Lbl_TituloMenu.Cursor = Cursors.Hand;
 
             // Configurar os controles existentes com cores escuras
@@ -301,13 +295,11 @@ namespace CanvasApp
             Flp_Projetos1.AutoSize = true;
             Flp_Projetos1.BackColor = Color.Transparent;
 
-            // Configurar botão Novo Projeto com cores claras - FIXO NO FINAL
+            // Configurar botão Novo Projeto com cores claras
             Pnl_NovoProjeto.BackColor = Color.FromArgb(230, 230, 230);
             Pnl_NovoProjeto.Cursor = Cursors.Hand;
             Pnl_NovoProjeto.Click += Pnl_NovoProjeto_Click;
             Pnl_NovoProjeto.BorderStyle = BorderStyle.FixedSingle;
-            Pnl_NovoProjeto.Dock = DockStyle.Bottom;
-            Pnl_NovoProjeto.Height = 50;
 
             // Configurar ícone e texto do botão Novo Projeto
             Lbl_Novo.ForeColor = Color.FromArgb(64, 64, 64);
@@ -315,40 +307,8 @@ namespace CanvasApp
             Lbl_Novo.Cursor = Cursors.Hand;
             Lbl_Novo.Click += Pnl_NovoProjeto_Click;
 
-            // Criar um painel de conteúdo para as categorias e projetos (abaixo do título)
-            Panel Pnl_Conteudo = new Panel();
-            Pnl_Conteudo.Location = new Point(0, 50);
-            Pnl_Conteudo.Size = new Size(Pnl_MenuLateral1.Width, Pnl_MenuLateral1.Height - 100);
-            Pnl_Conteudo.AutoScroll = true;
-            Pnl_Conteudo.BackColor = Color.Transparent;
-
-            // Reorganizar os controles dentro do painel de conteúdo
-            Lbl_Categorias1.Parent = Pnl_Conteudo;
-            Flp_Categorias1.Parent = Pnl_Conteudo;
-            Lbl_ProjetosMenu1.Parent = Pnl_Conteudo;
-            Flp_Projetos1.Parent = Pnl_Conteudo;
-
-            // Adicionar o painel de conteúdo ao menu lateral
-            Pnl_Conteudo.Parent = Pnl_MenuLateral1;
-
-            // Reposicionar os controles dentro do painel de conteúdo
-            Lbl_Categorias1.Location = new Point(10, 10);
-            Flp_Categorias1.Location = new Point(10, 40);
-            Lbl_ProjetosMenu1.Location = new Point(10, Flp_Categorias1.Bottom + 20);
-            Flp_Projetos1.Location = new Point(10, Lbl_ProjetosMenu1.Bottom + 10);
-
-            // Garantir que PictureBox e Lbl_TituloMenu estão no topo
-            pictureBox1.BringToFront();
-            Lbl_TituloMenu.BringToFront();
-
             // Carregar itens do menu
             CarregarMenuLateral();
-
-            // Ajustar layout responsivo
-            this.Resize += Frm_Projeto_Resize;
-
-            // Ajustar layout inicial
-            AjustarLayoutParaMenuLateral();
         }
 
         private void CarregarMenuLateral()
@@ -369,9 +329,6 @@ namespace CanvasApp
 
             // Carregar projetos do usuário
             CarregarProjetosMenu(usuarioId);
-
-            // Ajustar responsividade após carregar
-            AjustarMenuLateralResponsivo();
         }
 
         private void AdicionarCategoriaMenu(string nome, int quantidade)
@@ -518,65 +475,6 @@ namespace CanvasApp
         private void panelProjeto_MouseLeave(Panel panel, EventArgs e)
         {
             panel.BackColor = Color.Transparent;
-        }
-
-        private void Frm_Projeto_Resize(object sender, EventArgs e)
-        {
-            // Ajustar responsividade do menu lateral
-            AjustarMenuLateralResponsivo();
-
-            // Reposicionar o painel de notificações se estiver visível
-            if (notificacoesVisiveis)
-            {
-                Point posicao = Lbl_TituloMenu.PointToScreen(new Point(0, Lbl_TituloMenu.Height));
-                posicao = this.PointToClient(posicao);
-                Pnl_Notificacoes.Location = new Point(posicao.X, posicao.Y);
-            }
-
-            // Ajustar layout dos controles principais
-            AjustarLayoutParaMenuLateral();
-        }
-
-        private void AjustarMenuLateralResponsivo()
-        {
-            // Ajustar largura do menu lateral baseado no tamanho da tela
-            if (this.Width < 800)
-            {
-                Pnl_MenuLateral1.Width = 160;
-            }
-            else if (this.Width < 1200)
-            {
-                Pnl_MenuLateral1.Width = 180;
-            }
-            else
-            {
-                Pnl_MenuLateral1.Width = 200;
-            }
-
-            // Ajustar a largura dos painéis internos
-            foreach (Control control in Flp_Categorias1.Controls)
-            {
-                if (control is Panel panel)
-                {
-                    panel.Width = Flp_Categorias1.Width - 20;
-                    if (panel.Controls.Count >= 2)
-                    {
-                        panel.Controls[1].Left = panel.Width - 30;
-                    }
-                }
-            }
-
-            foreach (Control control in Flp_Projetos1.Controls)
-            {
-                if (control is Panel panel)
-                {
-                    panel.Width = Flp_Projetos1.Width - 20;
-                    if (panel.Controls.Count >= 2)
-                    {
-                        panel.Controls[1].Left = panel.Width - 30;
-                    }
-                }
-            }
         }
 
         private void Pnl_NovoProjeto_Click(object sender, EventArgs e)
@@ -867,8 +765,6 @@ namespace CanvasApp
 
         private void InicializarComponentesDaInterface()
         {
-            AjustarLayoutParaMenuLateral();
-
             Lst_ListaTarefas.AutoScroll = true;
             Lbl_Triste.Text = "Nenhuma tarefa criada";
 
@@ -877,78 +773,13 @@ namespace CanvasApp
 
             // Configurar título do grupo de status
             Grp_Status.Text = "Status do Projeto";
-            Lbl_Status.Text = "Progresso do Projeto";
-            Lbl_Status.Font = new Font("Segoe UI", 10, FontStyle.Bold);
-            Lbl_Status.ForeColor = Color.FromArgb(64, 64, 64);
-
-            Lbl_Pendentes.Text = "Colaboradores com Tarefas Pendentes";
-            Lbl_Concluidas.Text = "Colaboradores com Todas Tarefas Concluídas";
-
-            Lbl_Pendentes.Font = new Font("Segoe UI", 8, FontStyle.Bold);
-            Lbl_Concluidas.Font = new Font("Segoe UI", 8, FontStyle.Bold);
-
-            // Configurar flow layouts
-            Flw_Pendentes.FlowDirection = FlowDirection.LeftToRight;
-            Flw_Pendentes.WrapContents = true;
-            Flw_Concluidos.FlowDirection = FlowDirection.LeftToRight;
-            Flw_Concluidos.WrapContents = true;
 
             // REMOVA estas linhas se os eventos já estiverem configurados no designer
             Txt_Tarefa.Enter += Txt_Tarefa_Enter;
             Txt_Tarefa.Leave += Txt_Tarefa_Leave;
             Txt_Tarefa.KeyDown += Txt_Tarefa_KeyDown;
 
-            CentralizarMensagemDeVazio();
             AtualizarInterface();
-        }
-
-        private void AjustarLayoutParaMenuLateral()
-        {
-            int menuWidth = Pnl_MenuLateral1.Width;
-            int margin = 10;
-
-            // Posicionar título
-            Lbl_Titulo.Left = menuWidth + margin;
-            Lbl_Titulo.Width = this.Width - menuWidth - (margin * 2);
-
-            // Posicionar campo de texto para nova tarefa
-            Txt_Tarefa.Left = menuWidth + margin;
-            Txt_Tarefa.Width = this.Width - menuWidth - (margin * 2) - 40;
-
-            // Posicionar ícone de adicionar
-            Pic_IconPlus.Left = Txt_Tarefa.Right + 5;
-
-            // Posicionar lista de tarefas
-            Lst_ListaTarefas.Left = menuWidth + margin;
-            Lst_ListaTarefas.Width = this.Width - menuWidth - (margin * 2);
-
-            // Aumentar altura da lista para acomodar itens maiores
-            int alturaDisponivel = this.Height - Lst_ListaTarefas.Top - 220;
-            Lst_ListaTarefas.Height = Math.Max(alturaDisponivel, 120);
-
-            // Posicionar Grp_Status à direita do drawer e abaixo da lista de tarefas
-            Grp_Status.Left = menuWidth + margin;
-            Grp_Status.Top = Lst_ListaTarefas.Bottom + 10;
-            Grp_Status.Width = Lst_ListaTarefas.Width;
-            Grp_Status.Height = 180;
-
-            // Ajustar posição do link de tarefas concluídas
-            Lnk_TarefasConcluidas.Left = menuWidth + margin;
-            Lnk_TarefasConcluidas.Top = Lst_ListaTarefas.Bottom - 25;
-
-            CentralizarMensagemDeVazio();
-        }
-
-        private void CentralizarMensagemDeVazio()
-        {
-            int menuWidth = Pnl_MenuLateral1.Width;
-            int centerX = menuWidth + (this.Width - menuWidth) / 2;
-
-            Lbl_Triste.Left = centerX - (Lbl_Triste.Width / 2);
-            Lbl_Triste.Top = (this.ClientSize.Height / 2) - Lbl_Triste.Height - (Pic_Tristesa.Height / 2) - 10;
-
-            Pic_Tristesa.Left = centerX - (Pic_Tristesa.Width / 2);
-            Pic_Tristesa.Top = (this.ClientSize.Height / 2) - (Pic_Tristesa.Height / 2);
         }
 
         private void AtualizarInterface()
@@ -967,7 +798,6 @@ namespace CanvasApp
                 Pic_Tristesa.Visible = true;
                 Lst_ListaTarefas.Visible = false;
                 Grp_Status.Visible = false;
-                CentralizarMensagemDeVazio();
             }
             else
             {
@@ -994,22 +824,25 @@ namespace CanvasApp
                     AtualizarStatusGrafico();
                 }
             }
-
-            // Reajustar o layout após atualizar a interface
-            AjustarLayoutParaMenuLateral();
         }
 
         private void AtualizarStatusGrafico()
         {
+            // Usar os controles existentes do designer
+            Lbl_Status.Visible = true;
+            Lbl_Pendentes.Visible = true;
+            Lbl_Concluidas.Visible = true;
+            Flw_Pendentes.Visible = true;
+            Flw_Concluidos.Visible = true;
+
+            // Limpar os flow layouts existentes
             Flw_Pendentes.Controls.Clear();
             Flw_Concluidos.Controls.Clear();
-
-            Lbl_Pendentes.Visible = false;
-            Lbl_Concluidas.Visible = false;
 
             Chrt_Tarefas.Series.Clear();
             var totalTarefas = tarefasPendentes.Count + tarefasConcluidas.Count;
 
+            // Configurar o gráfico
             if (totalTarefas > 0)
             {
                 Series seriePizza = new Series("StatusTarefas") { ChartType = SeriesChartType.Pie };
@@ -1017,194 +850,130 @@ namespace CanvasApp
                 if (tarefasPendentes.Count > 0)
                 {
                     var pontoPendente = seriePizza.Points.Add(tarefasPendentes.Count);
-                    pontoPendente.Color = Color.BlueViolet;
+                    pontoPendente.Color = Color.FromArgb(74, 124, 255);
                     pontoPendente.LegendText = "Pendentes";
+                    pontoPendente.Label = $"{tarefasPendentes.Count}";
                 }
 
                 if (tarefasConcluidas.Count > 0)
                 {
                     var pontoConcluido = seriePizza.Points.Add(tarefasConcluidas.Count);
-                    pontoConcluido.Color = Color.Goldenrod;
+                    pontoConcluido.Color = Color.FromArgb(50, 200, 100);
                     pontoConcluido.LegendText = "Concluídas";
+                    pontoConcluido.Label = $"{tarefasConcluidas.Count}";
                 }
 
                 Chrt_Tarefas.Series.Add(seriePizza);
 
+                // Configurações do gráfico
                 Chrt_Tarefas.Titles.Clear();
-                Chrt_Tarefas.Titles.Add("Status das Tarefas").Font = new Font("Segoe UI", 8, FontStyle.Bold);
-
-                double porcentagem = totalTarefas > 0 ? (double)tarefasConcluidas.Count / totalTarefas : 0;
-                Title titlePorcentagem = new Title("Percentagem")
-                {
-                    Text = $"{porcentagem:P0}",
-                    Docking = Docking.Bottom,
-                    Alignment = ContentAlignment.MiddleCenter,
-                    Font = new Font("Segoe UI", 12, FontStyle.Bold),
-                    IsDockedInsideChartArea = true
-                };
-                Chrt_Tarefas.Titles.Add(titlePorcentagem);
-
                 Chrt_Tarefas.Legends.Clear();
 
-                // Adicionar legenda personalizada
-                Legend legend = new Legend();
-                legend.Docking = Docking.Right;
-                legend.Alignment = StringAlignment.Center;
-                legend.Font = new Font("Segoe UI", 8);
-                Chrt_Tarefas.Legends.Add(legend);
+                seriePizza.IsValueShownAsLabel = true;
+                seriePizza.Font = new Font("Segoe UI", 8, FontStyle.Bold);
+                seriePizza.LabelForeColor = Color.White;
 
-                seriePizza.IsValueShownAsLabel = false;
-                Chrt_Tarefas.ChartAreas[0].Area3DStyle.Enable3D = false;
-
-                Chrt_Tarefas.ChartAreas[0].InnerPlotPosition.X = 10;
-                Chrt_Tarefas.ChartAreas[0].InnerPlotPosition.Y = 10;
-                Chrt_Tarefas.ChartAreas[0].InnerPlotPosition.Width = 80;
-                Chrt_Tarefas.ChartAreas[0].InnerPlotPosition.Height = 80;
+                Chrt_Tarefas.ChartAreas[0].Area3DStyle.Enable3D = true;
             }
             else
             {
                 Chrt_Tarefas.Series.Clear();
-                Chrt_Tarefas.Titles.Clear();
-                Chrt_Tarefas.Titles.Add("Nenhuma tarefa para exibir.").Font = new Font("Segoe UI", 10, FontStyle.Italic);
             }
 
+            // Preencher os colaboradores
             if (projetoSelecionado != null)
             {
                 var colaboradores = dbMembros.ObterMembrosProjeto(projetoSelecionado.Codigo);
                 if (colaboradores.Any())
                 {
-                    Lbl_Pendentes.Visible = true;
-                    Lbl_Concluidas.Visible = true;
-
-                    // Lista de cores únicas para colaboradores
+                    // Lista de cores
                     List<Color> coresDisponiveis = new List<Color>
                     {
-                        Color.BlueViolet, Color.Goldenrod, Color.Crimson, Color.DarkCyan,
-                        Color.DarkOrange, Color.DodgerBlue, Color.ForestGreen, Color.Indigo,
-                        Color.Teal, Color.Tomato, Color.SlateBlue, Color.Chocolate,
-                        Color.DarkMagenta, Color.SeaGreen, Color.OrangeRed
+                        Color.FromArgb(74, 124, 255),
+                        Color.FromArgb(255, 87, 87),
+                        Color.FromArgb(50, 200, 100),
+                        Color.FromArgb(255, 160, 0),
+                        Color.FromArgb(160, 90, 255),
+                        Color.FromArgb(0, 200, 200),
+                        Color.FromArgb(255, 100, 200),
+                        Color.FromArgb(139, 69, 19)
                     };
 
-                    Dictionary<string, Color> coresUsadasPendentes = new Dictionary<string, Color>();
-                    Dictionary<string, Color> coresUsadasConcluidos = new Dictionary<string, Color>();
-                    int indexCor = 0;
+                    int corIndex = 0;
 
                     foreach (var colab in colaboradores)
                     {
-                        // Verificar se colaborador tem tarefas pendentes
+                        // Verificar status do colaborador
                         bool temTarefasPendentes = tarefasPendentes.Any(t => t.CodUsuario == colab.Codigo);
                         bool temTarefasConcluidas = tarefasConcluidas.Any(t => t.CodUsuario == colab.Codigo);
-
-                        // Só vai para concluídos se NÃO tiver tarefas pendentes
                         bool vaiParaConcluidos = !temTarefasPendentes && temTarefasConcluidas;
 
-                        Color corColaborador;
+                        Color corColaborador = coresDisponiveis[corIndex % coresDisponiveis.Count];
+                        corIndex++;
+
+                        // Criar círculo do colaborador
+                        var circuloColab = CriarCirculoColaborador(colab.Nome, corColaborador);
 
                         if (vaiParaConcluidos)
                         {
-                            // Atribuir cor única para concluídos
-                            if (!coresUsadasConcluidos.ContainsKey(colab.Nome))
-                            {
-                                corColaborador = coresDisponiveis[indexCor % coresDisponiveis.Count];
-                                coresUsadasConcluidos[colab.Nome] = corColaborador;
-                                indexCor++;
-                            }
-                            else
-                            {
-                                corColaborador = coresUsadasConcluidos[colab.Nome];
-                            }
-
-                            var lblColabConc = CriarLabelColaborador(colab.Nome, corColaborador);
-                            Flw_Concluidos.Controls.Add(lblColabConc);
+                            Flw_Concluidos.Controls.Add(circuloColab);
                         }
                         else if (temTarefasPendentes)
                         {
-                            // Atribuir cor única para pendentes
-                            if (!coresUsadasPendentes.ContainsKey(colab.Nome))
-                            {
-                                corColaborador = coresDisponiveis[indexCor % coresDisponiveis.Count];
-                                coresUsadasPendentes[colab.Nome] = corColaborador;
-                                indexCor++;
-                            }
-                            else
-                            {
-                                corColaborador = coresUsadasPendentes[colab.Nome];
-                            }
-
-                            var lblColabPend = CriarLabelColaborador(colab.Nome, corColaborador);
-                            Flw_Pendentes.Controls.Add(lblColabPend);
+                            Flw_Pendentes.Controls.Add(circuloColab);
                         }
-                    }
-
-                    // Adicionar labels informativas se os flow layouts estiverem vazios
-                    if (Flw_Pendentes.Controls.Count == 0)
-                    {
-                        Label lblSemPendentes = new Label
-                        {
-                            Text = "Nenhum colaborador com tarefas pendentes",
-                            Font = new Font("Segoe UI", 8, FontStyle.Italic),
-                            ForeColor = Color.Gray,
-                            AutoSize = true
-                        };
-                        Flw_Pendentes.Controls.Add(lblSemPendentes);
-                    }
-
-                    if (Flw_Concluidos.Controls.Count == 0)
-                    {
-                        Label lblSemConcluidos = new Label
-                        {
-                            Text = "Nenhum colaborador concluiu todas as tarefas",
-                            Font = new Font("Segoe UI", 8, FontStyle.Italic),
-                            ForeColor = Color.Gray,
-                            AutoSize = true
-                        };
-                        Flw_Concluidos.Controls.Add(lblSemConcluidos);
                     }
                 }
                 else
                 {
-                    // Caso não haja colaboradores no projeto
-                    Label lblSemColaboradores = new Label
-                    {
-                        Text = "Nenhum colaborador no projeto",
-                        Font = new Font("Segoe UI", 8, FontStyle.Italic),
-                        ForeColor = Color.Gray,
-                        AutoSize = true
-                    };
-
-                    Panel panelInfo = new Panel();
-                    panelInfo.Controls.Add(lblSemColaboradores);
-                    panelInfo.Dock = DockStyle.Fill;
-
-                    // Adicionar em ambos os flow layouts
-                    Flw_Pendentes.Controls.Add(panelInfo);
-                    Flw_Concluidos.Controls.Add(new Panel()); // Panel vazio para manter layout
+                    // Caso não haja colaboradores
+                    Label lblSemColaboradores = new Label();
+                    lblSemColaboradores.Text = "Nenhum colaborador";
+                    lblSemColaboradores.Font = new Font("Segoe UI", 8, FontStyle.Italic);
+                    lblSemColaboradores.ForeColor = Color.Gray;
+                    lblSemColaboradores.AutoSize = true;
+                    Flw_Pendentes.Controls.Add(lblSemColaboradores);
                 }
             }
         }
 
-        private Label CriarLabelColaborador(string nome, Color cor)
+        // Método auxiliar para criar círculo de colaborador
+        private Panel CriarCirculoColaborador(string nome, Color cor)
         {
-            var lblColab = new Label
+            var panelCirculo = new Panel
             {
-                Text = nome[0].ToString().ToUpper(),
                 Width = 25,
                 Height = 25,
                 BackColor = cor,
+                Margin = new Padding(2)
+            };
+
+            // Tornar o painel circular
+            GraphicsPath path = new GraphicsPath();
+            path.AddEllipse(0, 0, panelCirculo.Width, panelCirculo.Height);
+            panelCirculo.Region = new Region(path);
+
+            // Label com a inicial
+            var lblInicial = new Label
+            {
+                Text = ObterInicialUsuario(nome),
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
                 ForeColor = Color.White,
                 TextAlign = ContentAlignment.MiddleCenter,
-                Margin = new Padding(3),
-                Font = new Font("Segoe UI", 9, FontStyle.Bold)
+                Dock = DockStyle.Fill,
+                BackColor = Color.Transparent
             };
 
             // Tooltip com nome completo
-            ToolTip toolTip = new ToolTip();
-            toolTip.SetToolTip(lblColab, nome);
+            var toolTip = new ToolTip();
+            toolTip.SetToolTip(panelCirculo, nome);
+            toolTip.SetToolTip(lblInicial, nome);
             toolTip.AutoPopDelay = 5000;
             toolTip.InitialDelay = 500;
             toolTip.ReshowDelay = 500;
 
-            return lblColab;
+            panelCirculo.Controls.Add(lblInicial);
+            return panelCirculo;
         }
 
         private void AdicionarNovaTarefa()
@@ -1292,45 +1061,13 @@ namespace CanvasApp
                 {
                     Text = tarefa.Descricao,
                     AutoSize = false,
-                    Width = panel.Width - 80,
+                    Width = panel.Width - 150,
                     Height = 20,
                     Location = new Point(40, 13),
                     Font = new Font("Segoe UI", 9, FontStyle.Regular),
                     TextAlign = ContentAlignment.MiddleLeft,
                     Cursor = Cursors.Hand
                 };
-
-                // Adicionar label para mostrar a data do alarme
-                try
-                {
-                    var alarme = dbAlarme.ObterAlarmePorTarefa(tarefa.Codigo);
-                    if (alarme != null)
-                    {
-                        Console.WriteLine($"Alarme encontrado para tarefa {tarefa.Codigo}: {alarme.Data:dd/MM/yyyy} {alarme.Hora:HH:mm}");
-
-                        var labelDataAlarme = new Label
-                        {
-                            Text = $"Alarme: {alarme.Data:dd/MM/yyyy} às {alarme.Hora:HH:mm}",
-                            AutoSize = true,
-                            Location = new Point(40, 35),
-                            Font = new Font("Segoe UI", 8, FontStyle.Italic),
-                            ForeColor = Color.Gray,
-                            Cursor = Cursors.Hand
-                        };
-                        panel.Controls.Add(labelDataAlarme);
-
-                        // Evento de clique na data do alarme
-                        labelDataAlarme.Click += (sender, e) => AbrirDetalhesTarefa(tarefa);
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Nenhum alarme encontrado para tarefa {tarefa.Codigo}");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Erro ao carregar alarme da tarefa {tarefa.Codigo}: {ex.Message}");
-                }
 
                 if (isConcluida)
                 {
@@ -1340,13 +1077,14 @@ namespace CanvasApp
 
                 panel.Controls.Add(labelDescricao);
 
+                // --- PRIMEIRO: ÍCONE DE FAVORITO ---
                 bool estaFavoritado = dbFavoritos.EhFavorito(usuarioLogadoId, tarefa.Codigo);
 
                 var picEstrela = new PictureBox
                 {
                     Width = 20,
                     Height = 20,
-                    Location = new Point(panel.Width - 35, 12),
+                    Location = new Point(panel.Width - 30, 15),
                     SizeMode = PictureBoxSizeMode.StretchImage,
                     Cursor = Cursors.Hand,
                     Tag = new { EstaFavoritado = estaFavoritado, Tarefa = tarefa }
@@ -1384,11 +1122,81 @@ namespace CanvasApp
 
                 panel.Controls.Add(picEstrela);
 
-                // Adicionar evento de clique para abrir os detalhes da tarefa
+                // --- SEGUNDO: RESPONSÁVEIS (à esquerda do favorito) ---
+                int posicaoResponsaveis = panel.Width - 60;
+
+                try
+                {
+                    // Obter responsáveis da tarefa
+                    var responsaveis = new List<Usuario>();
+
+                    // Se a tarefa tem um usuário atribuído, adicionar como responsável
+                    if (!string.IsNullOrEmpty(tarefa.CodUsuario))
+                    {
+                        var usuarioResponsavel = dbUsuario.ObterUsuarioPorCodigo(tarefa.CodUsuario);
+                        if (usuarioResponsavel != null)
+                        {
+                            responsaveis.Add(usuarioResponsavel);
+                        }
+                    }
+
+                    // Adicionar círculos dos responsáveis DA DIREITA PARA ESQUERDA
+                    if (responsaveis.Any())
+                    {
+                        // Ordenar para consistência na exibição
+                        foreach (var responsavel in responsaveis.OrderBy(r => r.Nome))
+                        {
+                            var circuloResponsavel = CriarCirculoResponsavel(responsavel);
+                            circuloResponsavel.Location = new Point(posicaoResponsaveis, 15);
+                            panel.Controls.Add(circuloResponsavel);
+
+                            // Mover para a esquerda para o próximo responsável
+                            posicaoResponsaveis -= 30;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Erro ao carregar responsáveis da tarefa: {ex.Message}");
+                }
+
+                // --- DATA DO ALARME (se houver) ---
+                try
+                {
+                    var alarme = dbAlarme.ObterAlarmePorTarefa(tarefa.Codigo);
+                    if (alarme != null)
+                    {
+                        Console.WriteLine($"Alarme encontrado para tarefa {tarefa.Codigo}: {alarme.Data:dd/MM/yyyy} {alarme.Hora:HH:mm}");
+
+                        var labelDataAlarme = new Label
+                        {
+                            Text = $"Alarme: {alarme.Data:dd/MM/yyyy} às {alarme.Hora:HH:mm}",
+                            AutoSize = true,
+                            Location = new Point(40, 35),
+                            Font = new Font("Segoe UI", 8, FontStyle.Italic),
+                            ForeColor = Color.Gray,
+                            Cursor = Cursors.Hand
+                        };
+                        panel.Controls.Add(labelDataAlarme);
+
+                        // Evento de clique na data do alarme
+                        labelDataAlarme.Click += (sender, e) => AbrirDetalhesTarefa(tarefa);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Nenhum alarme encontrado para tarefa {tarefa.Codigo}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Erro ao carregar alarme da tarefa {tarefa.Codigo}: {ex.Message}");
+                }
+
+                // --- EVENTOS DE CLIQUE ---
                 panel.Click += (sender, e) => AbrirDetalhesTarefa(tarefa);
                 labelDescricao.Click += (sender, e) => AbrirDetalhesTarefa(tarefa);
 
-                // Adicionar evento de duplo clique para abrir os detalhes
+                // --- EVENTOS DE DUPLO CLIQUE ---
                 panel.DoubleClick += (sender, e) => AbrirDetalhesTarefa(tarefa);
                 labelDescricao.DoubleClick += (sender, e) => AbrirDetalhesTarefa(tarefa);
 
@@ -1399,6 +1207,72 @@ namespace CanvasApp
                 Console.WriteLine($"Erro ao criar item de tarefa: {ex.Message}");
                 return new Panel { Width = Lst_ListaTarefas.Width - 25, Height = 60 };
             }
+        }
+
+        // --- MÉTODO AUXILIAR PARA CRIAR CÍRCULO DO RESPONSÁVEL ---
+        private Panel CriarCirculoResponsavel(Usuario usuario)
+        {
+            var panelCirculo = new Panel
+            {
+                Width = 25,
+                Height = 25,
+                BackColor = ObterCorAleatoriaResponsavel(usuario.Codigo)
+            };
+
+            // Tornar o painel circular
+            GraphicsPath path = new GraphicsPath();
+            path.AddEllipse(0, 0, panelCirculo.Width, panelCirculo.Height);
+            panelCirculo.Region = new Region(path);
+
+            // Label com a inicial
+            var lblInicial = new Label
+            {
+                Text = ObterInicialUsuario(usuario.Nome),
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                ForeColor = Color.White,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Dock = DockStyle.Fill,
+                BackColor = Color.Transparent,
+                Cursor = Cursors.Hand
+            };
+
+            // Tooltip com nome completo
+            var toolTip = new ToolTip();
+            toolTip.SetToolTip(panelCirculo, usuario.Nome);
+            toolTip.SetToolTip(lblInicial, usuario.Nome);
+
+            panelCirculo.Controls.Add(lblInicial);
+
+            return panelCirculo;
+        }
+
+        // --- MÉTODOS AUXILIARES PARA CORES E INICIAIS ---
+        private string ObterInicialUsuario(string nome)
+        {
+            if (string.IsNullOrEmpty(nome)) return "?";
+            return nome.Substring(0, 1).ToUpper();
+        }
+
+        private Color ObterCorAleatoriaResponsavel(string seed)
+        {
+            // Usar o código do usuário como seed para cor consistente
+            int hash = seed.GetHashCode();
+            Random rnd = new Random(hash);
+
+            Color[] cores = {
+                Color.FromArgb(74, 124, 255),
+                Color.FromArgb(255, 87, 87),
+                Color.FromArgb(50, 200, 100),
+                Color.FromArgb(255, 160, 0),
+                Color.FromArgb(160, 90, 255),
+                Color.FromArgb(0, 200, 200),
+                Color.FromArgb(255, 100, 200),
+                Color.FromArgb(100, 100, 100),
+                Color.FromArgb(139, 69, 19),
+                Color.FromArgb(75, 0, 130)
+            };
+
+            return cores[Math.Abs(hash) % cores.Length];
         }
 
         private void AbrirDetalhesTarefa(Projeto_Tarefas tarefa)
@@ -1463,6 +1337,11 @@ namespace CanvasApp
         private void Pic_IconPlus_Click(object sender, EventArgs e)
         {
             AdicionarNovaTarefa();
+        }
+
+        private void Lbl_Pendentes_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
