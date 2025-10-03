@@ -57,17 +57,12 @@
             this.Txt_NovoComentarioChat = new System.Windows.Forms.TextBox();
             this.Flw_ChatComentarios = new System.Windows.Forms.FlowLayoutPanel();
             this.Btn_FecharChat = new System.Windows.Forms.Button();
-            this.Pnl_Responsaveis = new System.Windows.Forms.Panel();
-            this.Txt_Responsavel = new System.Windows.Forms.TextBox();
-            this.Lbl_Titulo5 = new System.Windows.Forms.Label();
-            this.Pnl_FigurasResponsaveis = new System.Windows.Forms.FlowLayoutPanel();
             this.Pnl_Cabecalho.SuspendLayout();
             this.Pnl_Conteudo.SuspendLayout();
             this.Pnl_Comentarios.SuspendLayout();
             this.Pnl_Subtarefas.SuspendLayout();
             this.Pnl_Prazo.SuspendLayout();
             this.Pnl_ChatComentarios.SuspendLayout();
-            this.Pnl_Responsaveis.SuspendLayout();
             this.SuspendLayout();
             // 
             // Pnl_Cabecalho
@@ -352,50 +347,14 @@
             this.Btn_FecharChat.Text = "✕";
             this.Btn_FecharChat.UseVisualStyleBackColor = true;
             // 
-            // Pnl_Responsaveis
-            // 
-            this.Pnl_Responsaveis.Controls.Add(this.Pnl_FigurasResponsaveis);
-            this.Pnl_Responsaveis.Controls.Add(this.Txt_Responsavel);
-            this.Pnl_Responsaveis.Controls.Add(this.Lbl_Titulo5);
-            this.Pnl_Responsaveis.Location = new System.Drawing.Point(0, 531);
-            this.Pnl_Responsaveis.Name = "Pnl_Responsaveis";
-            this.Pnl_Responsaveis.Size = new System.Drawing.Size(434, 139);
-            this.Pnl_Responsaveis.TabIndex = 3;
-            // 
-            // Txt_Responsavel
-            // 
-            this.Txt_Responsavel.Location = new System.Drawing.Point(7, 30);
-            this.Txt_Responsavel.Name = "Txt_Responsavel";
-            this.Txt_Responsavel.Size = new System.Drawing.Size(406, 20);
-            this.Txt_Responsavel.TabIndex = 4;
-            this.Txt_Responsavel.Text = "Adicione um Responsavel";
-            // 
-            // Lbl_Titulo5
-            // 
-            this.Lbl_Titulo5.AutoSize = true;
-            this.Lbl_Titulo5.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Lbl_Titulo5.Location = new System.Drawing.Point(3, 3);
-            this.Lbl_Titulo5.Name = "Lbl_Titulo5";
-            this.Lbl_Titulo5.Size = new System.Drawing.Size(214, 24);
-            this.Lbl_Titulo5.TabIndex = 3;
-            this.Lbl_Titulo5.Text = "Seção de Responsaveis";
-            // 
-            // Pnl_FigurasResponsaveis
-            // 
-            this.Pnl_FigurasResponsaveis.Location = new System.Drawing.Point(10, 56);
-            this.Pnl_FigurasResponsaveis.Name = "Pnl_FigurasResponsaveis";
-            this.Pnl_FigurasResponsaveis.Size = new System.Drawing.Size(416, 73);
-            this.Pnl_FigurasResponsaveis.TabIndex = 5;
-            // 
             // Frm_TarefasDetalhes
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(434, 672);
+            this.ClientSize = new System.Drawing.Size(434, 624);
             this.Controls.Add(this.Pnl_ChatComentarios);
             this.Controls.Add(this.Pnl_Conteudo);
             this.Controls.Add(this.Pnl_Cabecalho);
-            this.Controls.Add(this.Pnl_Responsaveis);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "Frm_TarefasDetalhes";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
@@ -412,8 +371,6 @@
             this.Pnl_Prazo.PerformLayout();
             this.Pnl_ChatComentarios.ResumeLayout(false);
             this.Pnl_ChatComentarios.PerformLayout();
-            this.Pnl_Responsaveis.ResumeLayout(false);
-            this.Pnl_Responsaveis.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -448,10 +405,6 @@
         private System.Windows.Forms.FlowLayoutPanel Flw_ChatComentarios;
         private System.Windows.Forms.Button Btn_FecharChat;
         private System.Windows.Forms.Label Lbl_TituloChat;
-        private System.Windows.Forms.Panel Pnl_Responsaveis;
-        private System.Windows.Forms.TextBox Txt_Responsavel;
-        private System.Windows.Forms.Label Lbl_Titulo5;
         private System.Windows.Forms.Button Btn_SalvarData;
-        private System.Windows.Forms.FlowLayoutPanel Pnl_FigurasResponsaveis;
     }
 }

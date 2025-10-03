@@ -581,6 +581,46 @@ namespace CanvasApp.Classes.Databases
                 return false;
             }
         }
+        public List<Projeto_Tarefas> ObterTarefasPorUsuario(int usuarioId)
+        {
+            List<Projeto_Tarefas> tarefas = new List<Projeto_Tarefas>();
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                SELECT PT.Codigo, PT.Descricao, PT.isConcluida, PT.CodProjeto, PT.CodUsuario
+                FROM Projeto_Tarefas PT
+                INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                WHERE PM.CodMembro = @usuarioId
+                ORDER BY PT.Codigo DESC";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                tarefas.Add(new Projeto_Tarefas
+                                {
+                                    Codigo = Convert.ToInt32(reader["Codigo"]),
+                                    Descricao = reader["Descricao"].ToString(),
+                                    isConcluida = Convert.ToBoolean(reader["isConcluida"]),
+                                    CodProjeto = Convert.ToInt32(reader["CodProjeto"]),
+                                    CodUsuario = reader["CodUsuario"]?.ToString()
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao buscar tarefas do usuário: " + ex.Message;
+            }
+            return tarefas;
+        }
 
         public bool CriarTarefaCompartilhada(Projeto_Tarefas tarefa, int usuarioCriador)
         {
@@ -789,5 +829,8 @@ namespace CanvasApp.Classes.Databases
                 return false;
             }
         }
+
+
+
     }
 }

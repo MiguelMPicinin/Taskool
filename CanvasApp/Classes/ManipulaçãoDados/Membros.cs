@@ -18,6 +18,40 @@ namespace CanvasApp.Classes.Databases
             _usuarioDB = usuarioDB;
         }
 
+        // MÉTODO ADICIONADO: RemoverMembroProjeto
+        public bool RemoverMembroProjeto(int codProjeto, string codUsuario)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = "DELETE FROM Projeto_Membros WHERE CodProjeto = @CodProjeto AND CodMembro = @CodMembro";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@CodProjeto", codProjeto);
+                        cmd.Parameters.AddWithValue("@CodMembro", codUsuario);
+                        int rowsAffected = cmd.ExecuteNonQuery();
+
+                        if (rowsAffected > 0)
+                        {
+                            Mensagem = "Membro removido com sucesso!";
+                            return true;
+                        }
+                        else
+                        {
+                            Mensagem = "Membro não encontrado no projeto.";
+                            return false;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao remover membro: " + ex.Message;
+                return false;
+            }
+        }
+
         public List<Usuario> ObterMembrosProjeto(int codProjeto)
         {
             List<Usuario> membros = new List<Usuario>();
@@ -59,6 +93,7 @@ namespace CanvasApp.Classes.Databases
             return membros;
         }
 
+        // Resto dos métodos permanecem iguais...
         public bool EhMembroDoProjeto(int usuarioId, int projetoId)
         {
             try

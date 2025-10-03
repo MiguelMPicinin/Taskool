@@ -7,6 +7,45 @@ namespace CanvasApp.Classes.Databases
 {
     public class ProjetosDB : BaseDB
     {
+        // MÉTODO ADICIONADO: ObterProjetoPorCodigo
+        public Projetos ObterProjetoPorCodigo(int codigo)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = "SELECT Codigo, Nome, CodUsuario, NaoPertube FROM Projeto WHERE Codigo = @Codigo";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Codigo", codigo);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                return new Projetos
+                                {
+                                    Codigo = Convert.ToInt32(reader["Codigo"]),
+                                    Nome = reader["Nome"].ToString(),
+                                    CodUsuario = Convert.ToInt32(reader["CodUsuario"]),
+                                    NaoPertube = Convert.ToBoolean(reader["NaoPertube"])
+                                };
+                            }
+                            else
+                            {
+                                Mensagem = "Projeto não encontrado.";
+                                return null;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao obter projeto: " + ex.Message;
+                return null;
+            }
+        }
+
         public string ObterNomeProjeto(int codProjeto)
         {
             try

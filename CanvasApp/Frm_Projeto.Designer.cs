@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Frm_Projeto));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.Pnl_Titulo = new System.Windows.Forms.Panel();
             this.Lbl_Titulo = new System.Windows.Forms.Label();
             this.Txt_Tarefa = new System.Windows.Forms.TextBox();
@@ -41,13 +41,13 @@
             this.Pic_Tristesa = new System.Windows.Forms.PictureBox();
             this.Lnk_TarefasConcluidas = new System.Windows.Forms.LinkLabel();
             this.Grp_Status = new System.Windows.Forms.GroupBox();
+            this.Lbl_Concluidas = new System.Windows.Forms.Label();
             this.Flw_Concluidos = new System.Windows.Forms.FlowLayoutPanel();
             this.Flw_Pendentes = new System.Windows.Forms.FlowLayoutPanel();
             this.Pnl_Grafico = new System.Windows.Forms.Panel();
             this.Chrt_Tarefas = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.Pnl_Header = new System.Windows.Forms.Panel();
             this.Lbl_Status = new System.Windows.Forms.Label();
-            this.Lbl_Concluidas = new System.Windows.Forms.Label();
             this.Lbl_Pendentes = new System.Windows.Forms.Label();
             this.Pnl_MenuLateral1 = new System.Windows.Forms.Panel();
             this.Pnl_NovoProjeto = new System.Windows.Forms.Panel();
@@ -59,6 +59,8 @@
             this.Lbl_Categorias1 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.Lbl_TituloMenu = new System.Windows.Forms.Label();
+            this.Btn_MinhasTarefas = new System.Windows.Forms.Button();
+            this.Btn_GerenciaMembrosProjeto = new System.Windows.Forms.Button();
             this.Pnl_Titulo.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Pic_IconPlus)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Pic_Tristesa)).BeginInit();
@@ -163,6 +165,15 @@
             this.Grp_Status.TabIndex = 9;
             this.Grp_Status.TabStop = false;
             // 
+            // Lbl_Concluidas
+            // 
+            this.Lbl_Concluidas.AutoSize = true;
+            this.Lbl_Concluidas.Location = new System.Drawing.Point(102, 85);
+            this.Lbl_Concluidas.Name = "Lbl_Concluidas";
+            this.Lbl_Concluidas.Size = new System.Drawing.Size(59, 13);
+            this.Lbl_Concluidas.TabIndex = 11;
+            this.Lbl_Concluidas.Text = "Concluidas";
+            // 
             // Flw_Concluidos
             // 
             this.Flw_Concluidos.Location = new System.Drawing.Point(109, 100);
@@ -188,17 +199,17 @@
             // 
             // Chrt_Tarefas
             // 
-            chartArea3.Name = "ChartArea1";
-            this.Chrt_Tarefas.ChartAreas.Add(chartArea3);
+            chartArea1.Name = "ChartArea1";
+            this.Chrt_Tarefas.ChartAreas.Add(chartArea1);
             this.Chrt_Tarefas.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend3.Name = "Legend1";
-            this.Chrt_Tarefas.Legends.Add(legend3);
+            legend1.Name = "Legend1";
+            this.Chrt_Tarefas.Legends.Add(legend1);
             this.Chrt_Tarefas.Location = new System.Drawing.Point(0, 0);
             this.Chrt_Tarefas.Name = "Chrt_Tarefas";
-            series3.ChartArea = "ChartArea1";
-            series3.Legend = "Legend1";
-            series3.Name = "Series1";
-            this.Chrt_Tarefas.Series.Add(series3);
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.Chrt_Tarefas.Series.Add(series1);
             this.Chrt_Tarefas.Size = new System.Drawing.Size(96, 82);
             this.Chrt_Tarefas.TabIndex = 4;
             this.Chrt_Tarefas.Text = "chart1";
@@ -222,15 +233,6 @@
             this.Lbl_Status.Size = new System.Drawing.Size(73, 25);
             this.Lbl_Status.TabIndex = 0;
             this.Lbl_Status.Text = "Status";
-            // 
-            // Lbl_Concluidas
-            // 
-            this.Lbl_Concluidas.AutoSize = true;
-            this.Lbl_Concluidas.Location = new System.Drawing.Point(102, 85);
-            this.Lbl_Concluidas.Name = "Lbl_Concluidas";
-            this.Lbl_Concluidas.Size = new System.Drawing.Size(59, 13);
-            this.Lbl_Concluidas.TabIndex = 11;
-            this.Lbl_Concluidas.Text = "Concluidas";
             // 
             // Lbl_Pendentes
             // 
@@ -340,11 +342,31 @@
             this.Lbl_TituloMenu.TabIndex = 0;
             this.Lbl_TituloMenu.Text = "Taskool";
             // 
+            // Btn_MinhasTarefas
+            // 
+            this.Btn_MinhasTarefas.Location = new System.Drawing.Point(576, 48);
+            this.Btn_MinhasTarefas.Name = "Btn_MinhasTarefas";
+            this.Btn_MinhasTarefas.Size = new System.Drawing.Size(111, 29);
+            this.Btn_MinhasTarefas.TabIndex = 17;
+            this.Btn_MinhasTarefas.Text = "Minhas Tarefas";
+            this.Btn_MinhasTarefas.UseVisualStyleBackColor = true;
+            // 
+            // Btn_GerenciaMembrosProjeto
+            // 
+            this.Btn_GerenciaMembrosProjeto.Location = new System.Drawing.Point(696, 47);
+            this.Btn_GerenciaMembrosProjeto.Name = "Btn_GerenciaMembrosProjeto";
+            this.Btn_GerenciaMembrosProjeto.Size = new System.Drawing.Size(111, 29);
+            this.Btn_GerenciaMembrosProjeto.TabIndex = 18;
+            this.Btn_GerenciaMembrosProjeto.Text = "Gerenciar Membros";
+            this.Btn_GerenciaMembrosProjeto.UseVisualStyleBackColor = true;
+            // 
             // Frm_Projeto
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(819, 471);
+            this.Controls.Add(this.Btn_GerenciaMembrosProjeto);
+            this.Controls.Add(this.Btn_MinhasTarefas);
             this.Controls.Add(this.Pnl_MenuLateral1);
             this.Controls.Add(this.Lbl_Triste);
             this.Controls.Add(this.Pic_Tristesa);
@@ -405,5 +427,7 @@
         private System.Windows.Forms.Label Lbl_Categorias1;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Label Lbl_TituloMenu;
+        private System.Windows.Forms.Button Btn_MinhasTarefas;
+        private System.Windows.Forms.Button Btn_GerenciaMembrosProjeto;
     }
 }

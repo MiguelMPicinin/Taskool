@@ -37,6 +37,13 @@ namespace CanvasApp
         private Panel Pnl_Notificacoes;
         private bool notificacoesVisiveis = false;
 
+        // Controle para Frm_TarefasUsuario - RENOMEADO
+        private Frm_TarefasUsuario _frmTarefasUsuario;
+        private bool tarefasUsuarioAberto = false;
+
+        // Dicionário para controlar formulários de atribuição abertos
+        private Dictionary<int, Frm_AtribuirResponsavelTarefa> formulariosAtribuicaoAbertos = new Dictionary<int, Frm_AtribuirResponsavelTarefa>();
+
         public Frm_Projeto(Projetos projeto, int usuarioId)
         {
             // Inicializar as DBs que dependem de outras
@@ -49,6 +56,7 @@ namespace CanvasApp
             // Configurar o menu lateral e notificações
             ConfigurarMenuLateral();
             ConfigurarPainelNotificacoes();
+            ConfigurarBotoesExistentes();
         }
 
         public Frm_Projeto(List<Projeto_Tarefas> favoritos, int usuarioId)
@@ -63,6 +71,82 @@ namespace CanvasApp
             // Configurar o menu lateral e notificações
             ConfigurarMenuLateral();
             ConfigurarPainelNotificacoes();
+            ConfigurarBotoesExistentes();
+        }
+
+        private void ConfigurarBotoesExistentes()
+        {
+            // Configurar eventos para os botões já existentes no formulário
+            Btn_MinhasTarefas.Click += BtnTarefasUsuario_Click;
+
+            if (projetoSelecionado != null)
+            {
+                Btn_GerenciaMembrosProjeto.Click += BtnGerenciarMembros_Click;
+            }
+            else
+            {
+                Btn_GerenciaMembrosProjeto.Visible = false;
+            }
+        }
+
+        private void BtnTarefasUsuario_Click(object sender, EventArgs e)
+        {
+            AbrirTarefasUsuario();
+        }
+
+        private void BtnGerenciarMembros_Click(object sender, EventArgs e)
+        {
+            AbrirGerenciarMembros();
+        }
+
+        private void AbrirTarefasUsuario()
+        {
+            try
+            {
+                if (tarefasUsuarioAberto && _frmTarefasUsuario != null && !_frmTarefasUsuario.IsDisposed)
+                {
+                    _frmTarefasUsuario.BringToFront();
+                    return;
+                }
+
+                _frmTarefasUsuario = new Frm_TarefasUsuario(usuarioLogadoId);
+                _frmTarefasUsuario.FormClosed += (s, args) => { tarefasUsuarioAberto = false; };
+                _frmTarefasUsuario.Show();
+                tarefasUsuarioAberto = true;
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Erro ao abrir gerenciador de tarefas.", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void AbrirGerenciarMembros()
+        {
+            try
+            {
+                if (projetoSelecionado == null) return;
+
+                // CORREÇÃO: Comparação correta de tipos
+                if (projetoSelecionado.CodUsuario != usuarioLogadoId)
+                {
+                    MessageBox.Show("Apenas o proprietário do projeto pode gerenciar membros.", "Aviso",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // CORREÇÃO: Usar ShowDialog sem using
+                Frm_GerenciarMembros frmGerenciarMembros = new Frm_GerenciarMembros(projetoSelecionado.Codigo, usuarioLogadoId, dbMembros, dbTarefas);
+                frmGerenciarMembros.ShowDialog(this);
+
+                // Recarregar a interface após gerenciar membros
+                AtualizarInterface();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Erro ao abrir gerenciador de membros.", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void ConfigurarPainelNotificacoes()
@@ -543,9 +627,8 @@ namespace CanvasApp
             {
                 return dbFavoritos.ObterTarefasFavoritas(usuarioId).Count;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Erro ao obter quantidade de favoritas: {ex.Message}");
                 return 0;
             }
         }
@@ -556,9 +639,8 @@ namespace CanvasApp
             {
                 return dbTarefas.ObterQuantidadeTarefasComAlarmeHoje(usuarioId);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Erro ao obter quantidade de tarefas hoje: {ex.Message}");
                 return 0;
             }
         }
@@ -569,9 +651,8 @@ namespace CanvasApp
             {
                 return dbTarefas.ObterQuantidadeTarefasComAlarmeSemana(usuarioId);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Erro ao obter quantidade de tarefas semana: {ex.Message}");
                 return 0;
             }
         }
@@ -582,9 +663,8 @@ namespace CanvasApp
             {
                 return dbTarefas.ObterQuantidadeTarefasComAlarmeMes(usuarioId);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Erro ao obter quantidade de tarefas mês: {ex.Message}");
                 return 0;
             }
         }
@@ -609,9 +689,9 @@ namespace CanvasApp
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                MessageBox.Show($"Erro ao carregar favoritos: {ex.Message}", "Erro",
+                MessageBox.Show("Erro ao carregar favoritos.", "Erro",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -624,14 +704,7 @@ namespace CanvasApp
         {
             try
             {
-                Console.WriteLine($"=== INICIANDO FILTRO HOJE NO PROJETO - Usuário: {usuarioId} ===");
-
-                // Executar diagnóstico completo para debug
-                dbTarefas.DiagnosticoCompletoBrasil(usuarioId);
-
                 var tarefasHoje = dbTarefas.ObterTarefasComAlarmeHoje(usuarioId);
-
-                Console.WriteLine($"Tarefas com alarme para HOJE encontradas: {tarefasHoje.Count}");
 
                 this.tarefasPendentes = tarefasHoje;
                 this.tarefasConcluidas = new List<Projeto_Tarefas>();
@@ -649,11 +722,10 @@ namespace CanvasApp
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                MessageBox.Show($"Erro ao carregar tarefas de hoje: {ex.Message}", "Erro",
+                MessageBox.Show("Erro ao carregar tarefas de hoje.", "Erro",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Console.WriteLine($"ERRO DETALHADO CarregarTarefasHoje: {ex}");
             }
         }
 
@@ -661,11 +733,7 @@ namespace CanvasApp
         {
             try
             {
-                Console.WriteLine($"=== INICIANDO FILTRO SEMANA NO PROJETO - Usuário: {usuarioId} ===");
-
                 var tarefasSemana = dbTarefas.ObterTarefasComAlarmeSemana(usuarioId);
-
-                Console.WriteLine($"Tarefas com alarme para SEMANA encontradas: {tarefasSemana.Count}");
 
                 this.tarefasPendentes = tarefasSemana;
                 this.tarefasConcluidas = new List<Projeto_Tarefas>();
@@ -683,11 +751,10 @@ namespace CanvasApp
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                MessageBox.Show($"Erro ao carregar tarefas da semana: {ex.Message}", "Erro",
+                MessageBox.Show("Erro ao carregar tarefas da semana.", "Erro",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Console.WriteLine($"ERRO DETALHADO CarregarTarefasSemana: {ex}");
             }
         }
 
@@ -695,11 +762,7 @@ namespace CanvasApp
         {
             try
             {
-                Console.WriteLine($"=== INICIANDO FILTRO MÊS NO PROJETO - Usuário: {usuarioId} ===");
-
                 var tarefasMes = dbTarefas.ObterTarefasComAlarmeMes(usuarioId);
-
-                Console.WriteLine($"Tarefas com alarme para MÊS encontradas: {tarefasMes.Count}");
 
                 this.tarefasPendentes = tarefasMes;
                 this.tarefasConcluidas = new List<Projeto_Tarefas>();
@@ -717,11 +780,10 @@ namespace CanvasApp
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                MessageBox.Show($"Erro ao carregar tarefas do mês: {ex.Message}", "Erro",
+                MessageBox.Show("Erro ao carregar tarefas do mês.", "Erro",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Console.WriteLine($"ERRO DETALHADO CarregarTarefasMes: {ex}");
             }
         }
 
@@ -1155,9 +1217,9 @@ namespace CanvasApp
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    Console.WriteLine($"Erro ao carregar responsáveis da tarefa: {ex.Message}");
+                    // Ignorar erro
                 }
 
                 // --- DATA DO ALARME (se houver) ---
@@ -1166,8 +1228,6 @@ namespace CanvasApp
                     var alarme = dbAlarme.ObterAlarmePorTarefa(tarefa.Codigo);
                     if (alarme != null)
                     {
-                        Console.WriteLine($"Alarme encontrado para tarefa {tarefa.Codigo}: {alarme.Data:dd/MM/yyyy} {alarme.Hora:HH:mm}");
-
                         var labelDataAlarme = new Label
                         {
                             Text = $"Alarme: {alarme.Data:dd/MM/yyyy} às {alarme.Hora:HH:mm}",
@@ -1182,30 +1242,70 @@ namespace CanvasApp
                         // Evento de clique na data do alarme
                         labelDataAlarme.Click += (sender, e) => AbrirDetalhesTarefa(tarefa);
                     }
-                    else
-                    {
-                        Console.WriteLine($"Nenhum alarme encontrado para tarefa {tarefa.Codigo}");
-                    }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    Console.WriteLine($"Erro ao carregar alarme da tarefa {tarefa.Codigo}: {ex.Message}");
+                    // Ignorar erro
                 }
 
                 // --- EVENTOS DE CLIQUE ---
                 panel.Click += (sender, e) => AbrirDetalhesTarefa(tarefa);
                 labelDescricao.Click += (sender, e) => AbrirDetalhesTarefa(tarefa);
 
-                // --- EVENTOS DE DUPLO CLIQUE ---
-                panel.DoubleClick += (sender, e) => AbrirDetalhesTarefa(tarefa);
-                labelDescricao.DoubleClick += (sender, e) => AbrirDetalhesTarefa(tarefa);
+                // --- EVENTOS DE DUPLO CLIQUE - AGORA ABRE Frm_AtribuirResponsavelTarefa ---
+                panel.DoubleClick += (sender, e) => AbrirAtribuirResponsavel(tarefa);
+                labelDescricao.DoubleClick += (sender, e) => AbrirAtribuirResponsavel(tarefa);
 
                 return panel;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Erro ao criar item de tarefa: {ex.Message}");
                 return new Panel { Width = Lst_ListaTarefas.Width - 25, Height = 60 };
+            }
+        }
+
+        // --- NOVO MÉTODO PARA ABRIR FORMULÁRIO DE ATRIBUIR RESPONSÁVEL ---
+        private void AbrirAtribuirResponsavel(Projeto_Tarefas tarefa)
+        {
+            try
+            {
+                // Verificar se o formulário de atribuição já está aberto usando o dicionário
+                if (formulariosAtribuicaoAbertos.ContainsKey(tarefa.Codigo))
+                {
+                    var formExistente = formulariosAtribuicaoAbertos[tarefa.Codigo];
+                    if (formExistente != null && !formExistente.IsDisposed)
+                    {
+                        formExistente.BringToFront();
+                        return;
+                    }
+                    else
+                    {
+                        // Remover do dicionário se o formulário foi fechado
+                        formulariosAtribuicaoAbertos.Remove(tarefa.Codigo);
+                    }
+                }
+
+                // Se não estiver aberto, criar novo formulário
+                Frm_AtribuirResponsavelTarefa novoForm = new Frm_AtribuirResponsavelTarefa(tarefa);
+
+                // Adicionar evento para remover do dicionário quando o formulário for fechado
+                novoForm.FormClosed += (s, e) =>
+                {
+                    if (formulariosAtribuicaoAbertos.ContainsKey(tarefa.Codigo))
+                    {
+                        formulariosAtribuicaoAbertos.Remove(tarefa.Codigo);
+                    }
+                };
+
+                novoForm.Show();
+
+                // Adicionar ao dicionário de formulários abertos
+                formulariosAtribuicaoAbertos[tarefa.Codigo] = novoForm;
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Erro ao abrir formulário de atribuição de responsável.", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -1339,9 +1439,27 @@ namespace CanvasApp
             AdicionarNovaTarefa();
         }
 
-        private void Lbl_Pendentes_Click(object sender, EventArgs e)
-        {
+        private void Lbl_Pendentes_Click(object sender, EventArgs e) { }
 
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            base.OnFormClosed(e);
+
+            // Fechar Frm_TarefasUsuario se estiver aberto
+            if (_frmTarefasUsuario != null && !_frmTarefasUsuario.IsDisposed)
+            {
+                _frmTarefasUsuario.Close();
+            }
+
+            // Fechar todos os formulários de atribuição abertos
+            foreach (var form in formulariosAtribuicaoAbertos.Values)
+            {
+                if (form != null && !form.IsDisposed)
+                {
+                    form.Close();
+                }
+            }
+            formulariosAtribuicaoAbertos.Clear();
         }
     }
 }

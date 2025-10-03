@@ -217,11 +217,23 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>dbTarefas2DataSet.xsd</DependentUpon>
     </Compile>
+    <Compile Include="Frm_AtribuirResponsavelTarefa.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frm_AtribuirResponsavelTarefa.Designer.cs">
+      <DependentUpon>Frm_AtribuirResponsavelTarefa.cs</DependentUpon>
+    </Compile>
     <Compile Include="Frm_CriarProjeto.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Frm_CriarProjeto.Designer.cs">
       <DependentUpon>Frm_CriarProjeto.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Frm_GerenciarMembros.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frm_GerenciarMembros.Designer.cs">
+      <DependentUpon>Frm_GerenciarMembros.cs</DependentUpon>
     </Compile>
     <Compile Include="Frm_Projeto.cs">
       <SubType>Form</SubType>
@@ -234,6 +246,12 @@
     </Compile>
     <Compile Include="Frm_TarefasDetalhes.Designer.cs">
       <DependentUpon>Frm_TarefasDetalhes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Frm_TarefasUsuario.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frm_TarefasUsuario.Designer.cs">
+      <DependentUpon>Frm_TarefasUsuario.cs</DependentUpon>
     </Compile>
     <Compile Include="Home.cs">
       <SubType>Form</SubType>
@@ -252,14 +270,23 @@
     <EmbeddedResource Include="Cadastre-se.resx">
       <DependentUpon>Cadastre-se.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Frm_AtribuirResponsavelTarefa.resx">
+      <DependentUpon>Frm_AtribuirResponsavelTarefa.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Frm_CriarProjeto.resx">
       <DependentUpon>Frm_CriarProjeto.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Frm_GerenciarMembros.resx">
+      <DependentUpon>Frm_GerenciarMembros.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Frm_Projeto.resx">
       <DependentUpon>Frm_Projeto.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Frm_TarefasDetalhes.resx">
       <DependentUpon>Frm_TarefasDetalhes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Frm_TarefasUsuario.resx">
+      <DependentUpon>Frm_TarefasUsuario.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Home.resx">
       <DependentUpon>Home.cs</DependentUpon>
