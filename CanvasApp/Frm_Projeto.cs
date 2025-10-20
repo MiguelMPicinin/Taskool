@@ -215,7 +215,7 @@ namespace CanvasApp
         {
             if (Sessao.UsuarioLogado == null) return;
 
-            int usuarioId = int.Parse(Sessao.UsuarioLogado.Codigo);
+            int usuarioId = Convert.ToInt32(Sessao.UsuarioLogado.Codigo);
 
             // Limpar notificações existentes (exceto título e botão fechar)
             for (int i = Pnl_Notificacoes.Controls.Count - 1; i >= 0; i--)
@@ -403,7 +403,7 @@ namespace CanvasApp
 
             if (Sessao.UsuarioLogado == null) return;
 
-            int usuarioId = int.Parse(Sessao.UsuarioLogado.Codigo);
+            int usuarioId = Convert.ToInt32(Sessao.UsuarioLogado.Codigo);
 
             // Adicionar categorias fixas
             AdicionarCategoriaMenu("Favoritas", ObterQuantidadeFavoritas(usuarioId));
@@ -590,7 +590,7 @@ namespace CanvasApp
         {
             if (Sessao.UsuarioLogado == null) return;
 
-            int usuarioId = int.Parse(Sessao.UsuarioLogado.Codigo);
+            int usuarioId = Convert.ToInt32(Sessao.UsuarioLogado.Codigo);
 
             switch (categoria)
             {
@@ -613,7 +613,7 @@ namespace CanvasApp
         {
             if (Sessao.UsuarioLogado == null) return;
 
-            int usuarioId = int.Parse(Sessao.UsuarioLogado.Codigo);
+            int usuarioId = Convert.ToInt32(Sessao.UsuarioLogado.Codigo);
             AbrirFormProjeto(projeto, usuarioId);
         }
 
@@ -1193,9 +1193,9 @@ namespace CanvasApp
                     var responsaveis = new List<Usuario>();
 
                     // Se a tarefa tem um usuário atribuído, adicionar como responsável
-                    if (!string.IsNullOrEmpty(tarefa.CodUsuario))
+                    if (!string.IsNullOrEmpty(tarefa.CodUsuario.ToString()))
                     {
-                        var usuarioResponsavel = dbUsuario.ObterUsuarioPorCodigo(tarefa.CodUsuario);
+                        var usuarioResponsavel = dbUsuario.ObterUsuarioPorCodigo(tarefa.CodUsuario.ToString());
                         if (usuarioResponsavel != null)
                         {
                             responsaveis.Add(usuarioResponsavel);
@@ -1316,7 +1316,7 @@ namespace CanvasApp
             {
                 Width = 25,
                 Height = 25,
-                BackColor = ObterCorAleatoriaResponsavel(usuario.Codigo)
+                BackColor = ObterCorAleatoriaResponsavel(usuario.Codigo.ToString())
             };
 
             // Tornar o painel circular

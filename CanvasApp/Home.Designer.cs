@@ -41,8 +41,6 @@
             this.Pnl_Menu = new System.Windows.Forms.Panel();
             this.Btn_Sair = new System.Windows.Forms.Button();
             this.Btn_EditarDados = new System.Windows.Forms.Button();
-            this.Pic_PlayPause = new System.Windows.Forms.PictureBox();
-            this.Pic_Foto = new System.Windows.Forms.PictureBox();
             this.Pnl_MenuLateral1 = new System.Windows.Forms.Panel();
             this.Pnl_NovoProjeto = new System.Windows.Forms.Panel();
             this.Lbl_Novo = new System.Windows.Forms.Label();
@@ -53,13 +51,16 @@
             this.Lbl_Categorias1 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.Lbl_TituloMenu = new System.Windows.Forms.Label();
+            this.Btn_Dashboard = new System.Windows.Forms.Button();
+            this.Pic_PlayPause = new System.Windows.Forms.PictureBox();
+            this.Pic_Foto = new System.Windows.Forms.PictureBox();
             this.Pnl_Menu.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Pic_PlayPause)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Pic_Foto)).BeginInit();
             this.Pnl_MenuLateral1.SuspendLayout();
             this.Pnl_NovoProjeto.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Pic_PlayPause)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Pic_Foto)).BeginInit();
             this.SuspendLayout();
             // 
             // Lbl_Hora
@@ -162,28 +163,6 @@
             this.Btn_EditarDados.Text = "button1";
             this.Btn_EditarDados.UseVisualStyleBackColor = true;
             // 
-            // Pic_PlayPause
-            // 
-            this.Pic_PlayPause.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Pic_PlayPause.Image = ((System.Drawing.Image)(resources.GetObject("Pic_PlayPause.Image")));
-            this.Pic_PlayPause.Location = new System.Drawing.Point(242, 397);
-            this.Pic_PlayPause.Name = "Pic_PlayPause";
-            this.Pic_PlayPause.Size = new System.Drawing.Size(53, 50);
-            this.Pic_PlayPause.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.Pic_PlayPause.TabIndex = 14;
-            this.Pic_PlayPause.TabStop = false;
-            // 
-            // Pic_Foto
-            // 
-            this.Pic_Foto.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.Pic_Foto.Image = ((System.Drawing.Image)(resources.GetObject("Pic_Foto.Image")));
-            this.Pic_Foto.Location = new System.Drawing.Point(705, 12);
-            this.Pic_Foto.Name = "Pic_Foto";
-            this.Pic_Foto.Size = new System.Drawing.Size(113, 98);
-            this.Pic_Foto.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.Pic_Foto.TabIndex = 6;
-            this.Pic_Foto.TabStop = false;
-            // 
             // Pnl_MenuLateral1
             // 
             this.Pnl_MenuLateral1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -282,11 +261,45 @@
             this.Lbl_TituloMenu.TabIndex = 0;
             this.Lbl_TituloMenu.Text = "Taskool";
             // 
+            // Btn_Dashboard
+            // 
+            this.Btn_Dashboard.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.Btn_Dashboard.Location = new System.Drawing.Point(705, 131);
+            this.Btn_Dashboard.Name = "Btn_Dashboard";
+            this.Btn_Dashboard.Size = new System.Drawing.Size(113, 48);
+            this.Btn_Dashboard.TabIndex = 16;
+            this.Btn_Dashboard.Text = "Dashboard";
+            this.Btn_Dashboard.UseVisualStyleBackColor = true;
+            this.Btn_Dashboard.Click += new System.EventHandler(this.Btn_Dashboard_Click);
+            // 
+            // Pic_PlayPause
+            // 
+            this.Pic_PlayPause.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.Pic_PlayPause.Image = ((System.Drawing.Image)(resources.GetObject("Pic_PlayPause.Image")));
+            this.Pic_PlayPause.Location = new System.Drawing.Point(242, 397);
+            this.Pic_PlayPause.Name = "Pic_PlayPause";
+            this.Pic_PlayPause.Size = new System.Drawing.Size(53, 50);
+            this.Pic_PlayPause.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.Pic_PlayPause.TabIndex = 14;
+            this.Pic_PlayPause.TabStop = false;
+            // 
+            // Pic_Foto
+            // 
+            this.Pic_Foto.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.Pic_Foto.Image = ((System.Drawing.Image)(resources.GetObject("Pic_Foto.Image")));
+            this.Pic_Foto.Location = new System.Drawing.Point(705, 12);
+            this.Pic_Foto.Name = "Pic_Foto";
+            this.Pic_Foto.Size = new System.Drawing.Size(113, 98);
+            this.Pic_Foto.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.Pic_Foto.TabIndex = 6;
+            this.Pic_Foto.TabStop = false;
+            // 
             // Frm_Home
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(830, 470);
+            this.Controls.Add(this.Btn_Dashboard);
             this.Controls.Add(this.Pnl_MenuLateral1);
             this.Controls.Add(this.Pic_PlayPause);
             this.Controls.Add(this.Pnl_Menu);
@@ -300,14 +313,14 @@
             this.Name = "Frm_Home";
             this.Text = "Frm_Home";
             this.Pnl_Menu.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.Pic_PlayPause)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Pic_Foto)).EndInit();
             this.Pnl_MenuLateral1.ResumeLayout(false);
             this.Pnl_MenuLateral1.PerformLayout();
             this.Pnl_NovoProjeto.ResumeLayout(false);
             this.Pnl_NovoProjeto.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Pic_PlayPause)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Pic_Foto)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -337,6 +350,7 @@
         private System.Windows.Forms.Label Lbl_TituloMenu;
         private System.Windows.Forms.Label Lbl_Novo;
         private System.Windows.Forms.PictureBox pictureBox2;
+        private System.Windows.Forms.Button Btn_Dashboard;
     }
 }
 

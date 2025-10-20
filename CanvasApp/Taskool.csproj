@@ -194,6 +194,7 @@
     <Compile Include="Classes\Databases\Projetos.cs" />
     <Compile Include="Classes\Databases\Projeto_Membros.cs" />
     <Compile Include="Classes\Databases\Projeto_Tarefas.cs" />
+    <Compile Include="Classes\Databases\ProjetosTarefasDatas.cs" />
     <Compile Include="Classes\Databases\Sessao.cs" />
     <Compile Include="Classes\Databases\Tarefas_Comentarios.cs" />
     <Compile Include="Classes\Databases\Tarefas_SubTarefas.cs" />
@@ -208,6 +209,7 @@
     <Compile Include="Classes\ManipulaçãoDados\Notificacoes.cs" />
     <Compile Include="Classes\ManipulaçãoDados\PdfService.cs" />
     <Compile Include="Classes\ManipulaçãoDados\Projetos.cs" />
+    <Compile Include="Classes\ManipulaçãoDados\operacoesFTP.cs" />
     <Compile Include="Classes\ManipulaçãoDados\Subtarefas.cs" />
     <Compile Include="Classes\ManipulaçãoDados\Tarefas.cs" />
     <Compile Include="Classes\ManipulaçãoDados\Usuarios.cs" />
@@ -216,6 +218,18 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>dbTarefas2DataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="FormOpcoesFTP.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormOpcoesFTP.Designer.cs">
+      <DependentUpon>FormOpcoesFTP.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Frm_Dashboard.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frm_Dashboard.Designer.cs">
+      <DependentUpon>Frm_Dashboard.cs</DependentUpon>
     </Compile>
     <Compile Include="Frm_AtribuirResponsavelTarefa.cs">
       <SubType>Form</SubType>
@@ -253,6 +267,12 @@
     <Compile Include="Frm_TarefasUsuario.Designer.cs">
       <DependentUpon>Frm_TarefasUsuario.cs</DependentUpon>
     </Compile>
+    <Compile Include="FTPConfigForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FTPConfigForm.Designer.cs">
+      <DependentUpon>FTPConfigForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Home.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -269,6 +289,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Cadastre-se.resx">
       <DependentUpon>Cadastre-se.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Frm_Dashboard.resx">
+      <DependentUpon>Frm_Dashboard.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Frm_AtribuirResponsavelTarefa.resx">
       <DependentUpon>Frm_AtribuirResponsavelTarefa.cs</DependentUpon>
@@ -287,6 +310,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Frm_TarefasUsuario.resx">
       <DependentUpon>Frm_TarefasUsuario.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FTPConfigForm.resx">
+      <DependentUpon>FTPConfigForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Home.resx">
       <DependentUpon>Home.cs</DependentUpon>

@@ -171,8 +171,8 @@ namespace CanvasApp.Classes.Databases
 
                 foreach (var membro in membros)
                 {
-                    // Não notificar o criador da tarefa
-                    if (int.Parse(membro.Codigo) == usuarioCriador)
+                    // ✅ CORREÇÃO: Converter Codigo para int antes de comparar
+                    if (Convert.ToInt32(membro.Codigo) == usuarioCriador)
                         continue;
 
                     var notificacao = new Notificacoes
@@ -180,7 +180,7 @@ namespace CanvasApp.Classes.Databases
                         Texto = $"{nomeCriador} criou a tarefa '{tarefa.Descricao}' no projeto {nomeProjeto}",
                         Data = DateTime.Now,
                         CodProjeto = tarefa.CodProjeto,
-                        CodUsuario = int.Parse(membro.Codigo),
+                        CodUsuario = Convert.ToInt32(membro.Codigo), // ✅ CORREÇÃO
                         isFechada = false
                     };
 

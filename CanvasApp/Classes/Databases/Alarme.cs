@@ -19,7 +19,7 @@ namespace CanvasApp.Classes.Databases
         public int CodTarefa { get; set; }
         public int CodUsuario { get; set; }
         public DateTime Data { get; set; }
-        public DateTime Hora { get; set; }
+        public TimeSpan Hora { get; set; } // Alterado para TimeSpan para compatibilidade com SQL time
         public RepeticaoAlarme Repeticao { get; set; }
     }
 }

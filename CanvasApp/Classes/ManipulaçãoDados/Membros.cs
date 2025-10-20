@@ -18,7 +18,39 @@ namespace CanvasApp.Classes.Databases
             _usuarioDB = usuarioDB;
         }
 
-        // MÉTODO ADICIONADO: RemoverMembroProjeto
+        // =========================================================================
+        // MÉTODO ADICIONAL (INTEGRADO DO MembrosDBTeste)
+        // =========================================================================
+
+        public bool EhMembroDoProjeto(int usuarioId, int projetoId)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = @"SELECT COUNT(*) FROM Projeto_Membros 
+                                WHERE CodProjeto = @CodProjeto AND CodMembro = @CodMembro";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@CodProjeto", projetoId);
+                        cmd.Parameters.AddWithValue("@CodMembro", usuarioId);
+                        int count = Convert.ToInt32(cmd.ExecuteScalar());
+                        return count > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao verificar membro do projeto: " + ex.Message;
+                return false;
+            }
+        }
+
+        // =========================================================================
+        // MÉTODOS ORIGINAIS (MANTIDOS)
+        // =========================================================================
+
         public bool RemoverMembroProjeto(int codProjeto, string codUsuario)
         {
             try
@@ -74,7 +106,7 @@ namespace CanvasApp.Classes.Databases
                             {
                                 membros.Add(new Usuario
                                 {
-                                    Codigo = reader["Codigo"].ToString(),
+                                    Codigo = Convert.ToInt32(reader["Codigo"]),
                                     Nome = reader["Nome"].ToString(),
                                     Email = reader["Email"].ToString(),
                                     NomeUsuario = reader["NomeUsuario"].ToString(),
@@ -91,32 +123,6 @@ namespace CanvasApp.Classes.Databases
                 Mensagem = "Erro ao obter membros do projeto: " + ex.Message;
             }
             return membros;
-        }
-
-        // Resto dos métodos permanecem iguais...
-        public bool EhMembroDoProjeto(int usuarioId, int projetoId)
-        {
-            try
-            {
-                using (SqlConnection conn = GetConnection())
-                {
-                    string sql = @"SELECT COUNT(*) FROM Projeto_Membros 
-                                WHERE CodProjeto = @CodProjeto AND CodMembro = @CodMembro";
-
-                    using (SqlCommand cmd = new SqlCommand(sql, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@CodProjeto", projetoId);
-                        cmd.Parameters.AddWithValue("@CodMembro", usuarioId);
-                        int count = Convert.ToInt32(cmd.ExecuteScalar());
-                        return count > 0;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Mensagem = "Erro ao verificar membro do projeto: " + ex.Message;
-                return false;
-            }
         }
 
         public bool AdicionarMembroAoProjeto(int codProjeto, int codUsuario)

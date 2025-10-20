@@ -11,9 +11,8 @@ namespace CanvasApp.Classes.Databases
         public int Codigo { get; set; }
         public string Texto { get; set; }
         public DateTime Data { get; set; }
-        public int CodProjeto { get; set; }
+        public int? CodProjeto { get; set; } // Alterado para nullable
         public int CodUsuario { get; set; }
         public bool isFechada { get; set; }
-
     }
 }

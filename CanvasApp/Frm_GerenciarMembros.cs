@@ -20,7 +20,6 @@ namespace CanvasApp.Forms
         private List<Usuario> _todosUsuarios;
         private PdfService _pdfService;
 
-        // CONSTRUTOR ATUALIZADO
         public Frm_GerenciarMembros(int codProjeto, int usuarioLogadoId, MembrosDB membrosDB, TarefasDB tarefasDB)
         {
             InitializeComponent();
@@ -40,98 +39,98 @@ namespace CanvasApp.Forms
 
         private void InitializeComponent()
         {
-            this.Lbl_Titulo = new System.Windows.Forms.Label();
-            this.Lst_Membros = new System.Windows.Forms.ListBox();
-            this.Btn_Adicionar = new System.Windows.Forms.Button();
-            this.Btn_Remover = new System.Windows.Forms.Button();
-            this.Btn_ExportarPDF = new System.Windows.Forms.Button();
-            this.Btn_Fechar = new System.Windows.Forms.Button();
-            this.Cmb_UsuariosDisponiveis = new System.Windows.Forms.ComboBox();
-            this.Lbl_SelecionarUsuario = new System.Windows.Forms.Label();
+            this.Lbl_Titulo = new Label();
+            this.Lst_Membros = new ListBox();
+            this.Btn_Adicionar = new Button();
+            this.Btn_Remover = new Button();
+            this.Btn_ExportarPDF = new Button();
+            this.Btn_Fechar = new Button();
+            this.Cmb_UsuariosDisponiveis = new ComboBox();
+            this.Lbl_SelecionarUsuario = new Label();
             this.SuspendLayout();
 
             // Lbl_Titulo
             this.Lbl_Titulo.AutoSize = true;
-            this.Lbl_Titulo.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Lbl_Titulo.Location = new System.Drawing.Point(20, 20);
+            this.Lbl_Titulo.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold);
+            this.Lbl_Titulo.Location = new Point(20, 20);
             this.Lbl_Titulo.Name = "Lbl_Titulo";
-            this.Lbl_Titulo.Size = new System.Drawing.Size(197, 25);
+            this.Lbl_Titulo.Size = new Size(197, 25);
             this.Lbl_Titulo.TabIndex = 0;
             this.Lbl_Titulo.Text = "Membros do Projeto";
 
-            // Lbl_SelecionarUsuario
-            this.Lbl_SelecionarUsuario.AutoSize = true;
-            this.Lbl_SelecionarUsuario.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Lbl_SelecionarUsuario.Location = new System.Drawing.Point(25, 55);
-            this.Lbl_SelecionarUsuario.Name = "Lbl_SelecionarUsuario";
-            this.Lbl_SelecionarUsuario.Size = new System.Drawing.Size(105, 15);
-            this.Lbl_SelecionarUsuario.TabIndex = 1;
-            this.Lbl_SelecionarUsuario.Text = "Adicionar Usuário:";
-
-            // Cmb_UsuariosDisponiveis
-            this.Cmb_UsuariosDisponiveis.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.Cmb_UsuariosDisponiveis.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Cmb_UsuariosDisponiveis.FormattingEnabled = true;
-            this.Cmb_UsuariosDisponiveis.Location = new System.Drawing.Point(135, 52);
-            this.Cmb_UsuariosDisponiveis.Name = "Cmb_UsuariosDisponiveis";
-            this.Cmb_UsuariosDisponiveis.Size = new System.Drawing.Size(200, 23);
-            this.Cmb_UsuariosDisponiveis.TabIndex = 2;
-
             // Lst_Membros
             this.Lst_Membros.DisplayMember = "Nome";
-            this.Lst_Membros.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Lst_Membros.Font = new Font("Segoe UI", 9.75F);
             this.Lst_Membros.FormattingEnabled = true;
             this.Lst_Membros.ItemHeight = 17;
-            this.Lst_Membros.Location = new System.Drawing.Point(25, 85);
+            this.Lst_Membros.Location = new Point(25, 85);
             this.Lst_Membros.Name = "Lst_Membros";
-            this.Lst_Membros.Size = new System.Drawing.Size(440, 191);
+            this.Lst_Membros.Size = new Size(440, 191);
             this.Lst_Membros.TabIndex = 3;
             this.Lst_Membros.ValueMember = "Codigo";
 
             // Btn_Adicionar
-            this.Btn_Adicionar.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.Btn_Adicionar.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Btn_Adicionar.Location = new System.Drawing.Point(345, 50);
+            this.Btn_Adicionar.Cursor = Cursors.Hand;
+            this.Btn_Adicionar.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            this.Btn_Adicionar.Location = new Point(345, 50);
             this.Btn_Adicionar.Name = "Btn_Adicionar";
-            this.Btn_Adicionar.Size = new System.Drawing.Size(120, 27);
+            this.Btn_Adicionar.Size = new Size(120, 27);
             this.Btn_Adicionar.TabIndex = 4;
             this.Btn_Adicionar.Text = "Adicionar Membro";
             this.Btn_Adicionar.UseVisualStyleBackColor = true;
 
             // Btn_Remover
-            this.Btn_Remover.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.Btn_Remover.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Btn_Remover.Location = new System.Drawing.Point(25, 290);
+            this.Btn_Remover.Cursor = Cursors.Hand;
+            this.Btn_Remover.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            this.Btn_Remover.Location = new Point(25, 290);
             this.Btn_Remover.Name = "Btn_Remover";
-            this.Btn_Remover.Size = new System.Drawing.Size(120, 35);
+            this.Btn_Remover.Size = new Size(120, 35);
             this.Btn_Remover.TabIndex = 5;
             this.Btn_Remover.Text = "Remover Membro";
             this.Btn_Remover.UseVisualStyleBackColor = true;
 
             // Btn_ExportarPDF
-            this.Btn_ExportarPDF.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.Btn_ExportarPDF.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Btn_ExportarPDF.Location = new System.Drawing.Point(155, 290);
+            this.Btn_ExportarPDF.Cursor = Cursors.Hand;
+            this.Btn_ExportarPDF.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            this.Btn_ExportarPDF.Location = new Point(155, 290);
             this.Btn_ExportarPDF.Name = "Btn_ExportarPDF";
-            this.Btn_ExportarPDF.Size = new System.Drawing.Size(120, 35);
+            this.Btn_ExportarPDF.Size = new Size(120, 35);
             this.Btn_ExportarPDF.TabIndex = 6;
             this.Btn_ExportarPDF.Text = "Exportar PDF";
             this.Btn_ExportarPDF.UseVisualStyleBackColor = true;
 
             // Btn_Fechar
-            this.Btn_Fechar.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.Btn_Fechar.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Btn_Fechar.Location = new System.Drawing.Point(285, 290);
+            this.Btn_Fechar.Cursor = Cursors.Hand;
+            this.Btn_Fechar.Font = new Font("Segoe UI", 9F);
+            this.Btn_Fechar.Location = new Point(285, 290);
             this.Btn_Fechar.Name = "Btn_Fechar";
-            this.Btn_Fechar.Size = new System.Drawing.Size(120, 35);
+            this.Btn_Fechar.Size = new Size(120, 35);
             this.Btn_Fechar.TabIndex = 7;
             this.Btn_Fechar.Text = "Fechar";
             this.Btn_Fechar.UseVisualStyleBackColor = true;
 
-            // Frm_GerenciarMembros
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(484, 341);
+            // Cmb_UsuariosDisponiveis
+            this.Cmb_UsuariosDisponiveis.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.Cmb_UsuariosDisponiveis.Font = new Font("Segoe UI", 9F);
+            this.Cmb_UsuariosDisponiveis.FormattingEnabled = true;
+            this.Cmb_UsuariosDisponiveis.Location = new Point(135, 52);
+            this.Cmb_UsuariosDisponiveis.Name = "Cmb_UsuariosDisponiveis";
+            this.Cmb_UsuariosDisponiveis.Size = new Size(200, 23);
+            this.Cmb_UsuariosDisponiveis.TabIndex = 2;
+
+            // Lbl_SelecionarUsuario
+            this.Lbl_SelecionarUsuario.AutoSize = true;
+            this.Lbl_SelecionarUsuario.Font = new Font("Segoe UI", 9F);
+            this.Lbl_SelecionarUsuario.Location = new Point(25, 55);
+            this.Lbl_SelecionarUsuario.Name = "Lbl_SelecionarUsuario";
+            this.Lbl_SelecionarUsuario.Size = new Size(104, 15);
+            this.Lbl_SelecionarUsuario.TabIndex = 1;
+            this.Lbl_SelecionarUsuario.Text = "Adicionar Usuário:";
+
+            // Form
+            this.AutoScaleDimensions = new SizeF(6F, 13F);
+            this.AutoScaleMode = AutoScaleMode.Font;
+            this.ClientSize = new Size(484, 341);
             this.Controls.Add(this.Btn_Fechar);
             this.Controls.Add(this.Btn_ExportarPDF);
             this.Controls.Add(this.Btn_Remover);
@@ -150,7 +149,6 @@ namespace CanvasApp.Forms
 
         private void ConfigurarInterface()
         {
-            // Configuração do formulário
             this.Text = "Gerenciar Membros do Projeto | Taskool";
             this.Size = new Size(500, 380);
             this.StartPosition = FormStartPosition.CenterScreen;
@@ -159,13 +157,11 @@ namespace CanvasApp.Forms
             this.BackColor = Color.White;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
 
-            // Configurar eventos dos botões
             Btn_Adicionar.Click += Btn_AdicionarMembro_Click;
             Btn_Remover.Click += Btn_RemoverMembro_Click;
             Btn_ExportarPDF.Click += Btn_ExportarPDF_Click;
             Btn_Fechar.Click += (s, e) => this.Close();
 
-            // Configurar cores dos botões
             Btn_Adicionar.BackColor = Color.FromArgb(74, 124, 255);
             Btn_Adicionar.ForeColor = Color.White;
             Btn_Adicionar.FlatStyle = FlatStyle.Flat;
@@ -185,14 +181,11 @@ namespace CanvasApp.Forms
             Btn_Fechar.FlatStyle = FlatStyle.Flat;
             Btn_Fechar.FlatAppearance.BorderSize = 0;
 
-            // Configurar cor do título
             Lbl_Titulo.ForeColor = Color.FromArgb(64, 64, 64);
 
-            // Configurar ListBox
             Lst_Membros.BackColor = Color.FromArgb(250, 250, 250);
             Lst_Membros.BorderStyle = BorderStyle.FixedSingle;
 
-            // Configurar ComboBox
             Cmb_UsuariosDisponiveis.BackColor = Color.FromArgb(250, 250, 250);
             Cmb_UsuariosDisponiveis.DropDownStyle = ComboBoxStyle.DropDownList;
         }
@@ -201,6 +194,7 @@ namespace CanvasApp.Forms
         {
             try
             {
+                // ✅ CORREÇÃO: Converter int para string
                 _membrosProjeto = _membrosDB.ObterMembrosProjeto(_codProjeto);
                 Lst_Membros.DataSource = null;
                 Lst_Membros.DataSource = _membrosProjeto;
@@ -209,14 +203,12 @@ namespace CanvasApp.Forms
 
                 if (!_membrosProjeto.Any())
                 {
-                    MessageBox.Show("Não há membros neste projeto.", "Informação",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Não há membros neste projeto.", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao carregar membros: {ex.Message}", "Erro",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao carregar membros: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -224,10 +216,8 @@ namespace CanvasApp.Forms
         {
             try
             {
-                // CORREÇÃO: Usando o método existente BuscarUsuariosPorTexto com string vazia para obter todos os usuários
                 _todosUsuarios = _usuarioDB.BuscarUsuariosPorTexto("");
 
-                // Filtrar usuários que ainda não são membros do projeto
                 var usuariosDisponiveis = _todosUsuarios
                     .Where(u => !_membrosProjeto.Any(m => m.Codigo == u.Codigo))
                     .ToList();
@@ -251,8 +241,7 @@ namespace CanvasApp.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao carregar usuários: {ex.Message}", "Erro",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao carregar usuários: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -260,8 +249,7 @@ namespace CanvasApp.Forms
         {
             if (Cmb_UsuariosDisponiveis.SelectedItem == null)
             {
-                MessageBox.Show("Selecione um usuário para adicionar ao projeto.", "Aviso",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Selecione um usuário para adicionar ao projeto.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -269,43 +257,34 @@ namespace CanvasApp.Forms
             {
                 var usuarioSelecionado = (Usuario)Cmb_UsuariosDisponiveis.SelectedItem;
 
-                if (MessageBox.Show($"Deseja adicionar {usuarioSelecionado.Nome} ao projeto?", "Confirmar",
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                if (MessageBox.Show($"Deseja adicionar {usuarioSelecionado.Nome} ao projeto?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                    // CORREÇÃO: Usando o método existente AdicionarMembroAoProjeto
-                    // Convertendo Codigo (string) para int
-                    if (int.TryParse(usuarioSelecionado.Codigo, out int codUsuarioInt))
+                    if (int.TryParse(usuarioSelecionado.Codigo.ToString(), out int codUsuarioInt))
                     {
+                        // ✅ CORREÇÃO: Converter int para string
                         bool sucesso = _membrosDB.AdicionarMembroAoProjeto(_codProjeto, codUsuarioInt);
 
                         if (sucesso)
                         {
-                            MessageBox.Show("Membro adicionado com sucesso!", "Sucesso",
-                                MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                            // Recarregar as listas
+                            MessageBox.Show("Membro adicionado com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             CarregarMembros();
                             CarregarTodosUsuarios();
                         }
                         else
                         {
-                            // CORREÇÃO: Acessando a propriedade Mensagem corretamente
                             string mensagemErro = _membrosDB.Mensagem ?? "Erro ao adicionar membro ao projeto.";
-                            MessageBox.Show(mensagemErro, "Erro",
-                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show(mensagemErro, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
                     else
                     {
-                        MessageBox.Show("Código do usuário inválido.", "Erro",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Código do usuário inválido.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao adicionar membro: {ex.Message}", "Erro",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao adicionar membro: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -313,8 +292,7 @@ namespace CanvasApp.Forms
         {
             if (Lst_Membros.SelectedItem == null)
             {
-                MessageBox.Show("Selecione um membro para remover.", "Aviso",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Selecione um membro para remover.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -322,39 +300,32 @@ namespace CanvasApp.Forms
             {
                 var usuarioSelecionado = (Usuario)Lst_Membros.SelectedItem;
 
-                // CORREÇÃO: Convertendo para o mesmo tipo para comparação
-                if (usuarioSelecionado.Codigo == _usuarioLogadoId.ToString())
+                // ✅ CORREÇÃO: Converter string para int para comparação
+                if (int.Parse(usuarioSelecionado.Codigo.ToString()) == _usuarioLogadoId)
                 {
-                    MessageBox.Show("Você não pode remover a si mesmo do projeto.", "Aviso",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Você não pode remover a si mesmo do projeto.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                if (MessageBox.Show($"Deseja remover {usuarioSelecionado.Nome} do projeto?", "Confirmar",
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                if (MessageBox.Show($"Deseja remover {usuarioSelecionado.Nome} do projeto?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                    if (_membrosDB.RemoverMembroProjeto(_codProjeto, usuarioSelecionado.Codigo))
+                    // ✅ CORREÇÃO: Converter int para string
+                    if (_membrosDB.RemoverMembroProjeto(_codProjeto, usuarioSelecionado.Codigo.ToString()))
                     {
-                        MessageBox.Show("Membro removido com sucesso!", "Sucesso",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                        // Recarregar as listas
+                        MessageBox.Show("Membro removido com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         CarregarMembros();
                         CarregarTodosUsuarios();
                     }
                     else
                     {
-                        // CORREÇÃO: Acessando a propriedade Mensagem corretamente
                         string mensagemErro = _membrosDB.Mensagem ?? "Erro ao remover membro do projeto.";
-                        MessageBox.Show(mensagemErro, "Erro",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show(mensagemErro, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao remover membro: {ex.Message}", "Erro",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao remover membro: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -364,25 +335,21 @@ namespace CanvasApp.Forms
             {
                 if (!_membrosProjeto.Any())
                 {
-                    MessageBox.Show("Não há membros para exportar.", "Aviso",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Não há membros para exportar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                // Obter nome do projeto
                 string nomeProjeto = _projetosDB.ObterNomeProjeto(_codProjeto);
                 if (string.IsNullOrEmpty(nomeProjeto))
                 {
                     nomeProjeto = $"Projeto_{_codProjeto}";
                 }
 
-                // Exportar PDF
                 _pdfService.ExportarMembrosParaPdf(_membrosProjeto, nomeProjeto, _codProjeto);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao exportar PDF: {ex.Message}", "Erro",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao exportar PDF: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

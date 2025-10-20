@@ -14,10 +14,13 @@ namespace CanvasApp
 {
     public partial class Frm_Autenticacao : Form
     {
+        private bool _capsLockAvisado = false; // Variável para controlar se já avisou sobre o CAPS LOCK
+
         public Frm_Autenticacao()
         {
             InitializeComponent();
             InitializeUI();
+            VerificarCapsLock(); // Verificar ao carregar o formulário
         }
 
         private void InitializeUI()
@@ -30,6 +33,28 @@ namespace CanvasApp
             Btn_Entrar.Text = "Entrar";
             Lnk_Cadastrar.Text = "Cadastrar-se";
             Lnk_Teclado.Text = "Teclado Virtual";
+        }
+
+        private void VerificarCapsLock()
+        {
+            try
+            {
+                bool capsLockAtivo = Control.IsKeyLocked(Keys.CapsLock);
+
+                if (capsLockAtivo && !_capsLockAvisado)
+                {
+                    MessageBox.Show("Atenção!: Você está com o CAPS LOCK ativado.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    _capsLockAvisado = true; // Marcar que já avisou
+                }
+                else if (!capsLockAtivo)
+                {
+                    _capsLockAvisado = false; // Resetar quando CAPS LOCK for desativado
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void pictureBox1_DoubleClick(object sender, EventArgs e)
@@ -164,25 +189,20 @@ namespace CanvasApp
 
         private void Txt_Login_TextChanged(object sender, EventArgs e)
         {
-            try
+            VerificarCapsLock(); // Verificar sempre que o texto mudar
+        }
+
+        private void Txt_Login_Enter(object sender, EventArgs e)
+        {
+            VerificarCapsLock(); // Verificar quando o campo receber foco
+        }
+
+        private void Txt_Login_KeyDown(object sender, KeyEventArgs e)
+        {
+            // Verificar quando a tecla Caps Lock for pressionada
+            if (e.KeyCode == Keys.CapsLock)
             {
-                if (Control.IsKeyLocked(Keys.CapsLock))
-                {
-                    // Mostrar aviso apenas uma vez
-                    if (!Txt_Login.Tag?.Equals("CAPS_WARNED") == true)
-                    {
-                        MessageBox.Show("Atenção!: Você está com o CAPS LOCK ativado.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        Txt_Login.Tag = "CAPS_WARNED";
-                    }
-                }
-                else
-                {
-                    Txt_Login.Tag = null;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Erro: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                VerificarCapsLock();
             }
         }
 
@@ -191,12 +211,6 @@ namespace CanvasApp
             Frm_Cadastro f = new Frm_Cadastro();
             f.Show();
             this.Hide();
-        }
-
-        private void Txt_Login_Enter(object sender, EventArgs e)
-        {
-            // Limpar aviso do CAPS LOCK quando o campo recebe foco
-            Txt_Login.Tag = null;
         }
 
         // Eventos vazios necessários

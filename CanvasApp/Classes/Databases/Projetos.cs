@@ -14,4 +14,3 @@ namespace CanvasApp.Classes.Databases.UsuarioCL
         public bool NaoPertube { get; set; }
     }
 }
-  

@@ -13,9 +13,8 @@ namespace CanvasApp.Classes.Databases.Mensagem
         {
             public string mensagem { get; set; }
             public string autor { get; set; }
-
         }
-        
+
         public static Unit DesSerializedClassUnit(string vJson)
         {
             return JsonConvert.DeserializeObject<Unit>(vJson);
@@ -25,6 +24,5 @@ namespace CanvasApp.Classes.Databases.Mensagem
         {
             return JsonConvert.SerializeObject(unit);
         }
-
     }
 }

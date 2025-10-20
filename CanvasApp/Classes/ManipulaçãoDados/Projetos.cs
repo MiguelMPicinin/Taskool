@@ -2,12 +2,97 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
 
 namespace CanvasApp.Classes.Databases
 {
     public class ProjetosDB : BaseDB
     {
-        // MÉTODO ADICIONADO: ObterProjetoPorCodigo
+        // =========================================================================
+        // MÉTODOS CORRIGIDOS (INTEGRADOS DO ProjetosDBTeste)
+        // =========================================================================
+
+        public List<Projetos> ObterProjetosPorUsuario(int usuarioId)
+        {
+            List<Projetos> projetos = new List<Projetos>();
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    // ✅ CORREÇÃO: Nome correto da coluna "NaoPerturbe"
+                    string query = "SELECT Codigo, Nome, NaoPerturbe, CodUsuario FROM Projeto WHERE CodUsuario = @usuarioId";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                projetos.Add(new Projetos
+                                {
+                                    Codigo = Convert.ToInt32(reader["Codigo"]),
+                                    Nome = reader["Nome"].ToString(),
+                                    CodUsuario = Convert.ToInt32(reader["CodUsuario"]),
+                                    // ✅ CORREÇÃO: Use o nome correto da propriedade
+                                    NaoPertube = Convert.ToBoolean(reader["NaoPerturbe"])
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao buscar projetos: " + ex.Message;
+            }
+            return projetos;
+        }
+
+        public List<Projetos> ObterProjetosCompartilhados(int usuarioId)
+        {
+            List<Projetos> projetos = new List<Projetos>();
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    // ✅ CORREÇÃO: Nome correto da coluna "NaoPerturbe"
+                    string query = @"
+                        SELECT P.Codigo, P.Nome, P.NaoPerturbe, P.CodUsuario
+                        FROM Projeto P
+                        INNER JOIN Projeto_Membros PM ON P.Codigo = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId AND P.CodUsuario != @usuarioId";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                projetos.Add(new Projetos
+                                {
+                                    Codigo = Convert.ToInt32(reader["Codigo"]),
+                                    Nome = reader["Nome"].ToString(),
+                                    CodUsuario = Convert.ToInt32(reader["CodUsuario"]),
+                                    // ✅ CORREÇÃO: Use o nome correto da propriedade
+                                    NaoPertube = Convert.ToBoolean(reader["NaoPerturbe"])
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao buscar projetos compartilhados: " + ex.Message;
+            }
+            return projetos;
+        }
+
+        // =========================================================================
+        // MÉTODOS ORIGINAIS (MANTIDOS)
+        // =========================================================================
+
         public Projetos ObterProjetoPorCodigo(int codigo)
         {
             try
@@ -136,79 +221,6 @@ namespace CanvasApp.Classes.Databases
                 Mensagem = "Erro ao criar projeto compartilhado: " + ex.Message;
                 return false;
             }
-        }
-
-        public List<Projetos> ObterProjetosPorUsuario(int usuarioId)
-        {
-            List<Projetos> projetos = new List<Projetos>();
-            try
-            {
-                using (SqlConnection conn = GetConnection())
-                {
-                    string query = "SELECT Codigo, Nome, NaoPertube, CodUsuario FROM Projeto WHERE CodUsuario = @usuarioId";
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                projetos.Add(new Projetos
-                                {
-                                    Codigo = Convert.ToInt32(reader["Codigo"]),
-                                    Nome = reader["Nome"].ToString(),
-                                    CodUsuario = Convert.ToInt32(reader["CodUsuario"]),
-                                    NaoPertube = Convert.ToBoolean(reader["NaoPertube"])
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Mensagem = "Erro ao buscar projetos: " + ex.Message;
-            }
-            return projetos;
-        }
-
-        public List<Projetos> ObterProjetosCompartilhados(int usuarioId)
-        {
-            List<Projetos> projetos = new List<Projetos>();
-            try
-            {
-                using (SqlConnection conn = GetConnection())
-                {
-                    string query = @"
-                        SELECT P.Codigo, P.Nome, P.NaoPertube, P.CodUsuario
-                        FROM Projeto P
-                        INNER JOIN Projeto_Membros PM ON P.Codigo = PM.CodProjeto
-                        WHERE PM.CodMembro = @usuarioId AND P.CodUsuario != @usuarioId";
-
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                projetos.Add(new Projetos
-                                {
-                                    Codigo = Convert.ToInt32(reader["Codigo"]),
-                                    Nome = reader["Nome"].ToString(),
-                                    CodUsuario = Convert.ToInt32(reader["CodUsuario"]),
-                                    NaoPertube = Convert.ToBoolean(reader["NaoPertube"])
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Mensagem = "Erro ao buscar projetos compartilhados: " + ex.Message;
-            }
-            return projetos;
         }
 
         public List<Projetos> ObterTodosProjetosUsuario(int usuarioId)

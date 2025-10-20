@@ -19,10 +19,7 @@ namespace CanvasApp.Forms
         private readonly UsuarioDB _usuarioDB;
         private readonly MembrosDB _membrosDB;
 
-        // Controles criados programaticamente
         private Button btnAdicionarSubtarefa;
-
-        // REMOVIDO: Funcionalidade de responsáveis
 
         public Frm_TarefasDetalhes(Projeto_Tarefas tarefa)
         {
@@ -30,13 +27,11 @@ namespace CanvasApp.Forms
             this.tarefaAtual = tarefa;
             this.usuarioLogado = Sessao.UsuarioLogado;
 
-            // Inicializar as classes de banco de dados
             _alarmeDB = new AlarmeDB();
             _subtarefasDB = new SubtarefasDB();
             _comentariosDB = new ComentariosDB();
             _usuarioDB = new UsuarioDB();
 
-            // Inicializar TarefasDB com as dependências necessárias
             var notificacoesDB = new NotificacoesDB();
             var projetosDB = new ProjetosDB();
             _membrosDB = new MembrosDB(notificacoesDB, projetosDB, _usuarioDB);
@@ -48,14 +43,11 @@ namespace CanvasApp.Forms
 
         private void ConfigurarLayoutDetalhes()
         {
-            // Configuração dos eventos de clique/interação
             Btn_FecharJanela.Click += Bin_FecharJanela_Click;
 
-            // --- Seção Data e Alarme ---
             Lbl_DefinirDataLembrete.Click += Lbl_DefinirDataLembrete_Click;
             Btn_FecharData.Click += Bin_FecharData_Click;
 
-            // CONFIGURAR O BOTÃO DO DESIGNER - CORRIGIDO
             Btn_SalvarData.Click += Btn_SalvarData_Click;
             Btn_SalvarData.Visible = true;
 
@@ -64,14 +56,11 @@ namespace CanvasApp.Forms
             });
             Cbo_Repeticao.SelectedIndex = 0;
 
-            // Configurar valores padrão para os DateTimePicker
             Dtp_Prazo.Value = DateTime.Now.Date;
-            Dtp_HoraAlarme.Value = DateTime.Now.Date.AddHours(9); // Hora padrão: 9:00
+            Dtp_HoraAlarme.Value = DateTime.Now.Date.AddHours(9);
 
-            // --- Seção Subtarefas ---
             Txt_NovaSubtarefa.KeyDown += Txt_NovaSubtarefa_KeyDown;
 
-            // Adicionar botão para adicionar subtarefa
             btnAdicionarSubtarefa = new Button
             {
                 Text = "+",
@@ -85,15 +74,11 @@ namespace CanvasApp.Forms
                 Flw_Subtarefas.Parent.Controls.Add(btnAdicionarSubtarefa);
             }
 
-            // --- Seção Comentários (Chat) ---
             Btn_AbrirChat.Click += Btn_AbrirChat_Click;
             Btn_FecharChat.Click += Bin_FecharChat_Click;
             Btn_EnviarComentario.Click += Bin_EnviarComentario_Click;
             Txt_NovoComentarioChat.KeyDown += Txt_NovoComentarioChat_KeyDown;
 
-            // REMOVIDO: ConfigurarSelecaoResponsaveis();
-
-            // Botão para atribuir responsáveis
             var btnAtribuirResponsavel = new Button
             {
                 Text = "Atribuir Responsáveis",
@@ -107,16 +92,13 @@ namespace CanvasApp.Forms
             {
                 Frm_AtribuirResponsavelTarefa frmAtribuir = new Frm_AtribuirResponsavelTarefa(tarefaAtual);
                 frmAtribuir.ShowDialog();
-                // Recarregar dados se necessário
                 CarregarDadosTarefa();
             };
             this.Controls.Add(btnAtribuirResponsavel);
 
-            // Configuração do Painel de Chat (Oculto inicialmente)
             Pnl_ChatComentarios.Visible = false;
             Pnl_ChatComentarios.BringToFront();
 
-            // Mostrar seção de data sempre
             MostrarSelecaoDataAlarme();
         }
 
@@ -129,18 +111,11 @@ namespace CanvasApp.Forms
             AtualizarPreviewComentarios();
         }
 
-        // =========================================================================
-        // A. PRAZO, LEMBRETE E ALARME - CORRIGIDO
-        // =========================================================================
-
         private void MostrarSelecaoDataAlarme()
         {
-            // Sempre mostrar os controles de data e alarme
             Dtp_Prazo.Visible = true;
             Dtp_HoraAlarme.Visible = true;
             Cbo_Repeticao.Visible = true;
-
-            // Mostrar o botão do designer
             Btn_SalvarData.Visible = true;
         }
 
@@ -152,20 +127,17 @@ namespace CanvasApp.Forms
 
                 if (alarme != null)
                 {
-                    // CORREÇÃO: Garantir que os valores são atualizados nos controles
                     Dtp_Prazo.Value = alarme.Data;
 
-                    // CORREÇÃO: Tratamento robusto para valores de hora
                     if (alarme.Hora != DateTime.MinValue && alarme.Hora.Year > 1900)
                     {
                         Dtp_HoraAlarme.Value = alarme.Hora;
                     }
                     else
                     {
-                        Dtp_HoraAlarme.Value = DateTime.Now.Date.AddHours(9); // Hora padrão
+                        Dtp_HoraAlarme.Value = DateTime.Now.Date.AddHours(9);
                     }
 
-                    // CORREÇÃO: Garantir que o combobox está com o valor correto
                     if (Cbo_Repeticao.Items.Count > 0)
                     {
                         int indexRepeticao = (int)alarme.Repeticao;
@@ -180,13 +152,9 @@ namespace CanvasApp.Forms
                     }
 
                     Lbl_DefinirDataLembrete.Text = "Prazo e Lembrete Definidos";
-
-                    // Usar o método existente para obter descrição do prazo
                     Lbl_PrazoExtenso.Text = _alarmeDB.ObterDescricaoPrazo(alarme.Data);
                     Lbl_PrazoExtenso.Visible = true;
                     Btn_FecharData.Visible = true;
-
-                    Console.WriteLine($"Alarme carregado: Tarefa {tarefaAtual.Codigo}, Data: {alarme.Data:dd/MM/yyyy}, Hora: {alarme.Hora:HH:mm}, Repetição: {alarme.Repeticao}");
                 }
                 else
                 {
@@ -194,20 +162,15 @@ namespace CanvasApp.Forms
                     Lbl_PrazoExtenso.Visible = false;
                     Btn_FecharData.Visible = false;
 
-                    // CORREÇÃO: Resetar para valores padrão quando não há alarme
                     Dtp_Prazo.Value = DateTime.Now.Date;
                     Dtp_HoraAlarme.Value = DateTime.Now.Date.AddHours(9);
                     if (Cbo_Repeticao.Items.Count > 0)
                         Cbo_Repeticao.SelectedIndex = 0;
-
-                    Console.WriteLine($"Nenhum alarme encontrado para tarefa {tarefaAtual.Codigo}");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao carregar prazo e alarme: {ex.Message}");
-                MessageBox.Show($"Erro ao carregar prazo: {ex.Message}", "Erro",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao carregar prazo: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -217,7 +180,6 @@ namespace CanvasApp.Forms
             Lbl_DefinirDataLembrete.Text = "Ajustar Prazo e Alarme";
         }
 
-        // MÉTODO CORRIGIDO - USANDO O BOTÃO DO DESIGNER
         private void Btn_SalvarData_Click(object sender, EventArgs e)
         {
             SalvarDataAlarme();
@@ -229,30 +191,18 @@ namespace CanvasApp.Forms
             {
                 var repeticao = (RepeticaoAlarme)Cbo_Repeticao.SelectedIndex;
 
-                // DEBUG: Verificar os valores antes de salvar
-                Console.WriteLine($"Salvando alarme - Tarefa: {tarefaAtual.Codigo}, " +
-                                 $"Data: {Dtp_Prazo.Value:dd/MM/yyyy}, " +
-                                 $"Hora: {Dtp_HoraAlarme.Value:HH:mm}, " +
-                                 $"Repetição: {repeticao}, " +
-                                 $"Usuário: {usuarioLogado.Codigo}");
-
-                // Verificar se os valores são válidos
                 if (Dtp_Prazo.Value < DateTime.Today)
                 {
-                    MessageBox.Show("A data não pode ser anterior a hoje!", "Data Inválida",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("A data não pode ser anterior a hoje!", "Data Inválida", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                // CORREÇÃO: Converter o código do usuário de string para int
-                if (!int.TryParse(usuarioLogado.Codigo, out int codUsuarioInt))
+                if (!int.TryParse(usuarioLogado.Codigo.ToString(), out int codUsuarioInt))
                 {
-                    MessageBox.Show("Código de usuário inválido!", "Erro",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Código de usuário inválido!", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                // Usar o método correto do AlarmeDB para salvar
                 if (_alarmeDB.DefinirPrazoELembrete(
                     tarefaAtual.Codigo,
                     codUsuarioInt,
@@ -260,39 +210,17 @@ namespace CanvasApp.Forms
                     Dtp_HoraAlarme.Value,
                     repeticao))
                 {
-                    MessageBox.Show("Prazo e alarme salvos com sucesso!", "Sucesso",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    // CORREÇÃO: Atualizar imediatamente os controles com os valores salvos
+                    MessageBox.Show("Prazo e alarme salvos com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     CarregarPrazoAlarme();
-
-                    // Debug para verificar se foi salvo
-                    var alarmeVerificado = _alarmeDB.ObterAlarmePorTarefa(tarefaAtual.Codigo);
-                    if (alarmeVerificado != null)
-                    {
-                        Console.WriteLine($"Alarme verificado após salvar: Data: {alarmeVerificado.Data:dd/MM/yyyy}, Hora: {alarmeVerificado.Hora:HH:mm}");
-
-                        // CORREÇÃO: Forçar atualização visual dos controles
-                        Dtp_Prazo.Value = alarmeVerificado.Data;
-                        Dtp_HoraAlarme.Value = alarmeVerificado.Hora;
-                        Cbo_Repeticao.SelectedIndex = (int)alarmeVerificado.Repeticao;
-                    }
-                    else
-                    {
-                        Console.WriteLine("ALARME NÃO ENCONTRADO APÓS SALVAR!");
-                    }
                 }
                 else
                 {
-                    MessageBox.Show($"Erro ao salvar alarme: {_alarmeDB.Mensagem}", "Erro",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Erro ao salvar alarme: {_alarmeDB.Mensagem}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao salvar alarme: {ex.Message}", "Erro",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Console.WriteLine($"ERRO DETALHADO ao salvar alarme: {ex}");
+                MessageBox.Show($"Erro ao salvar alarme: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -303,34 +231,26 @@ namespace CanvasApp.Forms
 
         private void RemoverDataAlarme()
         {
-            if (MessageBox.Show("Deseja remover o Prazo e o Alarme?", "Confirmar",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            if (MessageBox.Show("Deseja remover o Prazo e o Alarme?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 try
                 {
                     if (_alarmeDB.ResetarConfiguracoesTarefa(tarefaAtual.Codigo))
                     {
                         CarregarPrazoAlarme();
-                        MessageBox.Show("Prazo e alarme removidos com sucesso!", "Sucesso",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Prazo e alarme removidos com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     else
                     {
-                        MessageBox.Show($"Erro ao remover alarme: {_alarmeDB.Mensagem}", "Erro",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"Erro ao remover alarme: {_alarmeDB.Mensagem}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Erro ao remover alarme: {ex.Message}", "Erro",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Erro ao remover alarme: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
-
-        // =========================================================================
-        // B. SUBTAREFAS
-        // =========================================================================
 
         private void CarregarSubtarefas()
         {
@@ -338,7 +258,6 @@ namespace CanvasApp.Forms
             {
                 Flw_Subtarefas.Controls.Clear();
 
-                // Carregar subtarefas do banco
                 var listaSubtarefas = _subtarefasDB.ObterSubtarefasPorTarefa(tarefaAtual.Codigo);
 
                 foreach (var sub in listaSubtarefas)
@@ -346,7 +265,6 @@ namespace CanvasApp.Forms
                     AdicionarControleSubtarefa(sub);
                 }
 
-                // Mostrar mensagem se não houver subtarefas
                 if (!listaSubtarefas.Any())
                 {
                     var lblSemSubtarefas = new Label
@@ -362,9 +280,7 @@ namespace CanvasApp.Forms
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao carregar subtarefas: {ex.Message}");
-                MessageBox.Show($"Erro ao carregar subtarefas: {ex.Message}", "Erro",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao carregar subtarefas: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -383,8 +299,7 @@ namespace CanvasApp.Forms
             {
                 if (string.IsNullOrWhiteSpace(Txt_NovaSubtarefa.Text))
                 {
-                    MessageBox.Show("Digite uma descrição para a subtarefa!", "Aviso",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Digite uma descrição para a subtarefa!", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
@@ -397,7 +312,7 @@ namespace CanvasApp.Forms
 
                 if (_subtarefasDB.InserirSubtarefa(novaSub))
                 {
-                    CarregarSubtarefas(); // Recarregar do banco
+                    CarregarSubtarefas();
                     Txt_NovaSubtarefa.Clear();
                     Txt_NovaSubtarefa.Focus();
                 }
@@ -408,8 +323,7 @@ namespace CanvasApp.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao adicionar subtarefa: {ex.Message}", "Erro",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao adicionar subtarefa: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -445,14 +359,12 @@ namespace CanvasApp.Forms
                         if (!_subtarefasDB.AtualizarSubtarefa(sub))
                         {
                             MessageBox.Show(_subtarefasDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            // Reverter a mudança visual em caso de erro
                             chk.Checked = !chk.Checked;
                         }
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Erro ao atualizar subtarefa: {ex.Message}", "Erro",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"Erro ao atualizar subtarefa: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 };
 
@@ -472,14 +384,13 @@ namespace CanvasApp.Forms
                 btnExcluir.FlatAppearance.BorderSize = 0;
                 btnExcluir.Click += (s, e) =>
                 {
-                    if (MessageBox.Show("Deseja excluir esta subtarefa?", "Confirmar",
-                        MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    if (MessageBox.Show("Deseja excluir esta subtarefa?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
                         try
                         {
                             if (_subtarefasDB.ExcluirSubtarefa(sub.Codigo))
                             {
-                                CarregarSubtarefas(); // Recarregar do banco
+                                CarregarSubtarefas();
                             }
                             else
                             {
@@ -488,8 +399,7 @@ namespace CanvasApp.Forms
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show($"Erro ao excluir subtarefa: {ex.Message}", "Erro",
-                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show($"Erro ao excluir subtarefa: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
                 };
@@ -500,27 +410,20 @@ namespace CanvasApp.Forms
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao criar controle de subtarefa: {ex.Message}");
+                // Ignorar erro
             }
         }
-
-        // =========================================================================
-        // C. COMENTÁRIOS (PREVIEW E CHAT)
-        // =========================================================================
 
         private void CarregarComentarios()
         {
             try
             {
-                // Carregar comentários do banco - método atualizado para usar dados reais
                 var comentarios = _comentariosDB.ObterComentariosPorTarefa(tarefaAtual.Codigo);
-
-                // Atualizar contador no botão de abrir chat
                 Btn_AbrirChat.Text = $"Comentários ({comentarios.Count})";
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao carregar comentários: {ex.Message}");
+                // Ignorar erro
             }
         }
 
@@ -531,7 +434,6 @@ namespace CanvasApp.Forms
                 var comentarios = _comentariosDB.ObterComentariosPorTarefa(tarefaAtual.Codigo);
                 int contagem = comentarios.Count;
 
-                // Atualizar botão com a contagem
                 Btn_AbrirChat.Text = $"Comentários ({contagem})";
 
                 if (contagem > 0)
@@ -552,7 +454,6 @@ namespace CanvasApp.Forms
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao atualizar preview de comentários: {ex.Message}");
                 Lbl_PreviewComentarios.Text = "Erro ao carregar comentários.";
             }
         }
@@ -567,8 +468,7 @@ namespace CanvasApp.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao abrir chat: {ex.Message}", "Erro",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao abrir chat: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -590,14 +490,12 @@ namespace CanvasApp.Forms
                     AdicionarControleComentario(com);
                 }
 
-                // Rolagem automática para o final
                 if (Flw_ChatComentarios.Controls.Count > 0)
                 {
                     Flw_ChatComentarios.ScrollControlIntoView(
                         Flw_ChatComentarios.Controls[Flw_ChatComentarios.Controls.Count - 1]);
                 }
 
-                // Mostrar mensagem se não houver comentários
                 if (!comentarios.Any())
                 {
                     var lblSemComentarios = new Label
@@ -615,9 +513,7 @@ namespace CanvasApp.Forms
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao carregar comentários no chat: {ex.Message}");
-                MessageBox.Show($"Erro ao carregar comentários: {ex.Message}", "Erro",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao carregar comentários: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -641,15 +537,14 @@ namespace CanvasApp.Forms
             {
                 if (string.IsNullOrWhiteSpace(Txt_NovoComentarioChat.Text))
                 {
-                    MessageBox.Show("Digite um comentário antes de enviar.", "Aviso",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Digite um comentário antes de enviar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
                 var novoCom = new Tarefas_Comentarios
                 {
                     CodTarefa = tarefaAtual.Codigo,
-                    CodUsuario = usuarioLogado.Codigo,
+                    CodUsuario = usuarioLogado.Codigo.ToString(),
                     Comentario = Txt_NovoComentarioChat.Text.Trim(),
                     Data = DateTime.Now
                 };
@@ -668,8 +563,7 @@ namespace CanvasApp.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao enviar comentário: {ex.Message}", "Erro",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao enviar comentário: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -683,7 +577,7 @@ namespace CanvasApp.Forms
                     Margin = new Padding(5),
                     BorderStyle = BorderStyle.FixedSingle,
                     Tag = com.Codigo,
-                    BackColor = com.CodUsuario == usuarioLogado.Codigo ?
+                    BackColor = com.CodUsuario == usuarioLogado.Codigo.ToString() ?
                         Color.LightCyan : Color.White
                 };
 
@@ -724,7 +618,6 @@ namespace CanvasApp.Forms
                     ScrollBars = ScrollBars.None
                 };
 
-                // Ajustar altura do TextBox baseado no conteúdo
                 using (Graphics g = CreateGraphics())
                 {
                     SizeF size = g.MeasureString(txtComentario.Text, txtComentario.Font, txtComentario.Width);
@@ -741,13 +634,9 @@ namespace CanvasApp.Forms
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao criar controle de comentário: {ex.Message}");
+                // Ignorar erro
             }
         }
-
-        // =========================================================================
-        // EVENTOS DO FORMULÁRIO
-        // =========================================================================
 
         private void Bin_FecharJanela_Click(object sender, EventArgs e)
         {
@@ -756,11 +645,9 @@ namespace CanvasApp.Forms
 
         private void ValidarCamposData()
         {
-            // Validar se a data não é anterior a hoje
             if (Dtp_Prazo.Value < DateTime.Today)
             {
-                MessageBox.Show("A data não pode ser anterior a hoje!", "Data Inválida",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("A data não pode ser anterior a hoje!", "Data Inválida", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 Dtp_Prazo.Value = DateTime.Today;
             }
         }
@@ -772,19 +659,13 @@ namespace CanvasApp.Forms
 
         private void Frm_TarefasDetalhes_Load(object sender, EventArgs e)
         {
-            // Configurar eventos adicionais
             Dtp_Prazo.ValueChanged += Dtp_Prazo_ValueChanged;
-
-            // Centralizar formulário na tela
             this.StartPosition = FormStartPosition.CenterScreen;
-
-            // Focar no campo de título
             Txt_TituloTarefa.Focus();
         }
 
         private void Frm_TarefasDetalhes_FormClosing(object sender, FormClosingEventArgs e)
         {
-            // Limpar recursos se necessário
             if (btnAdicionarSubtarefa != null)
             {
                 btnAdicionarSubtarefa.Dispose();

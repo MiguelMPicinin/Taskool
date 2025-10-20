@@ -42,33 +42,33 @@ namespace CanvasApp {
         
         private UsuarioDataTable tableUsuario;
         
-        private global::System.Data.DataRelation relationFK__Alarme__CodTaref__4E88ABD4;
+        private global::System.Data.DataRelation relationFK__Alarme__CodTaref__5070F446;
         
-        private global::System.Data.DataRelation relationFK__Alarme__Repetica__4D94879B;
+        private global::System.Data.DataRelation relationFK__Alarme__CodUsuar__4F7CD00D;
         
-        private global::System.Data.DataRelation relationFK__Items_Fav__CodTa__49C3F6B7;
+        private global::System.Data.DataRelation relationFK__Items_Fav__CodTa__4BAC3F29;
         
-        private global::System.Data.DataRelation relationFK__Items_Fav__CodUs__48CFD27E;
+        private global::System.Data.DataRelation relationFK__Items_Fav__CodUs__4AB81AF0;
         
-        private global::System.Data.DataRelation relationFK__Notificac__CodPr__4222D4EF;
+        private global::System.Data.DataRelation relationFK__Notificac__CodPr__440B1D61;
         
-        private global::System.Data.DataRelation relationFK__Notificac__CodUs__412EB0B6;
+        private global::System.Data.DataRelation relationFK__Notificac__CodUs__4316F928;
         
-        private global::System.Data.DataRelation relationFK__Projeto__CodUsua__3A81B327;
+        private global::System.Data.DataRelation relationFK__Projeto__CodUsua__1273C1CD;
         
-        private global::System.Data.DataRelation relationFK__Projeto_M__CodMe__44FF419A;
+        private global::System.Data.DataRelation relationFK__Projeto_M__CodMe__182C9B23;
         
-        private global::System.Data.DataRelation relationFK__Projeto_M__CodPr__45F365D3;
+        private global::System.Data.DataRelation relationFK__Projeto_M__CodPr__47DBAE45;
         
-        private global::System.Data.DataRelation relationFK__Projeto_T__CodPr__3D5E1FD2;
+        private global::System.Data.DataRelation relationFK__Projeto_T__CodPr__3E52440B;
         
-        private global::System.Data.DataRelation relationFK__Projeto_T__CodUs__3E52440B;
+        private global::System.Data.DataRelation relationFK__Projeto_T__CodUs__164452B1;
         
-        private global::System.Data.DataRelation relationFK__Tarefas_C__CodTa__5535A963;
+        private global::System.Data.DataRelation relationFK__Tarefas_C__CodTa__5812160E;
         
-        private global::System.Data.DataRelation relationFK__Tarefas_C__CodUs__5441852A;
+        private global::System.Data.DataRelation relationFK__Tarefas_C__CodUs__571DF1D5;
         
-        private global::System.Data.DataRelation relationFK__Tarefas_S__CodTa__5165187F;
+        private global::System.Data.DataRelation relationFK__Tarefas_S__CodTa__5441852A;
         
         private global::System.Data.SchemaSerializationMode _schemaSerializationMode = global::System.Data.SchemaSerializationMode.IncludeSchema;
         
@@ -414,20 +414,20 @@ namespace CanvasApp {
                     this.tableUsuario.InitVars();
                 }
             }
-            this.relationFK__Alarme__CodTaref__4E88ABD4 = this.Relations["FK__Alarme__CodTaref__4E88ABD4"];
-            this.relationFK__Alarme__Repetica__4D94879B = this.Relations["FK__Alarme__Repetica__4D94879B"];
-            this.relationFK__Items_Fav__CodTa__49C3F6B7 = this.Relations["FK__Items_Fav__CodTa__49C3F6B7"];
-            this.relationFK__Items_Fav__CodUs__48CFD27E = this.Relations["FK__Items_Fav__CodUs__48CFD27E"];
-            this.relationFK__Notificac__CodPr__4222D4EF = this.Relations["FK__Notificac__CodPr__4222D4EF"];
-            this.relationFK__Notificac__CodUs__412EB0B6 = this.Relations["FK__Notificac__CodUs__412EB0B6"];
-            this.relationFK__Projeto__CodUsua__3A81B327 = this.Relations["FK__Projeto__CodUsua__3A81B327"];
-            this.relationFK__Projeto_M__CodMe__44FF419A = this.Relations["FK__Projeto_M__CodMe__44FF419A"];
-            this.relationFK__Projeto_M__CodPr__45F365D3 = this.Relations["FK__Projeto_M__CodPr__45F365D3"];
-            this.relationFK__Projeto_T__CodPr__3D5E1FD2 = this.Relations["FK__Projeto_T__CodPr__3D5E1FD2"];
-            this.relationFK__Projeto_T__CodUs__3E52440B = this.Relations["FK__Projeto_T__CodUs__3E52440B"];
-            this.relationFK__Tarefas_C__CodTa__5535A963 = this.Relations["FK__Tarefas_C__CodTa__5535A963"];
-            this.relationFK__Tarefas_C__CodUs__5441852A = this.Relations["FK__Tarefas_C__CodUs__5441852A"];
-            this.relationFK__Tarefas_S__CodTa__5165187F = this.Relations["FK__Tarefas_S__CodTa__5165187F"];
+            this.relationFK__Alarme__CodTaref__5070F446 = this.Relations["FK__Alarme__CodTaref__5070F446"];
+            this.relationFK__Alarme__CodUsuar__4F7CD00D = this.Relations["FK__Alarme__CodUsuar__4F7CD00D"];
+            this.relationFK__Items_Fav__CodTa__4BAC3F29 = this.Relations["FK__Items_Fav__CodTa__4BAC3F29"];
+            this.relationFK__Items_Fav__CodUs__4AB81AF0 = this.Relations["FK__Items_Fav__CodUs__4AB81AF0"];
+            this.relationFK__Notificac__CodPr__440B1D61 = this.Relations["FK__Notificac__CodPr__440B1D61"];
+            this.relationFK__Notificac__CodUs__4316F928 = this.Relations["FK__Notificac__CodUs__4316F928"];
+            this.relationFK__Projeto__CodUsua__1273C1CD = this.Relations["FK__Projeto__CodUsua__1273C1CD"];
+            this.relationFK__Projeto_M__CodMe__182C9B23 = this.Relations["FK__Projeto_M__CodMe__182C9B23"];
+            this.relationFK__Projeto_M__CodPr__47DBAE45 = this.Relations["FK__Projeto_M__CodPr__47DBAE45"];
+            this.relationFK__Projeto_T__CodPr__3E52440B = this.Relations["FK__Projeto_T__CodPr__3E52440B"];
+            this.relationFK__Projeto_T__CodUs__164452B1 = this.Relations["FK__Projeto_T__CodUs__164452B1"];
+            this.relationFK__Tarefas_C__CodTa__5812160E = this.Relations["FK__Tarefas_C__CodTa__5812160E"];
+            this.relationFK__Tarefas_C__CodUs__571DF1D5 = this.Relations["FK__Tarefas_C__CodUs__571DF1D5"];
+            this.relationFK__Tarefas_S__CodTa__5441852A = this.Relations["FK__Tarefas_S__CodTa__5441852A"];
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -456,62 +456,62 @@ namespace CanvasApp {
             base.Tables.Add(this.tableTarefas_SubTarefas);
             this.tableUsuario = new UsuarioDataTable();
             base.Tables.Add(this.tableUsuario);
-            this.relationFK__Alarme__CodTaref__4E88ABD4 = new global::System.Data.DataRelation("FK__Alarme__CodTaref__4E88ABD4", new global::System.Data.DataColumn[] {
+            this.relationFK__Alarme__CodTaref__5070F446 = new global::System.Data.DataRelation("FK__Alarme__CodTaref__5070F446", new global::System.Data.DataColumn[] {
                         this.tableProjeto_Tarefas.CodigoColumn}, new global::System.Data.DataColumn[] {
                         this.tableAlarme.CodTarefaColumn}, false);
-            this.Relations.Add(this.relationFK__Alarme__CodTaref__4E88ABD4);
-            this.relationFK__Alarme__Repetica__4D94879B = new global::System.Data.DataRelation("FK__Alarme__Repetica__4D94879B", new global::System.Data.DataColumn[] {
+            this.Relations.Add(this.relationFK__Alarme__CodTaref__5070F446);
+            this.relationFK__Alarme__CodUsuar__4F7CD00D = new global::System.Data.DataRelation("FK__Alarme__CodUsuar__4F7CD00D", new global::System.Data.DataColumn[] {
                         this.tableUsuario.CodigoColumn}, new global::System.Data.DataColumn[] {
                         this.tableAlarme.CodUsuarioColumn}, false);
-            this.Relations.Add(this.relationFK__Alarme__Repetica__4D94879B);
-            this.relationFK__Items_Fav__CodTa__49C3F6B7 = new global::System.Data.DataRelation("FK__Items_Fav__CodTa__49C3F6B7", new global::System.Data.DataColumn[] {
+            this.Relations.Add(this.relationFK__Alarme__CodUsuar__4F7CD00D);
+            this.relationFK__Items_Fav__CodTa__4BAC3F29 = new global::System.Data.DataRelation("FK__Items_Fav__CodTa__4BAC3F29", new global::System.Data.DataColumn[] {
                         this.tableProjeto_Tarefas.CodigoColumn}, new global::System.Data.DataColumn[] {
                         this.tableItems_Favoritos.CodTarefaColumn}, false);
-            this.Relations.Add(this.relationFK__Items_Fav__CodTa__49C3F6B7);
-            this.relationFK__Items_Fav__CodUs__48CFD27E = new global::System.Data.DataRelation("FK__Items_Fav__CodUs__48CFD27E", new global::System.Data.DataColumn[] {
+            this.Relations.Add(this.relationFK__Items_Fav__CodTa__4BAC3F29);
+            this.relationFK__Items_Fav__CodUs__4AB81AF0 = new global::System.Data.DataRelation("FK__Items_Fav__CodUs__4AB81AF0", new global::System.Data.DataColumn[] {
                         this.tableUsuario.CodigoColumn}, new global::System.Data.DataColumn[] {
                         this.tableItems_Favoritos.CodUsuarioColumn}, false);
-            this.Relations.Add(this.relationFK__Items_Fav__CodUs__48CFD27E);
-            this.relationFK__Notificac__CodPr__4222D4EF = new global::System.Data.DataRelation("FK__Notificac__CodPr__4222D4EF", new global::System.Data.DataColumn[] {
+            this.Relations.Add(this.relationFK__Items_Fav__CodUs__4AB81AF0);
+            this.relationFK__Notificac__CodPr__440B1D61 = new global::System.Data.DataRelation("FK__Notificac__CodPr__440B1D61", new global::System.Data.DataColumn[] {
                         this.tableProjeto.CodigoColumn}, new global::System.Data.DataColumn[] {
                         this.tableNotificacoes.CodProjetoColumn}, false);
-            this.Relations.Add(this.relationFK__Notificac__CodPr__4222D4EF);
-            this.relationFK__Notificac__CodUs__412EB0B6 = new global::System.Data.DataRelation("FK__Notificac__CodUs__412EB0B6", new global::System.Data.DataColumn[] {
+            this.Relations.Add(this.relationFK__Notificac__CodPr__440B1D61);
+            this.relationFK__Notificac__CodUs__4316F928 = new global::System.Data.DataRelation("FK__Notificac__CodUs__4316F928", new global::System.Data.DataColumn[] {
                         this.tableUsuario.CodigoColumn}, new global::System.Data.DataColumn[] {
                         this.tableNotificacoes.CodUsuarioColumn}, false);
-            this.Relations.Add(this.relationFK__Notificac__CodUs__412EB0B6);
-            this.relationFK__Projeto__CodUsua__3A81B327 = new global::System.Data.DataRelation("FK__Projeto__CodUsua__3A81B327", new global::System.Data.DataColumn[] {
+            this.Relations.Add(this.relationFK__Notificac__CodUs__4316F928);
+            this.relationFK__Projeto__CodUsua__1273C1CD = new global::System.Data.DataRelation("FK__Projeto__CodUsua__1273C1CD", new global::System.Data.DataColumn[] {
                         this.tableUsuario.CodigoColumn}, new global::System.Data.DataColumn[] {
                         this.tableProjeto.CodUsuarioColumn}, false);
-            this.Relations.Add(this.relationFK__Projeto__CodUsua__3A81B327);
-            this.relationFK__Projeto_M__CodMe__44FF419A = new global::System.Data.DataRelation("FK__Projeto_M__CodMe__44FF419A", new global::System.Data.DataColumn[] {
+            this.Relations.Add(this.relationFK__Projeto__CodUsua__1273C1CD);
+            this.relationFK__Projeto_M__CodMe__182C9B23 = new global::System.Data.DataRelation("FK__Projeto_M__CodMe__182C9B23", new global::System.Data.DataColumn[] {
                         this.tableUsuario.CodigoColumn}, new global::System.Data.DataColumn[] {
                         this.tableProjeto_Membros.CodMembroColumn}, false);
-            this.Relations.Add(this.relationFK__Projeto_M__CodMe__44FF419A);
-            this.relationFK__Projeto_M__CodPr__45F365D3 = new global::System.Data.DataRelation("FK__Projeto_M__CodPr__45F365D3", new global::System.Data.DataColumn[] {
+            this.Relations.Add(this.relationFK__Projeto_M__CodMe__182C9B23);
+            this.relationFK__Projeto_M__CodPr__47DBAE45 = new global::System.Data.DataRelation("FK__Projeto_M__CodPr__47DBAE45", new global::System.Data.DataColumn[] {
                         this.tableProjeto.CodigoColumn}, new global::System.Data.DataColumn[] {
                         this.tableProjeto_Membros.CodProjetoColumn}, false);
-            this.Relations.Add(this.relationFK__Projeto_M__CodPr__45F365D3);
-            this.relationFK__Projeto_T__CodPr__3D5E1FD2 = new global::System.Data.DataRelation("FK__Projeto_T__CodPr__3D5E1FD2", new global::System.Data.DataColumn[] {
+            this.Relations.Add(this.relationFK__Projeto_M__CodPr__47DBAE45);
+            this.relationFK__Projeto_T__CodPr__3E52440B = new global::System.Data.DataRelation("FK__Projeto_T__CodPr__3E52440B", new global::System.Data.DataColumn[] {
                         this.tableProjeto.CodigoColumn}, new global::System.Data.DataColumn[] {
                         this.tableProjeto_Tarefas.CodProjetoColumn}, false);
-            this.Relations.Add(this.relationFK__Projeto_T__CodPr__3D5E1FD2);
-            this.relationFK__Projeto_T__CodUs__3E52440B = new global::System.Data.DataRelation("FK__Projeto_T__CodUs__3E52440B", new global::System.Data.DataColumn[] {
+            this.Relations.Add(this.relationFK__Projeto_T__CodPr__3E52440B);
+            this.relationFK__Projeto_T__CodUs__164452B1 = new global::System.Data.DataRelation("FK__Projeto_T__CodUs__164452B1", new global::System.Data.DataColumn[] {
                         this.tableUsuario.CodigoColumn}, new global::System.Data.DataColumn[] {
                         this.tableProjeto_Tarefas.CodUsuarioColumn}, false);
-            this.Relations.Add(this.relationFK__Projeto_T__CodUs__3E52440B);
-            this.relationFK__Tarefas_C__CodTa__5535A963 = new global::System.Data.DataRelation("FK__Tarefas_C__CodTa__5535A963", new global::System.Data.DataColumn[] {
+            this.Relations.Add(this.relationFK__Projeto_T__CodUs__164452B1);
+            this.relationFK__Tarefas_C__CodTa__5812160E = new global::System.Data.DataRelation("FK__Tarefas_C__CodTa__5812160E", new global::System.Data.DataColumn[] {
                         this.tableProjeto_Tarefas.CodigoColumn}, new global::System.Data.DataColumn[] {
                         this.tableTarefas_Comentarios.CodTarefaColumn}, false);
-            this.Relations.Add(this.relationFK__Tarefas_C__CodTa__5535A963);
-            this.relationFK__Tarefas_C__CodUs__5441852A = new global::System.Data.DataRelation("FK__Tarefas_C__CodUs__5441852A", new global::System.Data.DataColumn[] {
+            this.Relations.Add(this.relationFK__Tarefas_C__CodTa__5812160E);
+            this.relationFK__Tarefas_C__CodUs__571DF1D5 = new global::System.Data.DataRelation("FK__Tarefas_C__CodUs__571DF1D5", new global::System.Data.DataColumn[] {
                         this.tableUsuario.CodigoColumn}, new global::System.Data.DataColumn[] {
                         this.tableTarefas_Comentarios.CodUsuarioColumn}, false);
-            this.Relations.Add(this.relationFK__Tarefas_C__CodUs__5441852A);
-            this.relationFK__Tarefas_S__CodTa__5165187F = new global::System.Data.DataRelation("FK__Tarefas_S__CodTa__5165187F", new global::System.Data.DataColumn[] {
+            this.Relations.Add(this.relationFK__Tarefas_C__CodUs__571DF1D5);
+            this.relationFK__Tarefas_S__CodTa__5441852A = new global::System.Data.DataRelation("FK__Tarefas_S__CodTa__5441852A", new global::System.Data.DataColumn[] {
                         this.tableProjeto_Tarefas.CodigoColumn}, new global::System.Data.DataColumn[] {
                         this.tableTarefas_SubTarefas.CodTarefaColumn}, false);
-            this.Relations.Add(this.relationFK__Tarefas_S__CodTa__5165187F);
+            this.Relations.Add(this.relationFK__Tarefas_S__CodTa__5441852A);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -787,7 +787,7 @@ namespace CanvasApp {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public AlarmeRow AddAlarmeRow(Projeto_TarefasRow parentProjeto_TarefasRowByFK__Alarme__CodTaref__4E88ABD4, UsuarioRow parentUsuarioRowByFK__Alarme__Repetica__4D94879B, System.DateTime Data, System.TimeSpan Hora, string Repeticao) {
+            public AlarmeRow AddAlarmeRow(Projeto_TarefasRow parentProjeto_TarefasRowByFK__Alarme__CodTaref__5070F446, UsuarioRow parentUsuarioRowByFK__Alarme__CodUsuar__4F7CD00D, System.DateTime Data, System.TimeSpan Hora, string Repeticao) {
                 AlarmeRow rowAlarmeRow = ((AlarmeRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
@@ -796,11 +796,11 @@ namespace CanvasApp {
                         Data,
                         Hora,
                         Repeticao};
-                if ((parentProjeto_TarefasRowByFK__Alarme__CodTaref__4E88ABD4 != null)) {
-                    columnValuesArray[1] = parentProjeto_TarefasRowByFK__Alarme__CodTaref__4E88ABD4[0];
+                if ((parentProjeto_TarefasRowByFK__Alarme__CodTaref__5070F446 != null)) {
+                    columnValuesArray[1] = parentProjeto_TarefasRowByFK__Alarme__CodTaref__5070F446[0];
                 }
-                if ((parentUsuarioRowByFK__Alarme__Repetica__4D94879B != null)) {
-                    columnValuesArray[2] = parentUsuarioRowByFK__Alarme__Repetica__4D94879B[0];
+                if ((parentUsuarioRowByFK__Alarme__CodUsuar__4F7CD00D != null)) {
+                    columnValuesArray[2] = parentUsuarioRowByFK__Alarme__CodUsuar__4F7CD00D[0];
                 }
                 rowAlarmeRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowAlarmeRow);
@@ -1088,16 +1088,16 @@ namespace CanvasApp {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public Items_FavoritosRow AddItems_FavoritosRow(UsuarioRow parentUsuarioRowByFK__Items_Fav__CodUs__48CFD27E, Projeto_TarefasRow parentProjeto_TarefasRowByFK__Items_Fav__CodTa__49C3F6B7) {
+            public Items_FavoritosRow AddItems_FavoritosRow(UsuarioRow parentUsuarioRowByFK__Items_Fav__CodUs__4AB81AF0, Projeto_TarefasRow parentProjeto_TarefasRowByFK__Items_Fav__CodTa__4BAC3F29) {
                 Items_FavoritosRow rowItems_FavoritosRow = ((Items_FavoritosRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
                         null};
-                if ((parentUsuarioRowByFK__Items_Fav__CodUs__48CFD27E != null)) {
-                    columnValuesArray[0] = parentUsuarioRowByFK__Items_Fav__CodUs__48CFD27E[0];
+                if ((parentUsuarioRowByFK__Items_Fav__CodUs__4AB81AF0 != null)) {
+                    columnValuesArray[0] = parentUsuarioRowByFK__Items_Fav__CodUs__4AB81AF0[0];
                 }
-                if ((parentProjeto_TarefasRowByFK__Items_Fav__CodTa__49C3F6B7 != null)) {
-                    columnValuesArray[1] = parentProjeto_TarefasRowByFK__Items_Fav__CodTa__49C3F6B7[0];
+                if ((parentProjeto_TarefasRowByFK__Items_Fav__CodTa__4BAC3F29 != null)) {
+                    columnValuesArray[1] = parentProjeto_TarefasRowByFK__Items_Fav__CodTa__4BAC3F29[0];
                 }
                 rowItems_FavoritosRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowItems_FavoritosRow);
@@ -1408,7 +1408,7 @@ namespace CanvasApp {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public NotificacoesRow AddNotificacoesRow(string Texto, System.DateTime Data, ProjetoRow parentProjetoRowByFK__Notificac__CodPr__4222D4EF, UsuarioRow parentUsuarioRowByFK__Notificac__CodUs__412EB0B6, bool isFechada) {
+            public NotificacoesRow AddNotificacoesRow(string Texto, System.DateTime Data, ProjetoRow parentProjetoRowByFK__Notificac__CodPr__440B1D61, UsuarioRow parentUsuarioRowByFK__Notificac__CodUs__4316F928, bool isFechada) {
                 NotificacoesRow rowNotificacoesRow = ((NotificacoesRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
@@ -1417,11 +1417,11 @@ namespace CanvasApp {
                         null,
                         null,
                         isFechada};
-                if ((parentProjetoRowByFK__Notificac__CodPr__4222D4EF != null)) {
-                    columnValuesArray[3] = parentProjetoRowByFK__Notificac__CodPr__4222D4EF[0];
+                if ((parentProjetoRowByFK__Notificac__CodPr__440B1D61 != null)) {
+                    columnValuesArray[3] = parentProjetoRowByFK__Notificac__CodPr__440B1D61[0];
                 }
-                if ((parentUsuarioRowByFK__Notificac__CodUs__412EB0B6 != null)) {
-                    columnValuesArray[4] = parentUsuarioRowByFK__Notificac__CodUs__412EB0B6[0];
+                if ((parentUsuarioRowByFK__Notificac__CodUs__4316F928 != null)) {
+                    columnValuesArray[4] = parentUsuarioRowByFK__Notificac__CodUs__4316F928[0];
                 }
                 rowNotificacoesRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowNotificacoesRow);
@@ -1730,15 +1730,15 @@ namespace CanvasApp {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public ProjetoRow AddProjetoRow(string Nome, UsuarioRow parentUsuarioRowByFK__Projeto__CodUsua__3A81B327, bool NaoPertube) {
+            public ProjetoRow AddProjetoRow(string Nome, UsuarioRow parentUsuarioRowByFK__Projeto__CodUsua__1273C1CD, bool NaoPertube) {
                 ProjetoRow rowProjetoRow = ((ProjetoRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
                         Nome,
                         null,
                         NaoPertube};
-                if ((parentUsuarioRowByFK__Projeto__CodUsua__3A81B327 != null)) {
-                    columnValuesArray[2] = parentUsuarioRowByFK__Projeto__CodUsua__3A81B327[0];
+                if ((parentUsuarioRowByFK__Projeto__CodUsua__1273C1CD != null)) {
+                    columnValuesArray[2] = parentUsuarioRowByFK__Projeto__CodUsua__1273C1CD[0];
                 }
                 rowProjetoRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowProjetoRow);
@@ -2021,16 +2021,16 @@ namespace CanvasApp {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public Projeto_MembrosRow AddProjeto_MembrosRow(UsuarioRow parentUsuarioRowByFK__Projeto_M__CodMe__44FF419A, ProjetoRow parentProjetoRowByFK__Projeto_M__CodPr__45F365D3) {
+            public Projeto_MembrosRow AddProjeto_MembrosRow(UsuarioRow parentUsuarioRowByFK__Projeto_M__CodMe__182C9B23, ProjetoRow parentProjetoRowByFK__Projeto_M__CodPr__47DBAE45) {
                 Projeto_MembrosRow rowProjeto_MembrosRow = ((Projeto_MembrosRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
                         null};
-                if ((parentUsuarioRowByFK__Projeto_M__CodMe__44FF419A != null)) {
-                    columnValuesArray[0] = parentUsuarioRowByFK__Projeto_M__CodMe__44FF419A[0];
+                if ((parentUsuarioRowByFK__Projeto_M__CodMe__182C9B23 != null)) {
+                    columnValuesArray[0] = parentUsuarioRowByFK__Projeto_M__CodMe__182C9B23[0];
                 }
-                if ((parentProjetoRowByFK__Projeto_M__CodPr__45F365D3 != null)) {
-                    columnValuesArray[1] = parentProjetoRowByFK__Projeto_M__CodPr__45F365D3[0];
+                if ((parentProjetoRowByFK__Projeto_M__CodPr__47DBAE45 != null)) {
+                    columnValuesArray[1] = parentProjetoRowByFK__Projeto_M__CodPr__47DBAE45[0];
                 }
                 rowProjeto_MembrosRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowProjeto_MembrosRow);
@@ -2331,7 +2331,7 @@ namespace CanvasApp {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public Projeto_TarefasRow AddProjeto_TarefasRow(ProjetoRow parentProjetoRowByFK__Projeto_T__CodPr__3D5E1FD2, UsuarioRow parentUsuarioRowByFK__Projeto_T__CodUs__3E52440B, string Descricao, bool isConcluida) {
+            public Projeto_TarefasRow AddProjeto_TarefasRow(ProjetoRow parentProjetoRowByFK__Projeto_T__CodPr__3E52440B, UsuarioRow parentUsuarioRowByFK__Projeto_T__CodUs__164452B1, string Descricao, bool isConcluida) {
                 Projeto_TarefasRow rowProjeto_TarefasRow = ((Projeto_TarefasRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
@@ -2339,11 +2339,11 @@ namespace CanvasApp {
                         null,
                         Descricao,
                         isConcluida};
-                if ((parentProjetoRowByFK__Projeto_T__CodPr__3D5E1FD2 != null)) {
-                    columnValuesArray[1] = parentProjetoRowByFK__Projeto_T__CodPr__3D5E1FD2[0];
+                if ((parentProjetoRowByFK__Projeto_T__CodPr__3E52440B != null)) {
+                    columnValuesArray[1] = parentProjetoRowByFK__Projeto_T__CodPr__3E52440B[0];
                 }
-                if ((parentUsuarioRowByFK__Projeto_T__CodUs__3E52440B != null)) {
-                    columnValuesArray[2] = parentUsuarioRowByFK__Projeto_T__CodUs__3E52440B[0];
+                if ((parentUsuarioRowByFK__Projeto_T__CodUs__164452B1 != null)) {
+                    columnValuesArray[2] = parentUsuarioRowByFK__Projeto_T__CodUs__164452B1[0];
                 }
                 rowProjeto_TarefasRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowProjeto_TarefasRow);
@@ -2658,7 +2658,7 @@ namespace CanvasApp {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public Tarefas_ComentariosRow AddTarefas_ComentariosRow(UsuarioRow parentUsuarioRowByFK__Tarefas_C__CodUs__5441852A, Projeto_TarefasRow parentProjeto_TarefasRowByFK__Tarefas_C__CodTa__5535A963, string Comentario, System.DateTime Data) {
+            public Tarefas_ComentariosRow AddTarefas_ComentariosRow(UsuarioRow parentUsuarioRowByFK__Tarefas_C__CodUs__571DF1D5, Projeto_TarefasRow parentProjeto_TarefasRowByFK__Tarefas_C__CodTa__5812160E, string Comentario, System.DateTime Data) {
                 Tarefas_ComentariosRow rowTarefas_ComentariosRow = ((Tarefas_ComentariosRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
@@ -2666,11 +2666,11 @@ namespace CanvasApp {
                         null,
                         Comentario,
                         Data};
-                if ((parentUsuarioRowByFK__Tarefas_C__CodUs__5441852A != null)) {
-                    columnValuesArray[1] = parentUsuarioRowByFK__Tarefas_C__CodUs__5441852A[0];
+                if ((parentUsuarioRowByFK__Tarefas_C__CodUs__571DF1D5 != null)) {
+                    columnValuesArray[1] = parentUsuarioRowByFK__Tarefas_C__CodUs__571DF1D5[0];
                 }
-                if ((parentProjeto_TarefasRowByFK__Tarefas_C__CodTa__5535A963 != null)) {
-                    columnValuesArray[2] = parentProjeto_TarefasRowByFK__Tarefas_C__CodTa__5535A963[0];
+                if ((parentProjeto_TarefasRowByFK__Tarefas_C__CodTa__5812160E != null)) {
+                    columnValuesArray[2] = parentProjeto_TarefasRowByFK__Tarefas_C__CodTa__5812160E[0];
                 }
                 rowTarefas_ComentariosRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowTarefas_ComentariosRow);
@@ -2977,15 +2977,15 @@ namespace CanvasApp {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
-            public Tarefas_SubTarefasRow AddTarefas_SubTarefasRow(string Texto, Projeto_TarefasRow parentProjeto_TarefasRowByFK__Tarefas_S__CodTa__5165187F, bool isConcluida) {
+            public Tarefas_SubTarefasRow AddTarefas_SubTarefasRow(string Texto, Projeto_TarefasRow parentProjeto_TarefasRowByFK__Tarefas_S__CodTa__5441852A, bool isConcluida) {
                 Tarefas_SubTarefasRow rowTarefas_SubTarefasRow = ((Tarefas_SubTarefasRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
                         Texto,
                         null,
                         isConcluida};
-                if ((parentProjeto_TarefasRowByFK__Tarefas_S__CodTa__5165187F != null)) {
-                    columnValuesArray[2] = parentProjeto_TarefasRowByFK__Tarefas_S__CodTa__5165187F[0];
+                if ((parentProjeto_TarefasRowByFK__Tarefas_S__CodTa__5441852A != null)) {
+                    columnValuesArray[2] = parentProjeto_TarefasRowByFK__Tarefas_S__CodTa__5441852A[0];
                 }
                 rowTarefas_SubTarefasRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowTarefas_SubTarefasRow);
@@ -3624,10 +3624,10 @@ namespace CanvasApp {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public Projeto_TarefasRow Projeto_TarefasRow {
                 get {
-                    return ((Projeto_TarefasRow)(this.GetParentRow(this.Table.ParentRelations["FK__Alarme__CodTaref__4E88ABD4"])));
+                    return ((Projeto_TarefasRow)(this.GetParentRow(this.Table.ParentRelations["FK__Alarme__CodTaref__5070F446"])));
                 }
                 set {
-                    this.SetParentRow(value, this.Table.ParentRelations["FK__Alarme__CodTaref__4E88ABD4"]);
+                    this.SetParentRow(value, this.Table.ParentRelations["FK__Alarme__CodTaref__5070F446"]);
                 }
             }
             
@@ -3635,10 +3635,10 @@ namespace CanvasApp {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public UsuarioRow UsuarioRow {
                 get {
-                    return ((UsuarioRow)(this.GetParentRow(this.Table.ParentRelations["FK__Alarme__Repetica__4D94879B"])));
+                    return ((UsuarioRow)(this.GetParentRow(this.Table.ParentRelations["FK__Alarme__CodUsuar__4F7CD00D"])));
                 }
                 set {
-                    this.SetParentRow(value, this.Table.ParentRelations["FK__Alarme__Repetica__4D94879B"]);
+                    this.SetParentRow(value, this.Table.ParentRelations["FK__Alarme__CodUsuar__4F7CD00D"]);
                 }
             }
             
@@ -3719,10 +3719,10 @@ namespace CanvasApp {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public Projeto_TarefasRow Projeto_TarefasRow {
                 get {
-                    return ((Projeto_TarefasRow)(this.GetParentRow(this.Table.ParentRelations["FK__Items_Fav__CodTa__49C3F6B7"])));
+                    return ((Projeto_TarefasRow)(this.GetParentRow(this.Table.ParentRelations["FK__Items_Fav__CodTa__4BAC3F29"])));
                 }
                 set {
-                    this.SetParentRow(value, this.Table.ParentRelations["FK__Items_Fav__CodTa__49C3F6B7"]);
+                    this.SetParentRow(value, this.Table.ParentRelations["FK__Items_Fav__CodTa__4BAC3F29"]);
                 }
             }
             
@@ -3730,10 +3730,10 @@ namespace CanvasApp {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public UsuarioRow UsuarioRow {
                 get {
-                    return ((UsuarioRow)(this.GetParentRow(this.Table.ParentRelations["FK__Items_Fav__CodUs__48CFD27E"])));
+                    return ((UsuarioRow)(this.GetParentRow(this.Table.ParentRelations["FK__Items_Fav__CodUs__4AB81AF0"])));
                 }
                 set {
-                    this.SetParentRow(value, this.Table.ParentRelations["FK__Items_Fav__CodUs__48CFD27E"]);
+                    this.SetParentRow(value, this.Table.ParentRelations["FK__Items_Fav__CodUs__4AB81AF0"]);
                 }
             }
         }
@@ -3832,10 +3832,10 @@ namespace CanvasApp {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public ProjetoRow ProjetoRow {
                 get {
-                    return ((ProjetoRow)(this.GetParentRow(this.Table.ParentRelations["FK__Notificac__CodPr__4222D4EF"])));
+                    return ((ProjetoRow)(this.GetParentRow(this.Table.ParentRelations["FK__Notificac__CodPr__440B1D61"])));
                 }
                 set {
-                    this.SetParentRow(value, this.Table.ParentRelations["FK__Notificac__CodPr__4222D4EF"]);
+                    this.SetParentRow(value, this.Table.ParentRelations["FK__Notificac__CodPr__440B1D61"]);
                 }
             }
             
@@ -3843,10 +3843,10 @@ namespace CanvasApp {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public UsuarioRow UsuarioRow {
                 get {
-                    return ((UsuarioRow)(this.GetParentRow(this.Table.ParentRelations["FK__Notificac__CodUs__412EB0B6"])));
+                    return ((UsuarioRow)(this.GetParentRow(this.Table.ParentRelations["FK__Notificac__CodUs__4316F928"])));
                 }
                 set {
-                    this.SetParentRow(value, this.Table.ParentRelations["FK__Notificac__CodUs__412EB0B6"]);
+                    this.SetParentRow(value, this.Table.ParentRelations["FK__Notificac__CodUs__4316F928"]);
                 }
             }
             
@@ -3937,43 +3937,43 @@ namespace CanvasApp {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public UsuarioRow UsuarioRow {
                 get {
-                    return ((UsuarioRow)(this.GetParentRow(this.Table.ParentRelations["FK__Projeto__CodUsua__3A81B327"])));
+                    return ((UsuarioRow)(this.GetParentRow(this.Table.ParentRelations["FK__Projeto__CodUsua__1273C1CD"])));
                 }
                 set {
-                    this.SetParentRow(value, this.Table.ParentRelations["FK__Projeto__CodUsua__3A81B327"]);
+                    this.SetParentRow(value, this.Table.ParentRelations["FK__Projeto__CodUsua__1273C1CD"]);
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public NotificacoesRow[] GetNotificacoesRows() {
-                if ((this.Table.ChildRelations["FK__Notificac__CodPr__4222D4EF"] == null)) {
+                if ((this.Table.ChildRelations["FK__Notificac__CodPr__440B1D61"] == null)) {
                     return new NotificacoesRow[0];
                 }
                 else {
-                    return ((NotificacoesRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Notificac__CodPr__4222D4EF"])));
+                    return ((NotificacoesRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Notificac__CodPr__440B1D61"])));
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public Projeto_MembrosRow[] GetProjeto_MembrosRows() {
-                if ((this.Table.ChildRelations["FK__Projeto_M__CodPr__45F365D3"] == null)) {
+                if ((this.Table.ChildRelations["FK__Projeto_M__CodPr__47DBAE45"] == null)) {
                     return new Projeto_MembrosRow[0];
                 }
                 else {
-                    return ((Projeto_MembrosRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Projeto_M__CodPr__45F365D3"])));
+                    return ((Projeto_MembrosRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Projeto_M__CodPr__47DBAE45"])));
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public Projeto_TarefasRow[] GetProjeto_TarefasRows() {
-                if ((this.Table.ChildRelations["FK__Projeto_T__CodPr__3D5E1FD2"] == null)) {
+                if ((this.Table.ChildRelations["FK__Projeto_T__CodPr__3E52440B"] == null)) {
                     return new Projeto_TarefasRow[0];
                 }
                 else {
-                    return ((Projeto_TarefasRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Projeto_T__CodPr__3D5E1FD2"])));
+                    return ((Projeto_TarefasRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Projeto_T__CodPr__3E52440B"])));
                 }
             }
         }
@@ -4018,10 +4018,10 @@ namespace CanvasApp {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public UsuarioRow UsuarioRow {
                 get {
-                    return ((UsuarioRow)(this.GetParentRow(this.Table.ParentRelations["FK__Projeto_M__CodMe__44FF419A"])));
+                    return ((UsuarioRow)(this.GetParentRow(this.Table.ParentRelations["FK__Projeto_M__CodMe__182C9B23"])));
                 }
                 set {
-                    this.SetParentRow(value, this.Table.ParentRelations["FK__Projeto_M__CodMe__44FF419A"]);
+                    this.SetParentRow(value, this.Table.ParentRelations["FK__Projeto_M__CodMe__182C9B23"]);
                 }
             }
             
@@ -4029,10 +4029,10 @@ namespace CanvasApp {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public ProjetoRow ProjetoRow {
                 get {
-                    return ((ProjetoRow)(this.GetParentRow(this.Table.ParentRelations["FK__Projeto_M__CodPr__45F365D3"])));
+                    return ((ProjetoRow)(this.GetParentRow(this.Table.ParentRelations["FK__Projeto_M__CodPr__47DBAE45"])));
                 }
                 set {
-                    this.SetParentRow(value, this.Table.ParentRelations["FK__Projeto_M__CodPr__45F365D3"]);
+                    this.SetParentRow(value, this.Table.ParentRelations["FK__Projeto_M__CodPr__47DBAE45"]);
                 }
             }
         }
@@ -4120,10 +4120,10 @@ namespace CanvasApp {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public ProjetoRow ProjetoRow {
                 get {
-                    return ((ProjetoRow)(this.GetParentRow(this.Table.ParentRelations["FK__Projeto_T__CodPr__3D5E1FD2"])));
+                    return ((ProjetoRow)(this.GetParentRow(this.Table.ParentRelations["FK__Projeto_T__CodPr__3E52440B"])));
                 }
                 set {
-                    this.SetParentRow(value, this.Table.ParentRelations["FK__Projeto_T__CodPr__3D5E1FD2"]);
+                    this.SetParentRow(value, this.Table.ParentRelations["FK__Projeto_T__CodPr__3E52440B"]);
                 }
             }
             
@@ -4131,10 +4131,10 @@ namespace CanvasApp {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public UsuarioRow UsuarioRow {
                 get {
-                    return ((UsuarioRow)(this.GetParentRow(this.Table.ParentRelations["FK__Projeto_T__CodUs__3E52440B"])));
+                    return ((UsuarioRow)(this.GetParentRow(this.Table.ParentRelations["FK__Projeto_T__CodUs__164452B1"])));
                 }
                 set {
-                    this.SetParentRow(value, this.Table.ParentRelations["FK__Projeto_T__CodUs__3E52440B"]);
+                    this.SetParentRow(value, this.Table.ParentRelations["FK__Projeto_T__CodUs__164452B1"]);
                 }
             }
             
@@ -4165,44 +4165,44 @@ namespace CanvasApp {
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public AlarmeRow[] GetAlarmeRows() {
-                if ((this.Table.ChildRelations["FK__Alarme__CodTaref__4E88ABD4"] == null)) {
+                if ((this.Table.ChildRelations["FK__Alarme__CodTaref__5070F446"] == null)) {
                     return new AlarmeRow[0];
                 }
                 else {
-                    return ((AlarmeRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Alarme__CodTaref__4E88ABD4"])));
+                    return ((AlarmeRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Alarme__CodTaref__5070F446"])));
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public Items_FavoritosRow[] GetItems_FavoritosRows() {
-                if ((this.Table.ChildRelations["FK__Items_Fav__CodTa__49C3F6B7"] == null)) {
+                if ((this.Table.ChildRelations["FK__Items_Fav__CodTa__4BAC3F29"] == null)) {
                     return new Items_FavoritosRow[0];
                 }
                 else {
-                    return ((Items_FavoritosRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Items_Fav__CodTa__49C3F6B7"])));
+                    return ((Items_FavoritosRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Items_Fav__CodTa__4BAC3F29"])));
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public Tarefas_ComentariosRow[] GetTarefas_ComentariosRows() {
-                if ((this.Table.ChildRelations["FK__Tarefas_C__CodTa__5535A963"] == null)) {
+                if ((this.Table.ChildRelations["FK__Tarefas_C__CodTa__5812160E"] == null)) {
                     return new Tarefas_ComentariosRow[0];
                 }
                 else {
-                    return ((Tarefas_ComentariosRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Tarefas_C__CodTa__5535A963"])));
+                    return ((Tarefas_ComentariosRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Tarefas_C__CodTa__5812160E"])));
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public Tarefas_SubTarefasRow[] GetTarefas_SubTarefasRows() {
-                if ((this.Table.ChildRelations["FK__Tarefas_S__CodTa__5165187F"] == null)) {
+                if ((this.Table.ChildRelations["FK__Tarefas_S__CodTa__5441852A"] == null)) {
                     return new Tarefas_SubTarefasRow[0];
                 }
                 else {
-                    return ((Tarefas_SubTarefasRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Tarefas_S__CodTa__5165187F"])));
+                    return ((Tarefas_SubTarefasRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Tarefas_S__CodTa__5441852A"])));
                 }
             }
         }
@@ -4280,10 +4280,10 @@ namespace CanvasApp {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public Projeto_TarefasRow Projeto_TarefasRow {
                 get {
-                    return ((Projeto_TarefasRow)(this.GetParentRow(this.Table.ParentRelations["FK__Tarefas_C__CodTa__5535A963"])));
+                    return ((Projeto_TarefasRow)(this.GetParentRow(this.Table.ParentRelations["FK__Tarefas_C__CodTa__5812160E"])));
                 }
                 set {
-                    this.SetParentRow(value, this.Table.ParentRelations["FK__Tarefas_C__CodTa__5535A963"]);
+                    this.SetParentRow(value, this.Table.ParentRelations["FK__Tarefas_C__CodTa__5812160E"]);
                 }
             }
             
@@ -4291,10 +4291,10 @@ namespace CanvasApp {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public UsuarioRow UsuarioRow {
                 get {
-                    return ((UsuarioRow)(this.GetParentRow(this.Table.ParentRelations["FK__Tarefas_C__CodUs__5441852A"])));
+                    return ((UsuarioRow)(this.GetParentRow(this.Table.ParentRelations["FK__Tarefas_C__CodUs__571DF1D5"])));
                 }
                 set {
-                    this.SetParentRow(value, this.Table.ParentRelations["FK__Tarefas_C__CodUs__5441852A"]);
+                    this.SetParentRow(value, this.Table.ParentRelations["FK__Tarefas_C__CodUs__571DF1D5"]);
                 }
             }
         }
@@ -4371,10 +4371,10 @@ namespace CanvasApp {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public Projeto_TarefasRow Projeto_TarefasRow {
                 get {
-                    return ((Projeto_TarefasRow)(this.GetParentRow(this.Table.ParentRelations["FK__Tarefas_S__CodTa__5165187F"])));
+                    return ((Projeto_TarefasRow)(this.GetParentRow(this.Table.ParentRelations["FK__Tarefas_S__CodTa__5441852A"])));
                 }
                 set {
-                    this.SetParentRow(value, this.Table.ParentRelations["FK__Tarefas_S__CodTa__5165187F"]);
+                    this.SetParentRow(value, this.Table.ParentRelations["FK__Tarefas_S__CodTa__5441852A"]);
                 }
             }
             
@@ -4514,77 +4514,77 @@ namespace CanvasApp {
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public AlarmeRow[] GetAlarmeRows() {
-                if ((this.Table.ChildRelations["FK__Alarme__Repetica__4D94879B"] == null)) {
+                if ((this.Table.ChildRelations["FK__Alarme__CodUsuar__4F7CD00D"] == null)) {
                     return new AlarmeRow[0];
                 }
                 else {
-                    return ((AlarmeRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Alarme__Repetica__4D94879B"])));
+                    return ((AlarmeRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Alarme__CodUsuar__4F7CD00D"])));
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public Items_FavoritosRow[] GetItems_FavoritosRows() {
-                if ((this.Table.ChildRelations["FK__Items_Fav__CodUs__48CFD27E"] == null)) {
+                if ((this.Table.ChildRelations["FK__Items_Fav__CodUs__4AB81AF0"] == null)) {
                     return new Items_FavoritosRow[0];
                 }
                 else {
-                    return ((Items_FavoritosRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Items_Fav__CodUs__48CFD27E"])));
+                    return ((Items_FavoritosRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Items_Fav__CodUs__4AB81AF0"])));
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public NotificacoesRow[] GetNotificacoesRows() {
-                if ((this.Table.ChildRelations["FK__Notificac__CodUs__412EB0B6"] == null)) {
+                if ((this.Table.ChildRelations["FK__Notificac__CodUs__4316F928"] == null)) {
                     return new NotificacoesRow[0];
                 }
                 else {
-                    return ((NotificacoesRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Notificac__CodUs__412EB0B6"])));
+                    return ((NotificacoesRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Notificac__CodUs__4316F928"])));
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public ProjetoRow[] GetProjetoRows() {
-                if ((this.Table.ChildRelations["FK__Projeto__CodUsua__3A81B327"] == null)) {
+                if ((this.Table.ChildRelations["FK__Projeto__CodUsua__1273C1CD"] == null)) {
                     return new ProjetoRow[0];
                 }
                 else {
-                    return ((ProjetoRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Projeto__CodUsua__3A81B327"])));
+                    return ((ProjetoRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Projeto__CodUsua__1273C1CD"])));
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public Projeto_MembrosRow[] GetProjeto_MembrosRows() {
-                if ((this.Table.ChildRelations["FK__Projeto_M__CodMe__44FF419A"] == null)) {
+                if ((this.Table.ChildRelations["FK__Projeto_M__CodMe__182C9B23"] == null)) {
                     return new Projeto_MembrosRow[0];
                 }
                 else {
-                    return ((Projeto_MembrosRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Projeto_M__CodMe__44FF419A"])));
+                    return ((Projeto_MembrosRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Projeto_M__CodMe__182C9B23"])));
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public Projeto_TarefasRow[] GetProjeto_TarefasRows() {
-                if ((this.Table.ChildRelations["FK__Projeto_T__CodUs__3E52440B"] == null)) {
+                if ((this.Table.ChildRelations["FK__Projeto_T__CodUs__164452B1"] == null)) {
                     return new Projeto_TarefasRow[0];
                 }
                 else {
-                    return ((Projeto_TarefasRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Projeto_T__CodUs__3E52440B"])));
+                    return ((Projeto_TarefasRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Projeto_T__CodUs__164452B1"])));
                 }
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "17.0.0.0")]
             public Tarefas_ComentariosRow[] GetTarefas_ComentariosRows() {
-                if ((this.Table.ChildRelations["FK__Tarefas_C__CodUs__5441852A"] == null)) {
+                if ((this.Table.ChildRelations["FK__Tarefas_C__CodUs__571DF1D5"] == null)) {
                     return new Tarefas_ComentariosRow[0];
                 }
                 else {
-                    return ((Tarefas_ComentariosRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Tarefas_C__CodUs__5441852A"])));
+                    return ((Tarefas_ComentariosRow[])(base.GetChildRows(this.Table.ChildRelations["FK__Tarefas_C__CodUs__571DF1D5"])));
                 }
             }
         }

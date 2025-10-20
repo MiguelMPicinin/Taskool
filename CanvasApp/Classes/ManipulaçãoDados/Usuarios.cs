@@ -76,7 +76,7 @@ namespace CanvasApp.Classes.Databases
                             {
                                 return new Usuario
                                 {
-                                    Codigo = reader["Codigo"].ToString(),
+                                    Codigo = Convert.ToInt32(reader["Codigo"]),
                                     Nome = reader["Nome"].ToString(),
                                     Email = reader["Email"].ToString(),
                                     NomeUsuario = reader["NomeUsuario"].ToString(),
@@ -118,7 +118,7 @@ namespace CanvasApp.Classes.Databases
                             {
                                 lista.Add(new Usuario
                                 {
-                                    Codigo = reader["Codigo"].ToString(),
+                                    Codigo = Convert.ToInt32(reader["Codigo"]),
                                     Nome = reader["Nome"].ToString(),
                                     Email = reader["Email"].ToString(),
                                     NomeUsuario = reader["NomeUsuario"].ToString(),
@@ -185,7 +185,7 @@ namespace CanvasApp.Classes.Databases
                                 {
                                     return new Usuario
                                     {
-                                        Codigo = reader["Codigo"].ToString(),
+                                        Codigo = Convert.ToInt32(reader["Codigo"]),
                                         Nome = reader["Nome"].ToString(),
                                         Email = reader["Email"].ToString(),
                                         NomeUsuario = reader["NomeUsuario"].ToString(),
@@ -298,7 +298,9 @@ namespace CanvasApp.Classes.Databases
             }
         }
 
-        // Adicione estes métodos à classe UsuarioDB existente:
+        // =========================================================================
+        // MÉTODOS ADICIONAIS (INTEGRADOS DO UsuarioDBTeste)
+        // =========================================================================
 
         public Usuario ObterUsuarioPorCodigo(string codigo)
         {
@@ -316,7 +318,7 @@ namespace CanvasApp.Classes.Databases
                             {
                                 return new Usuario
                                 {
-                                    Codigo = reader["Codigo"].ToString(),
+                                    Codigo = Convert.ToInt32(reader["Codigo"]),
                                     Nome = reader["Nome"].ToString(),
                                     Email = reader["Email"].ToString(),
                                     NomeUsuario = reader["NomeUsuario"].ToString(),
@@ -344,6 +346,120 @@ namespace CanvasApp.Classes.Databases
         public bool VerificarPermissaoVisualizacao(string usuarioLogado, string usuarioDono)
         {
             return usuarioLogado == usuarioDono;
+        }
+
+        public int ObterQuantidadeTarefasAtrasadas(int usuarioId)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                        SELECT COUNT(*) 
+                        FROM Projeto_Tarefas PT
+                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId 
+                        AND PT.isConcluida = 0 
+                        AND PT.DataLimite < GETDATE()";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        int total = Convert.ToInt32(cmd.ExecuteScalar());
+                        Console.WriteLine($"📊 Quantidade atrasadas: {total}");
+                        return total;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erro ao contar tarefas atrasadas: {ex.Message}");
+                return 0;
+            }
+        }
+
+        public int ObterQuantidadeProjetosUsuario(int usuarioId)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                        SELECT COUNT(DISTINCT P.Codigo)
+                        FROM Projeto P
+                        INNER JOIN Projeto_Membros PM ON P.Codigo = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        int total = Convert.ToInt32(cmd.ExecuteScalar());
+                        Console.WriteLine($"📊 Quantidade de projetos: {total}");
+                        return total;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erro ao contar projetos: {ex.Message}");
+                return 0;
+            }
+        }
+
+        public void DiagnosticoCompletoUsuario(int usuarioId)
+        {
+            try
+            {
+                Console.WriteLine("\n" + new string('=', 70));
+                Console.WriteLine("🎯 DIAGNÓSTICO COMPLETO DO USUÁRIO");
+                Console.WriteLine(new string('=', 70));
+
+                // Para usar os métodos de TarefasDB, precisamos criar uma instância
+                var tarefasDB = new TarefasDB();
+
+                DateTime dataServidor = DateTime.Today; // Fallback simples
+                Console.WriteLine($"\n📊 DATA DO SISTEMA: {dataServidor:dd/MM/yyyy}");
+
+                // Contagens totais
+                int totalTarefas = tarefasDB.ObterQuantidadeTarefasTotaisDoUsuario(usuarioId);
+                int totalConcluidas = tarefasDB.ObterQuantidadeTarefasTotaisConcluidasDoUsuario(usuarioId);
+                int totalPendentes = tarefasDB.ObterQuantidadeTarefasTotaisPendentesDoUsuario(usuarioId);
+                int totalAtrasadas = ObterQuantidadeTarefasAtrasadas(usuarioId);
+                int totalProjetos = ObterQuantidadeProjetosUsuario(usuarioId);
+
+                // Contagens de hoje
+                int hojeConcluidas = tarefasDB.ObterQuantidadeTarefasConcluidasComAlarmeHoje(usuarioId);
+                int hojePendentes = tarefasDB.ObterQuantidadeTarefasPendentesComAlarmeHoje(usuarioId);
+
+                // Contagens da semana
+                int semanaConcluidas = tarefasDB.ObterQuantidadeTarefasConcluidasComAlarmeSemana(usuarioId);
+                int semanaPendentes = tarefasDB.ObterQuantidadeTarefasPendentesComAlarmeSemana(usuarioId);
+
+                Console.WriteLine($"\n📈 ESTATÍSTICAS GERAIS:");
+                Console.WriteLine($"   • Total de Tarefas: {totalTarefas}");
+                Console.WriteLine($"   • Tarefas Concluídas: {totalConcluidas}");
+                Console.WriteLine($"   • Tarefas Pendentes: {totalPendentes}");
+                Console.WriteLine($"   • Tarefas Atrasadas: {totalAtrasadas}");
+                Console.WriteLine($"   • Projetos: {totalProjetos}");
+
+                Console.WriteLine($"\n📅 HOJE ({dataServidor:dd/MM/yyyy}):");
+                Console.WriteLine($"   • Concluídas: {hojeConcluidas}");
+                Console.WriteLine($"   • Pendentes: {hojePendentes}");
+
+                Console.WriteLine($"\n📅 ESTA SEMANA:");
+                Console.WriteLine($"   • Concluídas: {semanaConcluidas}");
+                Console.WriteLine($"   • Pendentes: {semanaPendentes}");
+
+                // Cálculo de porcentagem
+                double porcentagemConcluidas = totalTarefas > 0 ? Math.Round((totalConcluidas * 100.0) / totalTarefas, 1) : 0;
+                Console.WriteLine($"\n🎯 PROGRESSO GERAL: {porcentagemConcluidas}% concluído");
+
+                Console.WriteLine("\n" + new string('=', 70));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erro no diagnóstico: {ex.Message}");
+            }
         }
     }
 }

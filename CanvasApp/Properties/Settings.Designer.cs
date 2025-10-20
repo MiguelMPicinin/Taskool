@@ -44,5 +44,16 @@ namespace CanvasApp.Properties {
                 return ((string)(this["dbTarefas2ConnectionString"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=Olimpiada\\SQLEXPRESS;Initial Catalog=dbTarefas4;Integrated Security=T" +
+            "rue;TrustServerCertificate=True")]
+        public string dbTarefas4ConnectionString {
+            get {
+                return ((string)(this["dbTarefas4ConnectionString"]));
+            }
+        }
     }
 }

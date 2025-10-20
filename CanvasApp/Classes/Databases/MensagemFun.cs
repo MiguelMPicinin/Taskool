@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace CanvasApp.Classes.Databases.MensagemFun
 {
@@ -16,7 +15,6 @@ namespace CanvasApp.Classes.Databases.MensagemFun
 
         public string Buscar(string mensagem)
         {
-            
             try
             {
                 string caminho = Path.Combine(diretorio, mensagem + ".json");
@@ -40,7 +38,5 @@ namespace CanvasApp.Classes.Databases.MensagemFun
                 return null;
             }
         }
-
-        
     }
 }

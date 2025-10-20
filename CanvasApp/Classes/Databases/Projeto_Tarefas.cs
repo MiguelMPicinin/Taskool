@@ -10,8 +10,9 @@ namespace CanvasApp.Classes.Databases.UsuarioCL
     {
         public int Codigo { get; set; }
         public int CodProjeto { get; set; }
-        public string CodUsuario { get; set; }
+        public int? CodUsuario { get; set; } // Alterado para nullable
         public string Descricao { get; set; }
         public bool isConcluida { get; set; }
+        // Removido DataLimite e DataConclusao pois não existem na tabela
     }
 }
