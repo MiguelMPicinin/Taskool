@@ -1054,9 +1054,10 @@ namespace CanvasApp
 
             bool sucesso;
 
+            // CORREÇÃO: Chamada correta do método CriarTarefaCompartilhada
             if (projetoSelecionado.CodUsuario != usuarioLogadoId)
             {
-                sucesso = dbTarefas.CriarTarefaCompartilhada(novaTarefa, usuarioLogadoId);
+                sucesso = dbTarefas.CriarTarefaCompartilhada(novaTarefa);
             }
             else
             {
@@ -1158,7 +1159,6 @@ namespace CanvasApp
 
                 picEstrela.Click += (sender, e) =>
                 {
-                    e.GetType().GetProperty("Handled")?.SetValue(e, true);
                     var pictureBox = (PictureBox)sender;
                     var dados = (dynamic)pictureBox.Tag;
                     bool novoEstado = !dados.EstaFavoritado;
@@ -1189,20 +1189,20 @@ namespace CanvasApp
 
                 try
                 {
-                    // Obter responsáveis da tarefa
+                    // CORREÇÃO: Obter responsáveis da tarefa de forma mais robusta
                     var responsaveis = new List<Usuario>();
 
                     // Se a tarefa tem um usuário atribuído, adicionar como responsável
-                    if (!string.IsNullOrEmpty(tarefa.CodUsuario.ToString()))
+                    if (tarefa.CodUsuario.HasValue && tarefa.CodUsuario > 0)
                     {
-                        var usuarioResponsavel = dbUsuario.ObterUsuarioPorCodigo(tarefa.CodUsuario.ToString());
+                        var usuarioResponsavel = dbUsuario.ObterUsuarioPorCodigo(Convert.ToInt32(tarefa.CodUsuario));
                         if (usuarioResponsavel != null)
                         {
                             responsaveis.Add(usuarioResponsavel);
                         }
                     }
 
-                    // Adicionar círculos dos responsáveis DA DIREITA PARA ESQUERDA
+                    // CORREÇÃO: Adicionar círculos dos responsáveis DA DIREITA PARA ESQUERDA
                     if (responsaveis.Any())
                     {
                         // Ordenar para consistência na exibição
@@ -1217,9 +1217,9 @@ namespace CanvasApp
                         }
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    // Ignorar erro
+                    Console.WriteLine($"Erro ao carregar responsáveis: {ex.Message}");
                 }
 
                 // --- DATA DO ALARME (se houver) ---
@@ -1230,7 +1230,7 @@ namespace CanvasApp
                     {
                         var labelDataAlarme = new Label
                         {
-                            Text = $"Alarme: {alarme.Data:dd/MM/yyyy} às {alarme.Hora:HH:mm}",
+                            Text = $"Alarme: {alarme.Data:dd/MM/yyyy} às {alarme.Hora:hh\\:mm}",
                             AutoSize = true,
                             Location = new Point(40, 35),
                             Font = new Font("Segoe UI", 8, FontStyle.Italic),
@@ -1243,9 +1243,9 @@ namespace CanvasApp
                         labelDataAlarme.Click += (sender, e) => AbrirDetalhesTarefa(tarefa);
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    // Ignorar erro
+                    Console.WriteLine($"Erro ao carregar alarme: {ex.Message}");
                 }
 
                 // --- EVENTOS DE CLIQUE ---
@@ -1258,8 +1258,9 @@ namespace CanvasApp
 
                 return panel;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine($"Erro ao criar item tarefa: {ex.Message}");
                 return new Panel { Width = Lst_ListaTarefas.Width - 25, Height = 60 };
             }
         }
@@ -1302,9 +1303,9 @@ namespace CanvasApp
                 // Adicionar ao dicionário de formulários abertos
                 formulariosAtribuicaoAbertos[tarefa.Codigo] = novoForm;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Erro ao abrir formulário de atribuição de responsável.", "Erro",
+                MessageBox.Show($"Erro ao abrir formulário de atribuição de responsável: {ex.Message}", "Erro",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -1324,7 +1325,7 @@ namespace CanvasApp
             path.AddEllipse(0, 0, panelCirculo.Width, panelCirculo.Height);
             panelCirculo.Region = new Region(path);
 
-            // Label com a inicial
+            // CORREÇÃO: Label com a inicial - garantir que não seja nula
             var lblInicial = new Label
             {
                 Text = ObterInicialUsuario(usuario.Nome),

@@ -141,7 +141,7 @@ namespace Home
         {
             if (Sessao.UsuarioLogado == null) return;
 
-            int usuarioId = int.Parse(Sessao.UsuarioLogado.Codigo);
+            int usuarioId = Convert.ToInt32(Sessao.UsuarioLogado.Codigo);
 
             // Limpar notificações existentes (exceto título e botão fechar)
             for (int i = Pnl_Notificacoes.Controls.Count - 1; i >= 0; i--)
@@ -367,7 +367,7 @@ namespace Home
 
             if (Sessao.UsuarioLogado == null) return;
 
-            int usuarioId = int.Parse(Sessao.UsuarioLogado.Codigo);
+            int usuarioId = Convert.ToInt32(Sessao.UsuarioLogado.Codigo);
 
             // Adicionar categorias fixas
             AdicionarCategoriaMenu("Favoritas", ObterQuantidadeFavoritas(usuarioId));
@@ -613,7 +613,7 @@ namespace Home
         {
             if (Sessao.UsuarioLogado == null) return;
 
-            int usuarioId = int.Parse(Sessao.UsuarioLogado.Codigo);
+            int usuarioId = Convert.ToInt32(Sessao.UsuarioLogado.Codigo);
 
             switch (categoria)
             {
@@ -636,7 +636,7 @@ namespace Home
         {
             if (Sessao.UsuarioLogado == null) return;
 
-            int usuarioId = int.Parse(Sessao.UsuarioLogado.Codigo);
+            int usuarioId = Convert.ToInt32(Sessao.UsuarioLogado.Codigo);
             AbrirFormProjeto(projeto, usuarioId);
         }
 
@@ -1097,5 +1097,12 @@ namespace Home
         private void Frm_Home_Load(object sender, EventArgs e) { }
         private void Lbl_Taskool_Click(object sender, EventArgs e) { }
         private void Lbl_Titulo_Click(object sender, EventArgs e) { }
+
+        private void Btn_Dashboard_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            Frm_Dashboard fd = new Frm_Dashboard();
+            fd.ShowDialog();
+        }
     }
 }

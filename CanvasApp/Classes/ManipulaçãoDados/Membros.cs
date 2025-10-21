@@ -7,20 +7,13 @@ namespace CanvasApp.Classes.Databases
 {
     public class MembrosDB : BaseDB
     {
-        private readonly NotificacoesDB _notificacoesDB;
-        private readonly ProjetosDB _projetosDB;
-        private readonly UsuarioDB _usuarioDB;
+        // CONSTRUTORES CORRIGIDOS
+        public MembrosDB() { }
 
         public MembrosDB(NotificacoesDB notificacoesDB, ProjetosDB projetosDB, UsuarioDB usuarioDB)
         {
-            _notificacoesDB = notificacoesDB;
-            _projetosDB = projetosDB;
-            _usuarioDB = usuarioDB;
+            // Inicialização das dependências se necessário
         }
-
-        // =========================================================================
-        // MÉTODO ADICIONAL (INTEGRADO DO MembrosDBTeste)
-        // =========================================================================
 
         public bool EhMembroDoProjeto(int usuarioId, int projetoId)
         {
@@ -30,7 +23,6 @@ namespace CanvasApp.Classes.Databases
                 {
                     string sql = @"SELECT COUNT(*) FROM Projeto_Membros 
                                 WHERE CodProjeto = @CodProjeto AND CodMembro = @CodMembro";
-
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@CodProjeto", projetoId);
@@ -47,21 +39,24 @@ namespace CanvasApp.Classes.Databases
             }
         }
 
-        // =========================================================================
-        // MÉTODOS ORIGINAIS (MANTIDOS)
-        // =========================================================================
-
         public bool RemoverMembroProjeto(int codProjeto, string codUsuario)
         {
             try
             {
+                // CORREÇÃO: Converter string para int
+                if (!int.TryParse(codUsuario, out int usuarioId))
+                {
+                    Mensagem = "Código de usuário inválido.";
+                    return false;
+                }
+
                 using (SqlConnection conn = GetConnection())
                 {
                     string sql = "DELETE FROM Projeto_Membros WHERE CodProjeto = @CodProjeto AND CodMembro = @CodMembro";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@CodProjeto", codProjeto);
-                        cmd.Parameters.AddWithValue("@CodMembro", codUsuario);
+                        cmd.Parameters.AddWithValue("@CodMembro", usuarioId);
                         int rowsAffected = cmd.ExecuteNonQuery();
 
                         if (rowsAffected > 0)
@@ -95,8 +90,8 @@ namespace CanvasApp.Classes.Databases
                         SELECT U.Codigo, U.Nome, U.Email, U.NomeUsuario, U.DataNascimento, U.Telefone
                         FROM Usuario U
                         INNER JOIN Projeto_Membros PM ON U.Codigo = PM.CodMembro
-                        WHERE PM.CodProjeto = @CodProjeto";
-
+                        WHERE PM.CodProjeto = @CodProjeto
+                        ORDER BY U.Nome";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@CodProjeto", codProjeto);
@@ -131,7 +126,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
-                    // Primeiro verifica se o membro já existe
+                    // Verificar se o membro já existe
                     string sqlVerificar = @"SELECT COUNT(*) FROM Projeto_Membros 
                                           WHERE CodProjeto = @CodProjeto AND CodMembro = @CodMembro";
                     using (SqlCommand cmdVerificar = new SqlCommand(sqlVerificar, conn))
@@ -147,7 +142,7 @@ namespace CanvasApp.Classes.Databases
                         }
                     }
 
-                    // Adiciona o membro
+                    // Adicionar o membro
                     string sqlInserir = @"INSERT INTO Projeto_Membros (CodProjeto, CodMembro) 
                                         VALUES (@CodProjeto, @CodMembro)";
                     using (SqlCommand cmdInserir = new SqlCommand(sqlInserir, conn))
@@ -156,22 +151,6 @@ namespace CanvasApp.Classes.Databases
                         cmdInserir.Parameters.AddWithValue("@CodMembro", codUsuario);
                         cmdInserir.ExecuteNonQuery();
                     }
-
-                    // Cria notificação para o usuário adicionado
-                    string nomeProjeto = _projetosDB.ObterNomeProjeto(codProjeto);
-                    int proprietarioId = _projetosDB.ObterProprietarioProjeto(codProjeto);
-                    string nomeProprietario = _usuarioDB.ObterNomeUsuario(proprietarioId);
-
-                    var notificacao = new Notificacoes
-                    {
-                        Texto = $"Você foi adicionado no projeto {nomeProjeto} por {nomeProprietario}",
-                        Data = DateTime.Now,
-                        CodProjeto = codProjeto,
-                        CodUsuario = codUsuario,
-                        isFechada = false
-                    };
-
-                    _notificacoesDB.InserirNotificacao(notificacao);
 
                     Mensagem = "Membro adicionado com sucesso!";
                     return true;
@@ -211,7 +190,6 @@ namespace CanvasApp.Classes.Databases
                     // Verificar se já é membro
                     string sqlVerificarMembro = @"SELECT COUNT(*) FROM Projeto_Membros 
                                                 WHERE CodProjeto = @CodProjeto AND CodMembro = @CodMembro";
-
                     using (SqlCommand cmdVerificar = new SqlCommand(sqlVerificarMembro, conn))
                     {
                         cmdVerificar.Parameters.AddWithValue("@CodProjeto", codProjeto);
@@ -228,28 +206,12 @@ namespace CanvasApp.Classes.Databases
                     // Adicionar como membro
                     string sqlInserir = @"INSERT INTO Projeto_Membros (CodProjeto, CodMembro) 
                                         VALUES (@CodProjeto, @CodMembro)";
-
                     using (SqlCommand cmdInserir = new SqlCommand(sqlInserir, conn))
                     {
                         cmdInserir.Parameters.AddWithValue("@CodProjeto", codProjeto);
                         cmdInserir.Parameters.AddWithValue("@CodMembro", codUsuarioCompartilhar);
                         cmdInserir.ExecuteNonQuery();
                     }
-
-                    // Criar notificação
-                    string nomeProjeto = _projetosDB.ObterNomeProjeto(codProjeto);
-                    string nomeProprietario = _usuarioDB.ObterNomeUsuario(codUsuarioProprietario);
-
-                    var notificacao = new Notificacoes
-                    {
-                        Texto = $"Você foi adicionado ao projeto '{nomeProjeto}' por {nomeProprietario}",
-                        Data = DateTime.Now,
-                        CodProjeto = codProjeto,
-                        CodUsuario = codUsuarioCompartilhar,
-                        isFechada = false
-                    };
-
-                    _notificacoesDB.InserirNotificacao(notificacao);
 
                     Mensagem = "Projeto compartilhado com sucesso!";
                     return true;
@@ -260,6 +222,55 @@ namespace CanvasApp.Classes.Databases
                 Mensagem = "Erro ao compartilhar projeto: " + ex.Message;
                 return false;
             }
+        }
+
+        public int ObterQuantidadeMembrosProjeto(int codProjeto)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = @"SELECT COUNT(*) FROM Projeto_Membros WHERE CodProjeto = @CodProjeto";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@CodProjeto", codProjeto);
+                        return Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao contar membros: " + ex.Message;
+                return 0;
+            }
+        }
+
+        public List<int> ObterProjetosDoUsuario(int codUsuario)
+        {
+            List<int> projetos = new List<int>();
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = @"SELECT CodProjeto FROM Projeto_Membros WHERE CodMembro = @CodMembro";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@CodMembro", codUsuario);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                projetos.Add(Convert.ToInt32(reader["CodProjeto"]));
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao obter projetos do usuário: " + ex.Message;
+            }
+            return projetos;
         }
     }
 }

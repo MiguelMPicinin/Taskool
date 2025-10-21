@@ -34,7 +34,7 @@ namespace CanvasApp
         private void InitializeUI()
         {
             this.BackColor = Tema.corAtual;
-            this.usuarioLogadoId = int.Parse(Sessao.UsuarioLogado.Codigo);
+            this.usuarioLogadoId = Convert.ToInt32(Sessao.UsuarioLogado.Codigo);
 
             Tbp_Membros.Text = "Membros da Lista";
             Tbp_Opcoes.Text = "Opções da lista";
@@ -305,7 +305,7 @@ namespace CanvasApp
             var projeto = new Projetos
             {
                 Nome = nomeProjeto,
-                CodUsuario = int.Parse(proprietario.Codigo),
+                CodUsuario = Convert.ToInt32(proprietario.Codigo),
                 NaoPertube = Rbtn_ToggleSwitch.Checked
             };
 
@@ -326,7 +326,7 @@ namespace CanvasApp
                 return;
             }
 
-            var projetosUsuario = dbProjetos.ObterProjetosPorUsuario(int.Parse(proprietario.Codigo));
+            var projetosUsuario = dbProjetos.ObterProjetosPorUsuario(Convert.ToInt32(proprietario.Codigo));
             var projetoCompleto = projetosUsuario?.FirstOrDefault(p => p.Nome == nomeProjeto);
 
             if (projetoCompleto == null)
@@ -342,7 +342,7 @@ namespace CanvasApp
                     if (membro.Codigo == proprietario.Codigo)
                         continue;
 
-                    if (!dbMembros.AdicionarMembroAoProjeto(projetoCompleto.Codigo, int.Parse(membro.Codigo)))
+                    if (!dbMembros.AdicionarMembroAoProjeto(projetoCompleto.Codigo, Convert.ToInt32(membro.Codigo)))
                     {
                         MessageBox.Show($"Erro ao adicionar membro {membro.Nome}: {dbMembros.Mensagem}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }

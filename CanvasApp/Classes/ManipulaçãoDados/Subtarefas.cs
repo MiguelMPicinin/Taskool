@@ -89,7 +89,10 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
-                    string sql = "SELECT * FROM Tarefas_SubTarefas WHERE CodTarefa = @CodTarefa ORDER BY Codigo";
+                    string sql = @"SELECT Codigo, Texto, CodTarefa, isConcluida 
+                                 FROM Tarefas_SubTarefas 
+                                 WHERE CodTarefa = @CodTarefa 
+                                 ORDER BY Codigo";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@CodTarefa", codTarefa);
@@ -114,6 +117,75 @@ namespace CanvasApp.Classes.Databases
                 Mensagem = "Erro ao obter subtarefas: " + ex.Message;
             }
             return subtarefas;
+        }
+
+        public bool MarcarSubtarefaConcluida(int codSubtarefa, bool concluida)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = @"UPDATE Tarefas_SubTarefas SET isConcluida = @isConcluida 
+                                 WHERE Codigo = @Codigo";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@isConcluida", concluida);
+                        cmd.Parameters.AddWithValue("@Codigo", codSubtarefa);
+                        cmd.ExecuteNonQuery();
+                        Mensagem = "Status da subtarefa atualizado com sucesso.";
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao atualizar subtarefa: " + ex.Message;
+                return false;
+            }
+        }
+
+        public int ObterQuantidadeSubtarefasConcluidas(int codTarefa)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = @"SELECT COUNT(*) FROM Tarefas_SubTarefas 
+                                 WHERE CodTarefa = @CodTarefa AND isConcluida = 1";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@CodTarefa", codTarefa);
+                        return Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao contar subtarefas concluídas: " + ex.Message;
+                return 0;
+            }
+        }
+
+        public int ObterQuantidadeSubtarefas(int codTarefa)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = @"SELECT COUNT(*) FROM Tarefas_SubTarefas 
+                                 WHERE CodTarefa = @CodTarefa";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@CodTarefa", codTarefa);
+                        return Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao contar subtarefas: " + ex.Message;
+                return 0;
+            }
         }
     }
 }

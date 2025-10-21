@@ -16,31 +16,35 @@ namespace CanvasApp.Forms
         private TarefasDB _tarefasDB;
         private MembrosDB _membrosDB;
         private UsuarioDB _usuarioDB;
-        private List<Usuario> _responsaveisAdicionados = new List<Usuario>();
+        private Usuario _responsavelAtual;
 
         // Controles existentes no designer
         private Label Lbl_Titulo;
         private FlowLayoutPanel Pnl_Responsaveis;
         private Label Lbl_Ilustracao;
-        private TextBox Lst_Sugestoes;
-        private Button Btn_Concluir1;
-        private ListBox Lst_SugestoesResponsavel;
+        private TextBox Txt_BuscaResponsavel;
+        private Button Btn_Concluir;
+        private ListView Lst_SugestoesResponsavel; // CORREÇÃO: Mudado para ListView
 
         public Frm_AtribuirResponsavelTarefa(Projeto_Tarefas tarefa)
         {
             _tarefa = tarefa;
             _usuarioLogado = Sessao.UsuarioLogado;
 
+            // Inicializar as dependências corretamente
             var notificacoesDB = new NotificacoesDB();
             var projetosDB = new ProjetosDB();
             _usuarioDB = new UsuarioDB();
             _membrosDB = new MembrosDB(notificacoesDB, projetosDB, _usuarioDB);
-            _tarefasDB = new TarefasDB(notificacoesDB, projetosDB, _usuarioDB, _membrosDB,
-                                      new AlarmeDB(), new SubtarefasDB(), new ComentariosDB());
+            var alarmeDB = new AlarmeDB();
+            var subtarefasDB = new SubtarefasDB();
+            var comentariosDB = new ComentariosDB();
+
+            _tarefasDB = new TarefasDB(notificacoesDB, projetosDB, _usuarioDB, _membrosDB, alarmeDB, subtarefasDB, comentariosDB);
 
             InitializeComponent();
             ConfigurarInterfaceResponsaveis();
-            CarregarResponsaveisExistentes();
+            CarregarResponsavelExistente();
         }
 
         private void InitializeComponent()
@@ -48,18 +52,19 @@ namespace CanvasApp.Forms
             this.Lbl_Titulo = new Label();
             this.Pnl_Responsaveis = new FlowLayoutPanel();
             this.Lbl_Ilustracao = new Label();
-            this.Lst_Sugestoes = new TextBox();
-            this.Btn_Concluir1 = new Button();
+            this.Txt_BuscaResponsavel = new TextBox();
+            this.Btn_Concluir = new Button();
+            this.Lst_SugestoesResponsavel = new ListView(); // CORREÇÃO: Mudado para ListView
             this.SuspendLayout();
 
             // Lbl_Titulo
             this.Lbl_Titulo.AutoSize = true;
-            this.Lbl_Titulo.Font = new Font("Segoe UI", 12F);
+            this.Lbl_Titulo.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             this.Lbl_Titulo.Location = new Point(20, 20);
             this.Lbl_Titulo.Name = "Lbl_Titulo";
-            this.Lbl_Titulo.Size = new Size(193, 21);
+            this.Lbl_Titulo.Size = new Size(220, 21);
             this.Lbl_Titulo.TabIndex = 0;
-            this.Lbl_Titulo.Text = "Responsaveis desta Tarefa:";
+            this.Lbl_Titulo.Text = "Responsável desta Tarefa:";
 
             // Pnl_Responsaveis
             this.Pnl_Responsaveis.AutoScroll = true;
@@ -75,29 +80,42 @@ namespace CanvasApp.Forms
             this.Lbl_Ilustracao.Location = new Point(20, 150);
             this.Lbl_Ilustracao.Name = "Lbl_Ilustracao";
             this.Lbl_Ilustracao.Size = new Size(217, 15);
-            this.Lbl_Ilustracao.TabIndex = 0;
+            this.Lbl_Ilustracao.TabIndex = 2;
             this.Lbl_Ilustracao.Text = "Digite para buscar membros do projeto:";
 
-            // Lst_Sugestoes
-            this.Lst_Sugestoes.Location = new Point(20, 175);
-            this.Lst_Sugestoes.Name = "Lst_Sugestoes";
-            this.Lst_Sugestoes.Size = new Size(300, 20);
-            this.Lst_Sugestoes.TabIndex = 2;
+            // Txt_BuscaResponsavel
+            this.Txt_BuscaResponsavel.Location = new Point(20, 175);
+            this.Txt_BuscaResponsavel.Name = "Txt_BuscaResponsavel";
+            this.Txt_BuscaResponsavel.Size = new Size(300, 20);
+            this.Txt_BuscaResponsavel.TabIndex = 3;
 
-            // Btn_Concluir1
-            this.Btn_Concluir1.Font = new Font("Segoe UI", 9F);
-            this.Btn_Concluir1.Location = new Point(350, 400);
-            this.Btn_Concluir1.Name = "Btn_Concluir1";
-            this.Btn_Concluir1.Size = new Size(100, 30);
-            this.Btn_Concluir1.TabIndex = 3;
-            this.Btn_Concluir1.Text = "Concluir";
-            this.Btn_Concluir1.UseVisualStyleBackColor = true;
+            // Lst_SugestoesResponsavel - CORREÇÃO: Configurado como ListView
+            this.Lst_SugestoesResponsavel.Location = new Point(20, 205);
+            this.Lst_SugestoesResponsavel.Name = "Lst_SugestoesResponsavel";
+            this.Lst_SugestoesResponsavel.Size = new Size(300, 100);
+            this.Lst_SugestoesResponsavel.TabIndex = 4;
+            this.Lst_SugestoesResponsavel.Visible = false;
+            this.Lst_SugestoesResponsavel.View = View.Details;
+            this.Lst_SugestoesResponsavel.FullRowSelect = true;
+            this.Lst_SugestoesResponsavel.MultiSelect = false;
+            this.Lst_SugestoesResponsavel.Columns.Add("Usuário", 120);
+            this.Lst_SugestoesResponsavel.Columns.Add("Email", 160);
+
+            // Btn_Concluir
+            this.Btn_Concluir.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            this.Btn_Concluir.Location = new Point(350, 350);
+            this.Btn_Concluir.Name = "Btn_Concluir";
+            this.Btn_Concluir.Size = new Size(100, 30);
+            this.Btn_Concluir.TabIndex = 5;
+            this.Btn_Concluir.Text = "Concluir";
+            this.Btn_Concluir.UseVisualStyleBackColor = true;
 
             // Form
             this.BackColor = Color.White;
-            this.ClientSize = new Size(500, 500);
-            this.Controls.Add(this.Btn_Concluir1);
-            this.Controls.Add(this.Lst_Sugestoes);
+            this.ClientSize = new Size(500, 400);
+            this.Controls.Add(this.Lst_SugestoesResponsavel);
+            this.Controls.Add(this.Btn_Concluir);
+            this.Controls.Add(this.Txt_BuscaResponsavel);
             this.Controls.Add(this.Lbl_Ilustracao);
             this.Controls.Add(this.Pnl_Responsaveis);
             this.Controls.Add(this.Lbl_Titulo);
@@ -105,14 +123,14 @@ namespace CanvasApp.Forms
             this.MinimizeBox = false;
             this.Name = "Frm_AtribuirResponsavelTarefa";
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.Text = "5";
+            this.Text = "Atribuir Responsável";
             this.ResumeLayout(false);
             this.PerformLayout();
         }
 
         private void ConfigurarInterfaceResponsaveis()
         {
-            this.Text = $"Atribuir Responsáveis - Tarefa #{_tarefa.Codigo}";
+            this.Text = $"Atribuir Responsável - Tarefa #{_tarefa.Codigo}";
 
             Lbl_Titulo.Font = new Font("Segoe UI", 12, FontStyle.Bold);
             Lbl_Titulo.ForeColor = Color.FromArgb(64, 64, 64);
@@ -121,60 +139,55 @@ namespace CanvasApp.Forms
             Pnl_Responsaveis.WrapContents = true;
             Pnl_Responsaveis.BackColor = Color.FromArgb(250, 250, 250);
 
-            Lst_Sugestoes.Text = "Digite nome, usuário ou email...";
-            Lst_Sugestoes.ForeColor = Color.Gray;
-            Lst_Sugestoes.Font = new Font("Segoe UI", 9);
+            Txt_BuscaResponsavel.Text = "Digite nome, usuário ou email...";
+            Txt_BuscaResponsavel.ForeColor = Color.Gray;
+            Txt_BuscaResponsavel.Font = new Font("Segoe UI", 9);
 
-            Lst_Sugestoes.Enter += Txt_Responsavel_Enter_Placeholder;
-            Lst_Sugestoes.Leave += Txt_Responsavel_Leave_Placeholder;
+            // Configurar placeholder
+            Txt_BuscaResponsavel.Enter += Txt_Responsavel_Enter_Placeholder;
+            Txt_BuscaResponsavel.Leave += Txt_Responsavel_Leave_Placeholder;
 
-            Btn_Concluir1.BackColor = Color.FromArgb(74, 124, 255);
-            Btn_Concluir1.ForeColor = Color.White;
-            Btn_Concluir1.Font = new Font("Segoe UI", 9, FontStyle.Bold);
+            Btn_Concluir.BackColor = Color.FromArgb(74, 124, 255);
+            Btn_Concluir.ForeColor = Color.White;
+            Btn_Concluir.Font = new Font("Segoe UI", 9, FontStyle.Bold);
 
-            // Criar ListBox para sugestões
-            Lst_SugestoesResponsavel = new ListBox
-            {
-                Location = new Point(20, 205),
-                Size = new Size(300, 100),
-                Visible = false,
-                Font = new Font("Segoe UI", 9),
-                DisplayMember = "Nome"
-            };
-
-            this.Controls.Add(Lst_SugestoesResponsavel);
+            // CORREÇÃO: Configurar ListView para sugestões (igual Frm_CriarProjeto)
+            Lst_SugestoesResponsavel.Font = new Font("Segoe UI", 9);
+            Lst_SugestoesResponsavel.BackColor = Color.White;
+            Lst_SugestoesResponsavel.BorderStyle = BorderStyle.FixedSingle;
 
             // Configurar eventos
-            Lst_Sugestoes.TextChanged += Txt_Responsavel_TextChanged;
-            Lst_Sugestoes.KeyDown += Txt_Responsavel_KeyDown;
-            Lst_Sugestoes.Enter += Txt_Responsavel_Enter;
-            Lst_Sugestoes.Leave += Txt_Responsavel_Leave;
+            Txt_BuscaResponsavel.TextChanged += Txt_Responsavel_TextChanged;
+            Txt_BuscaResponsavel.KeyDown += Txt_Responsavel_KeyDown;
+            Txt_BuscaResponsavel.Enter += Txt_Responsavel_Enter;
+            Txt_BuscaResponsavel.Leave += Txt_Responsavel_Leave;
             Lst_SugestoesResponsavel.KeyDown += Lst_SugestoesResponsavel_KeyDown;
             Lst_SugestoesResponsavel.DoubleClick += Lst_SugestoesResponsavel_DoubleClick;
-            Btn_Concluir1.Click += Btn_Concluir_Click;
+            Lst_SugestoesResponsavel.Leave += Lst_SugestoesResponsavel_Leave;
+            Btn_Concluir.Click += Btn_Concluir_Click;
         }
 
         private void Txt_Responsavel_Enter_Placeholder(object sender, EventArgs e)
         {
-            if (Lst_Sugestoes.Text == "Digite nome, usuário ou email...")
+            if (Txt_BuscaResponsavel.Text == "Digite nome, usuário ou email...")
             {
-                Lst_Sugestoes.Text = "";
-                Lst_Sugestoes.ForeColor = SystemColors.WindowText;
+                Txt_BuscaResponsavel.Text = "";
+                Txt_BuscaResponsavel.ForeColor = SystemColors.WindowText;
             }
         }
 
         private void Txt_Responsavel_Leave_Placeholder(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(Lst_Sugestoes.Text))
+            if (string.IsNullOrWhiteSpace(Txt_BuscaResponsavel.Text))
             {
-                Lst_Sugestoes.Text = "Digite nome, usuário ou email...";
-                Lst_Sugestoes.ForeColor = Color.Gray;
+                Txt_BuscaResponsavel.Text = "Digite nome, usuário ou email...";
+                Txt_BuscaResponsavel.ForeColor = Color.Gray;
             }
         }
 
         private void Txt_Responsavel_TextChanged(object sender, EventArgs e)
         {
-            string textoBusca = Lst_Sugestoes.Text.Trim();
+            string textoBusca = Txt_BuscaResponsavel.Text.Trim();
 
             if (string.IsNullOrEmpty(textoBusca) || textoBusca == "Digite nome, usuário ou email...")
             {
@@ -184,30 +197,37 @@ namespace CanvasApp.Forms
 
             try
             {
-                // ✅ CORREÇÃO: Converter int para string
-                var membrosProjeto = _membrosDB.ObterMembrosProjeto(_tarefa.CodProjeto);
+                // CORREÇÃO: Usar busca similar ao Frm_CriarProjeto
+                var resultados = _usuarioDB.BuscarUsuariosPorTexto(textoBusca);
 
-                var resultados = membrosProjeto
-                    .Where(u => (u.Nome?.IndexOf(textoBusca, StringComparison.OrdinalIgnoreCase) >= 0) ||
-                               (u.NomeUsuario?.IndexOf(textoBusca, StringComparison.OrdinalIgnoreCase) >= 0) ||
-                               (u.Email?.IndexOf(textoBusca, StringComparison.OrdinalIgnoreCase) >= 0))
-                    .Where(u => !_responsaveisAdicionados.Any(r => r.Codigo == u.Codigo))
+                // Filtrar apenas membros do projeto atual
+                var membrosProjeto = _membrosDB.ObterMembrosProjeto(_tarefa.CodProjeto);
+                var membrosIds = membrosProjeto.Select(m => m.Codigo).ToList();
+
+                var resultadosFiltrados = resultados
+                    .Where(u => membrosIds.Contains(u.Codigo))
+                    .Where(u => _responsavelAtual == null || u.Codigo != _responsavelAtual.Codigo)
                     .ToList();
 
                 Lst_SugestoesResponsavel.Items.Clear();
 
-                foreach (var usuario in resultados)
+                foreach (var usuario in resultadosFiltrados)
                 {
-                    Lst_SugestoesResponsavel.Items.Add(usuario);
+                    var item = new ListViewItem(usuario.NomeUsuario);
+                    item.Tag = usuario;
+                    item.SubItems.Add(usuario.Email);
+                    Lst_SugestoesResponsavel.Items.Add(item);
                 }
 
-                Lst_SugestoesResponsavel.Visible = resultados.Any();
-                Lst_SugestoesResponsavel.Location = new Point(Lst_Sugestoes.Left, Lst_Sugestoes.Bottom + 2);
-                Lst_SugestoesResponsavel.Width = Lst_Sugestoes.Width;
+                Lst_SugestoesResponsavel.Visible = resultadosFiltrados.Any();
+                Lst_SugestoesResponsavel.Location = new Point(Txt_BuscaResponsavel.Left, Txt_BuscaResponsavel.Bottom + 2);
+                Lst_SugestoesResponsavel.Width = Txt_BuscaResponsavel.Width;
+                Lst_SugestoesResponsavel.Height = Math.Min(resultadosFiltrados.Count * 20 + 10, 150);
             }
-            catch
+            catch (Exception ex)
             {
                 Lst_SugestoesResponsavel.Visible = false;
+                Console.WriteLine($"Erro ao buscar membros: {ex.Message}");
             }
         }
 
@@ -217,84 +237,121 @@ namespace CanvasApp.Forms
             {
                 e.SuppressKeyPress = true;
 
-                if (Lst_SugestoesResponsavel.Visible && Lst_SugestoesResponsavel.Items.Count > 0)
+                if (Lst_SugestoesResponsavel.Visible && Lst_SugestoesResponsavel.SelectedItems.Count > 0)
                 {
-                    if (Lst_SugestoesResponsavel.SelectedItem == null)
-                        Lst_SugestoesResponsavel.SelectedIndex = 0;
-
-                    AdicionarResponsavel(Lst_SugestoesResponsavel.SelectedItem as Usuario);
+                    Usuario usuarioSelecionado = (Usuario)Lst_SugestoesResponsavel.SelectedItems[0].Tag;
+                    AdicionarResponsavel(usuarioSelecionado);
                 }
-                else if (!string.IsNullOrWhiteSpace(Lst_Sugestoes.Text) && Lst_Sugestoes.Text != "Digite nome, usuário ou email...")
+                else if (!string.IsNullOrWhiteSpace(Txt_BuscaResponsavel.Text) &&
+                         Txt_BuscaResponsavel.Text != "Digite nome, usuário ou email...")
                 {
-                    // ✅ CORREÇÃO: Converter int para string
+                    // Buscar diretamente pelo texto
+                    var resultados = _usuarioDB.BuscarUsuariosPorTexto(Txt_BuscaResponsavel.Text.Trim());
                     var membrosProjeto = _membrosDB.ObterMembrosProjeto(_tarefa.CodProjeto);
-                    var usuarioEncontrado = membrosProjeto
-                        .FirstOrDefault(u => (u.Nome?.Equals(Lst_Sugestoes.Text.Trim(), StringComparison.OrdinalIgnoreCase) == true) ||
-                                           (u.NomeUsuario?.Equals(Lst_Sugestoes.Text.Trim(), StringComparison.OrdinalIgnoreCase) == true) ||
-                                           (u.Email?.Equals(Lst_Sugestoes.Text.Trim(), StringComparison.OrdinalIgnoreCase) == true));
+                    var membrosIds = membrosProjeto.Select(m => m.Codigo).ToList();
 
-                    if (usuarioEncontrado != null && !_responsaveisAdicionados.Any(r => r.Codigo == usuarioEncontrado.Codigo))
+                    var usuarioEncontrado = resultados
+                        .FirstOrDefault(u => membrosIds.Contains(u.Codigo) &&
+                                           (_responsavelAtual == null || u.Codigo != _responsavelAtual.Codigo));
+
+                    if (usuarioEncontrado != null)
                     {
                         AdicionarResponsavel(usuarioEncontrado);
                     }
                     else
                     {
-                        MessageBox.Show("Usuário não encontrado ou já adicionado.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("Usuário não encontrado ou já é o responsável atual.", "Aviso",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
                 }
             }
             else if (e.KeyCode == Keys.Escape)
             {
                 Lst_SugestoesResponsavel.Visible = false;
-                Lst_Sugestoes.Clear();
+                Txt_BuscaResponsavel.Clear();
             }
             else if (e.KeyCode == Keys.Down && Lst_SugestoesResponsavel.Visible && Lst_SugestoesResponsavel.Items.Count > 0)
             {
                 Lst_SugestoesResponsavel.Focus();
-                if (Lst_SugestoesResponsavel.SelectedIndex == -1)
-                    Lst_SugestoesResponsavel.SelectedIndex = 0;
+                if (Lst_SugestoesResponsavel.SelectedItems.Count == 0)
+                    Lst_SugestoesResponsavel.Items[0].Selected = true;
             }
         }
 
         private void Lst_SugestoesResponsavel_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Enter && Lst_SugestoesResponsavel.SelectedItem != null)
+            if (e.KeyCode == Keys.Enter && Lst_SugestoesResponsavel.SelectedItems.Count > 0)
             {
-                AdicionarResponsavel(Lst_SugestoesResponsavel.SelectedItem as Usuario);
+                Usuario usuarioSelecionado = (Usuario)Lst_SugestoesResponsavel.SelectedItems[0].Tag;
+                AdicionarResponsavel(usuarioSelecionado);
                 e.Handled = true;
                 e.SuppressKeyPress = true;
             }
             else if (e.KeyCode == Keys.Escape)
             {
                 Lst_SugestoesResponsavel.Visible = false;
-                Lst_Sugestoes.Focus();
-                Lst_Sugestoes.Clear();
+                Txt_BuscaResponsavel.Focus();
+                Txt_BuscaResponsavel.Clear();
+            }
+            else if (e.KeyCode == Keys.Up && Lst_SugestoesResponsavel.SelectedItems.Count > 0)
+            {
+                if (Lst_SugestoesResponsavel.SelectedItems[0].Index == 0)
+                {
+                    Txt_BuscaResponsavel.Focus();
+                    Lst_SugestoesResponsavel.SelectedItems.Clear();
+                }
             }
         }
 
         private void Lst_SugestoesResponsavel_DoubleClick(object sender, EventArgs e)
         {
-            if (Lst_SugestoesResponsavel.SelectedItem != null)
+            if (Lst_SugestoesResponsavel.SelectedItems.Count > 0)
             {
-                AdicionarResponsavel(Lst_SugestoesResponsavel.SelectedItem as Usuario);
+                Usuario usuarioSelecionado = (Usuario)Lst_SugestoesResponsavel.SelectedItems[0].Tag;
+                AdicionarResponsavel(usuarioSelecionado);
             }
         }
 
         private void Txt_Responsavel_Enter(object sender, EventArgs e)
         {
-            Lst_SugestoesResponsavel.Location = new Point(Lst_Sugestoes.Left, Lst_Sugestoes.Bottom + 2);
-            Lst_SugestoesResponsavel.Width = Lst_Sugestoes.Width;
+            Lst_SugestoesResponsavel.Location = new Point(Txt_BuscaResponsavel.Left, Txt_BuscaResponsavel.Bottom + 2);
+            Lst_SugestoesResponsavel.Width = Txt_BuscaResponsavel.Width;
         }
 
         private void Txt_Responsavel_Leave(object sender, EventArgs e)
         {
-            System.Threading.Tasks.Task.Delay(150).ContinueWith(t =>
+            // CORREÇÃO: Usar timer para evitar conflito com clique na lista
+            var timer = new Timer { Interval = 150 };
+            timer.Tick += (s, args) =>
             {
-                if (this.IsHandleCreated && !Lst_SugestoesResponsavel.Focused)
+                timer.Stop();
+                timer.Dispose();
+
+                if (this.IsHandleCreated && !Lst_SugestoesResponsavel.Focused &&
+                    !Lst_SugestoesResponsavel.ClientRectangle.Contains(Lst_SugestoesResponsavel.PointToClient(Cursor.Position)))
                 {
                     this.Invoke(new Action(() => Lst_SugestoesResponsavel.Visible = false));
                 }
-            });
+            };
+            timer.Start();
+        }
+
+        private void Lst_SugestoesResponsavel_Leave(object sender, EventArgs e)
+        {
+            // CORREÇÃO: Usar timer para evitar conflito com clique na lista
+            var timer = new Timer { Interval = 150 };
+            timer.Tick += (s, args) =>
+            {
+                timer.Stop();
+                timer.Dispose();
+
+                if (this.IsHandleCreated && !Txt_BuscaResponsavel.Focused &&
+                    !Txt_BuscaResponsavel.ClientRectangle.Contains(Txt_BuscaResponsavel.PointToClient(Cursor.Position)))
+                {
+                    this.Invoke(new Action(() => Lst_SugestoesResponsavel.Visible = false));
+                }
+            };
+            timer.Start();
         }
 
         private void AdicionarResponsavel(Usuario usuario)
@@ -303,93 +360,83 @@ namespace CanvasApp.Forms
 
             try
             {
-                if (_responsaveisAdicionados.Any(r => r.Codigo == usuario.Codigo))
-                {
-                    MessageBox.Show("Este usuário já foi adicionado como responsável.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
+                _responsavelAtual = usuario;
+                AtualizarFiguraResponsavel();
 
-                _responsaveisAdicionados.Add(usuario);
-                AtualizarFigurasResponsaveis();
-
-                // ✅ CORREÇÃO: Usar int.Parse para converter string para int
+                // CORREÇÃO: Atribuir a tarefa ao usuário
                 if (!_tarefasDB.AtribuirTarefaUsuario(_tarefa.Codigo, Convert.ToInt32(usuario.Codigo)))
                 {
-                    MessageBox.Show($"Erro ao atribuir tarefa: {_tarefasDB.Mensagem}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    _responsaveisAdicionados.Remove(usuario);
-                    AtualizarFigurasResponsaveis();
+                    MessageBox.Show($"Erro ao atribuir tarefa: {_tarefasDB.Mensagem}", "Erro",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    _responsavelAtual = null;
+                    AtualizarFiguraResponsavel();
                     return;
                 }
 
                 _tarefa.CodUsuario = Convert.ToInt32(usuario.Codigo);
 
-                Lst_Sugestoes.Clear();
+                Txt_BuscaResponsavel.Clear();
                 Lst_SugestoesResponsavel.Visible = false;
-                Lst_Sugestoes.Focus();
+                Txt_BuscaResponsavel.Focus();
+
+                MessageBox.Show($"Responsável atribuído com sucesso: {usuario.Nome}", "Sucesso",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao adicionar responsável: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao adicionar responsável: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void RemoverResponsavel(Usuario usuario)
+        private void RemoverResponsavel()
         {
             try
             {
-                if (MessageBox.Show($"Deseja remover {usuario.Nome} como responsável?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                if (MessageBox.Show($"Deseja remover o responsável atual?", "Confirmar",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                    _responsaveisAdicionados.RemoveAll(r => r.Codigo == usuario.Codigo);
-                    AtualizarFigurasResponsaveis();
+                    _responsavelAtual = null;
+                    AtualizarFiguraResponsavel();
 
-                    if (_responsaveisAdicionados.Count == 0)
+                    if (!_tarefasDB.AtribuirTarefaUsuario(_tarefa.Codigo, 0))
                     {
-                        if (!_tarefasDB.AtribuirTarefaUsuario(_tarefa.Codigo, 0))
-                        {
-                            MessageBox.Show($"Erro ao remover responsável: {_tarefasDB.Mensagem}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                        else
-                        {
-                            _tarefa.CodUsuario = 0;
-                        }
+                        MessageBox.Show($"Erro ao remover responsável: {_tarefasDB.Mensagem}", "Erro",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                     else
                     {
-                        var primeiroResponsavel = _responsaveisAdicionados.First();
-                        if (!_tarefasDB.AtribuirTarefaUsuario(_tarefa.Codigo, Convert.ToInt32(primeiroResponsavel.Codigo)))
-                        {
-                            MessageBox.Show($"Erro ao atualizar responsável principal: {_tarefasDB.Mensagem}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                        else
-                        {
-                            _tarefa.CodUsuario = Convert.ToInt32(primeiroResponsavel.Codigo);
-                        }
+                        _tarefa.CodUsuario = 0;
+                        MessageBox.Show("Responsável removido com sucesso.", "Sucesso",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao remover responsável: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao remover responsável: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void AtualizarFigurasResponsaveis()
+        private void AtualizarFiguraResponsavel()
         {
             Pnl_Responsaveis.Controls.Clear();
 
-            foreach (var responsavel in _responsaveisAdicionados)
+            if (_responsavelAtual != null)
             {
-                AdicionarFiguraResponsavel(responsavel);
+                AdicionarFiguraResponsavel(_responsavelAtual);
             }
-
-            if (!_responsaveisAdicionados.Any())
+            else
             {
                 var lblSemResponsaveis = new Label
                 {
                     Text = "Nenhum responsável atribuído",
                     Font = new Font("Segoe UI", 9, FontStyle.Italic),
                     ForeColor = Color.Gray,
-                    AutoSize = true
+                    AutoSize = true,
+                    Dock = DockStyle.Fill,
+                    TextAlign = ContentAlignment.MiddleCenter
                 };
                 Pnl_Responsaveis.Controls.Add(lblSemResponsaveis);
             }
@@ -401,24 +448,26 @@ namespace CanvasApp.Forms
             {
                 var panel = new Panel
                 {
-                    Width = 45,
-                    Height = 60,
+                    Width = 60,
+                    Height = 75,
                     Margin = new Padding(5),
                     Tag = usuario
                 };
 
                 var circulo = new Panel
                 {
-                    Width = 40,
-                    Height = 40,
+                    Width = 45,
+                    Height = 45,
                     BackColor = ObterCorAleatoria(usuario.Codigo.ToString()),
-                    Location = new Point(2, 0)
+                    Location = new Point(7, 0)
                 };
 
+                // Tornar o painel circular
                 GraphicsPath path = new GraphicsPath();
                 path.AddEllipse(0, 0, circulo.Width, circulo.Height);
                 circulo.Region = new Region(path);
 
+                // CORREÇÃO: Garantir que a inicial seja exibida corretamente
                 var lblInicial = new Label
                 {
                     Text = ObterInicialUsuario(usuario.Nome),
@@ -436,8 +485,8 @@ namespace CanvasApp.Forms
                     Font = new Font("Segoe UI", 7),
                     ForeColor = Color.Gray,
                     TextAlign = ContentAlignment.TopCenter,
-                    Location = new Point(0, 42),
-                    Width = 45,
+                    Location = new Point(0, 48),
+                    Width = 60,
                     Height = 15,
                     AutoSize = false
                 };
@@ -445,10 +494,10 @@ namespace CanvasApp.Forms
                 var btnRemover = new Button
                 {
                     Text = "×",
-                    Size = new Size(16, 16),
-                    Location = new Point(27, -2),
+                    Size = new Size(18, 18),
+                    Location = new Point(37, -2),
                     Tag = usuario,
-                    Font = new Font("Segoe UI", 8, FontStyle.Bold),
+                    Font = new Font("Segoe UI", 9, FontStyle.Bold),
                     ForeColor = Color.Red,
                     BackColor = Color.White,
                     FlatStyle = FlatStyle.Flat,
@@ -456,46 +505,47 @@ namespace CanvasApp.Forms
                 };
                 btnRemover.FlatAppearance.BorderSize = 0;
                 btnRemover.FlatAppearance.MouseOverBackColor = Color.FromArgb(255, 200, 200);
-                btnRemover.Click += (s, e) => RemoverResponsavel(usuario);
+                btnRemover.Click += (s, e) => RemoverResponsavel();
 
                 panel.Controls.Add(circulo);
                 panel.Controls.Add(lblNome);
                 panel.Controls.Add(btnRemover);
 
+                // Tooltip com nome completo
                 var toolTip = new ToolTip();
                 toolTip.SetToolTip(panel, usuario.Nome);
                 toolTip.SetToolTip(circulo, usuario.Nome);
                 toolTip.SetToolTip(lblNome, usuario.Nome);
+                toolTip.SetToolTip(btnRemover, "Remover responsável");
 
                 Pnl_Responsaveis.Controls.Add(panel);
             }
-            catch
+            catch (Exception ex)
             {
-                // Ignorar erro
+                Console.WriteLine($"Erro ao criar figura do responsável: {ex.Message}");
             }
         }
 
-        private void CarregarResponsaveisExistentes()
+        private void CarregarResponsavelExistente()
         {
             try
             {
-                _responsaveisAdicionados.Clear();
+                _responsavelAtual = null;
 
                 if (_tarefa.CodUsuario > 0)
                 {
-                    // ✅ CORREÇÃO: Converter int para string
-                    var usuarioResponsavel = _usuarioDB.ObterUsuarioPorCodigo(_tarefa.CodUsuario.ToString());
+                    var usuarioResponsavel = _usuarioDB.ObterUsuarioPorCodigo(Convert.ToInt32(_tarefa.CodUsuario));
                     if (usuarioResponsavel != null)
                     {
-                        _responsaveisAdicionados.Add(usuarioResponsavel);
+                        _responsavelAtual = usuarioResponsavel;
                     }
                 }
 
-                AtualizarFigurasResponsaveis();
+                AtualizarFiguraResponsavel();
             }
-            catch
+            catch (Exception ex)
             {
-                // Ignorar erro
+                Console.WriteLine($"Erro ao carregar responsável existente: {ex.Message}");
             }
         }
 
@@ -513,7 +563,7 @@ namespace CanvasApp.Forms
             if (partes.Length == 1)
                 return nome.Length > 6 ? nome.Substring(0, 6) + "..." : nome;
 
-            return $"{partes[0]} {partes[1][0]}.";
+            return $"{partes[0]} {partes[partes.Length - 1][0]}.";
         }
 
         private Color ObterCorAleatoria(string seed)
@@ -528,7 +578,10 @@ namespace CanvasApp.Forms
                 Color.FromArgb(255, 160, 0),
                 Color.FromArgb(160, 90, 255),
                 Color.FromArgb(0, 200, 200),
-                Color.FromArgb(255, 100, 200)
+                Color.FromArgb(255, 100, 200),
+                Color.FromArgb(100, 100, 100),
+                Color.FromArgb(139, 69, 19),
+                Color.FromArgb(75, 0, 130)
             };
 
             return cores[Math.Abs(hash) % cores.Length];

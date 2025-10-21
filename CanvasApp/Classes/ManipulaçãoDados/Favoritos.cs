@@ -63,10 +63,11 @@ namespace CanvasApp.Classes.Databases
                 using (SqlConnection conn = GetConnection())
                 {
                     string sql = @"
-                        SELECT T.Codigo, T.Descricao, T.isConcluida, T.CodProjeto
+                        SELECT T.Codigo, T.Descricao, T.isConcluida, T.CodProjeto, T.CodUsuario
                         FROM Projeto_Tarefas T
                         INNER JOIN Items_Favoritos F ON T.Codigo = F.CodTarefa
-                        WHERE F.CodUsuario = @CodUsuario";
+                        WHERE F.CodUsuario = @CodUsuario
+                        ORDER BY T.Codigo DESC";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@CodUsuario", codUsuario);
@@ -74,12 +75,14 @@ namespace CanvasApp.Classes.Databases
                         {
                             while (reader.Read())
                             {
+                                var codUsuarioValue = reader["CodUsuario"];
                                 tarefasFavoritas.Add(new Projeto_Tarefas
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
                                     Descricao = reader["Descricao"].ToString(),
                                     isConcluida = Convert.ToBoolean(reader["isConcluida"]),
-                                    CodProjeto = Convert.ToInt32(reader["CodProjeto"])
+                                    CodProjeto = Convert.ToInt32(reader["CodProjeto"]),
+                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue)
                                 });
                             }
                         }
@@ -113,6 +116,27 @@ namespace CanvasApp.Classes.Databases
             {
                 Mensagem = "Erro ao verificar favorito: " + ex.Message;
                 return false;
+            }
+        }
+
+        public int ObterQuantidadeFavoritos(int codUsuario)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = @"SELECT COUNT(*) FROM Items_Favoritos WHERE CodUsuario = @CodUsuario";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@CodUsuario", codUsuario);
+                        return Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao contar favoritos: " + ex.Message;
+                return 0;
             }
         }
     }

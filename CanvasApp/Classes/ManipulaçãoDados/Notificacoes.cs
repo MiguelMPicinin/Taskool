@@ -1,5 +1,4 @@
-﻿using CanvasApp.Classes.Databases.UsuarioCL;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 
@@ -13,13 +12,13 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
-                    string sql = @"INSERT INTO Notificacoes (Texto, data, CodProjeto, CodUsuario, isFechada) 
-                             VALUES (@Texto, @data, @CodProjeto, @CodUsuario, @isFechada)";
+                    string sql = @"INSERT INTO Notificacoes (Texto, Data, CodProjeto, CodUsuario, isFechada) 
+                                 VALUES (@Texto, @Data, @CodProjeto, @CodUsuario, @isFechada)";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@Texto", notificacao.Texto);
-                        cmd.Parameters.AddWithValue("@data", notificacao.Data);
-                        cmd.Parameters.AddWithValue("@CodProjeto", notificacao.CodProjeto);
+                        cmd.Parameters.AddWithValue("@Data", notificacao.Data);
+                        cmd.Parameters.AddWithValue("@CodProjeto", notificacao.CodProjeto ?? (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@CodUsuario", notificacao.CodUsuario);
                         cmd.Parameters.AddWithValue("@isFechada", notificacao.isFechada);
                         cmd.ExecuteNonQuery();
@@ -42,11 +41,10 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
-                    string query = @"SELECT Codigo, Texto, data, CodProjeto, CodUsuario, isFechada 
+                    string query = @"SELECT Codigo, Texto, Data, CodProjeto, CodUsuario, isFechada 
                                FROM Notificacoes 
                                WHERE CodUsuario = @codUsuario
-                               ORDER BY data DESC";
-
+                               ORDER BY Data DESC";
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@codUsuario", usuarioId);
@@ -58,8 +56,8 @@ namespace CanvasApp.Classes.Databases
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
                                     Texto = reader["Texto"].ToString(),
-                                    Data = Convert.ToDateTime(reader["data"]),
-                                    CodProjeto = Convert.ToInt32(reader["CodProjeto"]),
+                                    Data = Convert.ToDateTime(reader["Data"]),
+                                    CodProjeto = reader["CodProjeto"] == DBNull.Value ? null : (int?)Convert.ToInt32(reader["CodProjeto"]),
                                     CodUsuario = Convert.ToInt32(reader["CodUsuario"]),
                                     isFechada = Convert.ToBoolean(reader["isFechada"])
                                 });
@@ -82,11 +80,10 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
-                    string query = @"SELECT Codigo, Texto, data, CodProjeto, CodUsuario, isFechada 
+                    string query = @"SELECT Codigo, Texto, Data, CodProjeto, CodUsuario, isFechada 
                                FROM Notificacoes 
                                WHERE CodUsuario = @codUsuario AND isFechada = 0
-                               ORDER BY data DESC";
-
+                               ORDER BY Data DESC";
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@codUsuario", usuarioId);
@@ -98,8 +95,8 @@ namespace CanvasApp.Classes.Databases
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
                                     Texto = reader["Texto"].ToString(),
-                                    Data = Convert.ToDateTime(reader["data"]),
-                                    CodProjeto = Convert.ToInt32(reader["CodProjeto"]),
+                                    Data = Convert.ToDateTime(reader["Data"]),
+                                    CodProjeto = reader["CodProjeto"] == DBNull.Value ? null : (int?)Convert.ToInt32(reader["CodProjeto"]),
                                     CodUsuario = Convert.ToInt32(reader["CodUsuario"]),
                                     isFechada = Convert.ToBoolean(reader["isFechada"])
                                 });
@@ -110,7 +107,7 @@ namespace CanvasApp.Classes.Databases
             }
             catch (Exception ex)
             {
-                Mensagem = "Erro ao buscar notificações: " + ex.Message;
+                Mensagem = "Erro ao buscar notificações não lidas: " + ex.Message;
             }
             return notificacoes;
         }
@@ -161,35 +158,49 @@ namespace CanvasApp.Classes.Databases
             }
         }
 
-        public void NotificarMembrosNovaTarefa(Projeto_Tarefas tarefa, int usuarioCriador, MembrosDB membrosDB, ProjetosDB projetosDB, UsuarioDB usuarioDB)
+        public int ObterQuantidadeNotificacoesNaoLidas(int usuarioId)
         {
             try
             {
-                var membros = membrosDB.ObterMembrosProjeto(tarefa.CodProjeto);
-                string nomeProjeto = projetosDB.ObterNomeProjeto(tarefa.CodProjeto);
-                string nomeCriador = usuarioDB.ObterNomeUsuario(usuarioCriador);
-
-                foreach (var membro in membros)
+                using (SqlConnection conn = GetConnection())
                 {
-                    // ✅ CORREÇÃO: Converter Codigo para int antes de comparar
-                    if (Convert.ToInt32(membro.Codigo) == usuarioCriador)
-                        continue;
-
-                    var notificacao = new Notificacoes
+                    string sql = @"SELECT COUNT(*) FROM Notificacoes 
+                                 WHERE CodUsuario = @codUsuario AND isFechada = 0";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
-                        Texto = $"{nomeCriador} criou a tarefa '{tarefa.Descricao}' no projeto {nomeProjeto}",
-                        Data = DateTime.Now,
-                        CodProjeto = tarefa.CodProjeto,
-                        CodUsuario = Convert.ToInt32(membro.Codigo), // ✅ CORREÇÃO
-                        isFechada = false
-                    };
-
-                    InserirNotificacao(notificacao);
+                        cmd.Parameters.AddWithValue("@codUsuario", usuarioId);
+                        return Convert.ToInt32(cmd.ExecuteScalar());
+                    }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Erro ao notificar membros: " + ex.Message);
+                Mensagem = "Erro ao contar notificações não lidas: " + ex.Message;
+                return 0;
+            }
+        }
+
+        public void LimparNotificacoesAntigas(int usuarioId, int dias)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = @"DELETE FROM Notificacoes 
+                                 WHERE CodUsuario = @codUsuario 
+                                 AND Data < DATEADD(day, -@dias, GETDATE())";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@codUsuario", usuarioId);
+                        cmd.Parameters.AddWithValue("@dias", dias);
+                        cmd.ExecuteNonQuery();
+                        Mensagem = "Notificações antigas limpas com sucesso.";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao limpar notificações antigas: " + ex.Message;
             }
         }
     }

@@ -49,7 +49,7 @@ namespace CanvasApp.Forms
             Btn_FecharData.Click += Bin_FecharData_Click;
 
             Btn_SalvarData.Click += Btn_SalvarData_Click;
-            Btn_SalvarData.Visible = true;
+            Btn_SalvarData.Visible = false;
 
             Cbo_Repeticao.Items.AddRange(new string[] {
                 "Nunca repetir", "Repetir todos os dias", "Repetir toda semana", "Repetir todo mês"
@@ -99,7 +99,7 @@ namespace CanvasApp.Forms
             Pnl_ChatComentarios.Visible = false;
             Pnl_ChatComentarios.BringToFront();
 
-            MostrarSelecaoDataAlarme();
+            OcultarSelecaoDataAlarme();
         }
 
         private void CarregarDadosTarefa()
@@ -117,6 +117,24 @@ namespace CanvasApp.Forms
             Dtp_HoraAlarme.Visible = true;
             Cbo_Repeticao.Visible = true;
             Btn_SalvarData.Visible = true;
+            Lbl_DefinirDataLembrete.Visible = false;
+            Lbl_PrazoExtenso.Visible = false;
+            Btn_FecharData.Visible = false;
+
+            // CORREÇÃO: Garantir que os controles fiquem na frente
+            Dtp_Prazo.BringToFront();
+            Dtp_HoraAlarme.BringToFront();
+            Cbo_Repeticao.BringToFront();
+            Btn_SalvarData.BringToFront();
+        }
+
+        private void OcultarSelecaoDataAlarme()
+        {
+            Dtp_Prazo.Visible = false;
+            Dtp_HoraAlarme.Visible = false;
+            Cbo_Repeticao.Visible = false;
+            Btn_SalvarData.Visible = false;
+            Lbl_DefinirDataLembrete.Visible = true;
         }
 
         private void CarregarPrazoAlarme()
@@ -129,32 +147,20 @@ namespace CanvasApp.Forms
                 {
                     Dtp_Prazo.Value = alarme.Data;
 
-                    if (alarme.Hora != DateTime.MinValue && alarme.Hora.Year > 1900)
-                    {
-                        Dtp_HoraAlarme.Value = alarme.Hora;
-                    }
-                    else
-                    {
-                        Dtp_HoraAlarme.Value = DateTime.Now.Date.AddHours(9);
-                    }
+                    // CORREÇÃO: Converter TimeSpan para DateTime corretamente
+                    DateTime dataComHora = DateTime.Today.Add(alarme.Hora);
+                    Dtp_HoraAlarme.Value = dataComHora;
 
-                    if (Cbo_Repeticao.Items.Count > 0)
-                    {
-                        int indexRepeticao = (int)alarme.Repeticao;
-                        if (indexRepeticao >= 0 && indexRepeticao < Cbo_Repeticao.Items.Count)
-                        {
-                            Cbo_Repeticao.SelectedIndex = indexRepeticao;
-                        }
-                        else
-                        {
-                            Cbo_Repeticao.SelectedIndex = 0;
-                        }
-                    }
+                    // CORREÇÃO: Mapear corretamente o enum de repetição
+                    Cbo_Repeticao.SelectedIndex = (int)alarme.Repeticao;
 
-                    Lbl_DefinirDataLembrete.Text = "Prazo e Lembrete Definidos";
+                    Lbl_DefinirDataLembrete.Text = "Ajustar Prazo e Lembrete";
                     Lbl_PrazoExtenso.Text = _alarmeDB.ObterDescricaoPrazo(alarme.Data);
                     Lbl_PrazoExtenso.Visible = true;
                     Btn_FecharData.Visible = true;
+
+                    // CORREÇÃO: Garantir que está oculto quando há alarme
+                    OcultarSelecaoDataAlarme();
                 }
                 else
                 {
@@ -164,8 +170,10 @@ namespace CanvasApp.Forms
 
                     Dtp_Prazo.Value = DateTime.Now.Date;
                     Dtp_HoraAlarme.Value = DateTime.Now.Date.AddHours(9);
-                    if (Cbo_Repeticao.Items.Count > 0)
-                        Cbo_Repeticao.SelectedIndex = 0;
+                    Cbo_Repeticao.SelectedIndex = 0;
+
+                    // CORREÇÃO: Garantir que está oculto quando não há alarme
+                    OcultarSelecaoDataAlarme();
                 }
             }
             catch (Exception ex)
@@ -177,7 +185,6 @@ namespace CanvasApp.Forms
         private void Lbl_DefinirDataLembrete_Click(object sender, EventArgs e)
         {
             MostrarSelecaoDataAlarme();
-            Lbl_DefinirDataLembrete.Text = "Ajustar Prazo e Alarme";
         }
 
         private void Btn_SalvarData_Click(object sender, EventArgs e)
@@ -189,6 +196,7 @@ namespace CanvasApp.Forms
         {
             try
             {
+                // CORREÇÃO: Usar enum RepeticaoAlarme diretamente
                 var repeticao = (RepeticaoAlarme)Cbo_Repeticao.SelectedIndex;
 
                 if (Dtp_Prazo.Value < DateTime.Today)
@@ -197,17 +205,15 @@ namespace CanvasApp.Forms
                     return;
                 }
 
-                if (!int.TryParse(usuarioLogado.Codigo.ToString(), out int codUsuarioInt))
-                {
-                    MessageBox.Show("Código de usuário inválido!", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
+                // CORREÇÃO: Salvar data e hora corretamente
+                DateTime dataPrazo = Dtp_Prazo.Value.Date;
+                TimeSpan horaAlarme = Dtp_HoraAlarme.Value.TimeOfDay;
 
                 if (_alarmeDB.DefinirPrazoELembrete(
                     tarefaAtual.Codigo,
-                    codUsuarioInt,
-                    Dtp_Prazo.Value,
-                    Dtp_HoraAlarme.Value,
+                    usuarioLogado.Codigo,
+                    dataPrazo,
+                    horaAlarme,
                     repeticao))
                 {
                     MessageBox.Show("Prazo e alarme salvos com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -544,7 +550,7 @@ namespace CanvasApp.Forms
                 var novoCom = new Tarefas_Comentarios
                 {
                     CodTarefa = tarefaAtual.Codigo,
-                    CodUsuario = usuarioLogado.Codigo.ToString(),
+                    CodUsuario = usuarioLogado.Codigo,
                     Comentario = Txt_NovoComentarioChat.Text.Trim(),
                     Data = DateTime.Now
                 };
@@ -577,7 +583,7 @@ namespace CanvasApp.Forms
                     Margin = new Padding(5),
                     BorderStyle = BorderStyle.FixedSingle,
                     Tag = com.Codigo,
-                    BackColor = com.CodUsuario == usuarioLogado.Codigo.ToString() ?
+                    BackColor = com.CodUsuario == usuarioLogado.Codigo ?
                         Color.LightCyan : Color.White
                 };
 
@@ -670,6 +676,34 @@ namespace CanvasApp.Forms
             {
                 btnAdicionarSubtarefa.Dispose();
             }
+        }
+
+        // CORREÇÃO: Adicionar método para verificar se os controles estão visíveis
+        private void VerificarVisibilidadeControles()
+        {
+            // Garantir que os controles estejam na posição correta
+            if (Dtp_Prazo != null && Lbl_DefinirDataLembrete != null)
+            {
+                Dtp_Prazo.Location = new Point(Lbl_DefinirDataLembrete.Left, Lbl_DefinirDataLembrete.Top);
+                Dtp_HoraAlarme.Location = new Point(Dtp_Prazo.Right + 10, Lbl_DefinirDataLembrete.Top);
+                Cbo_Repeticao.Location = new Point(Dtp_HoraAlarme.Right + 10, Lbl_DefinirDataLembrete.Top);
+                Btn_SalvarData.Location = new Point(Cbo_Repeticao.Right + 10, Lbl_DefinirDataLembrete.Top);
+            }
+        }
+
+        // CORREÇÃO: Sobrescrever OnLoad para garantir inicialização correta
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            VerificarVisibilidadeControles();
+            CarregarDadosTarefa();
+        }
+
+        // CORREÇÃO: Sobrescrever OnSizeChanged para ajustar layout
+        protected override void OnSizeChanged(EventArgs e)
+        {
+            base.OnSizeChanged(e);
+            VerificarVisibilidadeControles();
         }
 
         // Eventos vazios necessários do designer

@@ -8,9 +8,11 @@ namespace CanvasApp.Classes.Databases
 {
     public class ProjetosDB : BaseDB
     {
-        // =========================================================================
-        // MÉTODOS CORRIGIDOS (INTEGRADOS DO ProjetosDBTeste)
-        // =========================================================================
+        // MÉTODO ADICIONADO PARA CORRIGIR O ERRO
+        public bool CriarProjetoCompartilhado(Projetos projeto)
+        {
+            return InserirProjeto(projeto);
+        }
 
         public List<Projetos> ObterProjetosPorUsuario(int usuarioId)
         {
@@ -19,8 +21,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
-                    // ✅ CORREÇÃO: Nome correto da coluna "NaoPerturbe"
-                    string query = "SELECT Codigo, Nome, NaoPerturbe, CodUsuario FROM Projeto WHERE CodUsuario = @usuarioId";
+                    string query = "SELECT Codigo, Nome, CodUsuario, NaoPertube FROM Projeto WHERE CodUsuario = @usuarioId";
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
@@ -33,8 +34,7 @@ namespace CanvasApp.Classes.Databases
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
                                     Nome = reader["Nome"].ToString(),
                                     CodUsuario = Convert.ToInt32(reader["CodUsuario"]),
-                                    // ✅ CORREÇÃO: Use o nome correto da propriedade
-                                    NaoPertube = Convert.ToBoolean(reader["NaoPerturbe"])
+                                    NaoPertube = Convert.ToBoolean(reader["NaoPertube"])
                                 });
                             }
                         }
@@ -55,13 +55,11 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
-                    // ✅ CORREÇÃO: Nome correto da coluna "NaoPerturbe"
                     string query = @"
-                        SELECT P.Codigo, P.Nome, P.NaoPerturbe, P.CodUsuario
+                        SELECT P.Codigo, P.Nome, P.NaoPertube, P.CodUsuario
                         FROM Projeto P
                         INNER JOIN Projeto_Membros PM ON P.Codigo = PM.CodProjeto
                         WHERE PM.CodMembro = @usuarioId AND P.CodUsuario != @usuarioId";
-
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
@@ -74,8 +72,7 @@ namespace CanvasApp.Classes.Databases
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
                                     Nome = reader["Nome"].ToString(),
                                     CodUsuario = Convert.ToInt32(reader["CodUsuario"]),
-                                    // ✅ CORREÇÃO: Use o nome correto da propriedade
-                                    NaoPertube = Convert.ToBoolean(reader["NaoPerturbe"])
+                                    NaoPertube = Convert.ToBoolean(reader["NaoPertube"])
                                 });
                             }
                         }
@@ -88,10 +85,6 @@ namespace CanvasApp.Classes.Databases
             }
             return projetos;
         }
-
-        // =========================================================================
-        // MÉTODOS ORIGINAIS (MANTIDOS)
-        // =========================================================================
 
         public Projetos ObterProjetoPorCodigo(int codigo)
         {
@@ -157,7 +150,8 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
-                    string sql = @"INSERT INTO Projeto (Nome, CodUsuario, NaoPertube) VALUES (@Nome, @CodUsuario, @NaoPertube)";
+                    string sql = @"INSERT INTO Projeto (Nome, CodUsuario, NaoPertube) 
+                                 VALUES (@Nome, @CodUsuario, @NaoPertube)";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@Nome", projeto.Nome);
@@ -176,49 +170,68 @@ namespace CanvasApp.Classes.Databases
             }
         }
 
-        public bool CriarProjetoCompartilhado(Projetos projeto)
+        public bool AtualizarProjeto(Projetos projeto)
         {
             try
             {
                 using (SqlConnection conn = GetConnection())
                 {
-                    // Inserir projeto
-                    string sqlProjeto = @"INSERT INTO Projeto (Nome, CodUsuario, NaoPertube) 
-                                          VALUES (@Nome, @CodUsuario, @NaoPertube);
-                                          SELECT SCOPE_IDENTITY();";
+                    string sql = @"UPDATE Projeto SET Nome = @Nome, NaoPertube = @NaoPertube 
+                                 WHERE Codigo = @Codigo";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Nome", projeto.Nome);
+                        cmd.Parameters.AddWithValue("@NaoPertube", projeto.NaoPertube);
+                        cmd.Parameters.AddWithValue("@Codigo", projeto.Codigo);
+                        cmd.ExecuteNonQuery();
+                        Mensagem = "Projeto atualizado com sucesso.";
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao atualizar projeto: " + ex.Message;
+                return false;
+            }
+        }
+
+        public bool ExcluirProjeto(int codProjeto)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    // Primeiro excluir tarefas e membros associados
+                    string sqlTarefas = "DELETE FROM Projeto_Tarefas WHERE CodProjeto = @CodProjeto";
+                    string sqlMembros = "DELETE FROM Projeto_Membros WHERE CodProjeto = @CodProjeto";
+                    string sqlProjeto = "DELETE FROM Projeto WHERE Codigo = @CodProjeto";
+
+                    using (SqlCommand cmd = new SqlCommand(sqlTarefas, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@CodProjeto", codProjeto);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    using (SqlCommand cmd = new SqlCommand(sqlMembros, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@CodProjeto", codProjeto);
+                        cmd.ExecuteNonQuery();
+                    }
 
                     using (SqlCommand cmd = new SqlCommand(sqlProjeto, conn))
                     {
-                        cmd.Parameters.AddWithValue("@Nome", projeto.Nome);
-                        cmd.Parameters.AddWithValue("@CodUsuario", projeto.CodUsuario);
-                        cmd.Parameters.AddWithValue("@NaoPertube", projeto.NaoPertube);
-
-                        object result = cmd.ExecuteScalar();
-                        if (result == null || result == DBNull.Value)
-                        {
-                            Mensagem = "Erro ao criar projeto.";
-                            return false;
-                        }
-
-                        projeto.Codigo = Convert.ToInt32(result);
+                        cmd.Parameters.AddWithValue("@CodProjeto", codProjeto);
+                        cmd.ExecuteNonQuery();
                     }
 
-                    // Adicionar proprietário como membro do projeto
-                    string sqlMembro = @"INSERT INTO Projeto_Membros (CodProjeto, CodMembro) VALUES (@CodProjeto, @CodMembro)";
-                    using (SqlCommand cmdMembro = new SqlCommand(sqlMembro, conn))
-                    {
-                        cmdMembro.Parameters.AddWithValue("@CodProjeto", projeto.Codigo);
-                        cmdMembro.Parameters.AddWithValue("@CodMembro", projeto.CodUsuario);
-                        cmdMembro.ExecuteNonQuery();
-                    }
-
-                    Mensagem = "Projeto criado com sucesso e compartilhado com o proprietário.";
+                    Mensagem = "Projeto excluído com sucesso.";
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                Mensagem = "Erro ao criar projeto compartilhado: " + ex.Message;
+                Mensagem = "Erro ao excluir projeto: " + ex.Message;
                 return false;
             }
         }
@@ -235,7 +248,7 @@ namespace CanvasApp.Classes.Databases
             if (projetosCompartilhados != null)
                 projetos.AddRange(projetosCompartilhados);
 
-            return projetos;
+            return projetos.OrderBy(p => p.Nome).ToList();
         }
 
         public int ObterProprietarioProjeto(int codProjeto)
@@ -248,12 +261,38 @@ namespace CanvasApp.Classes.Databases
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@codProjeto", codProjeto);
-                        return Convert.ToInt32(cmd.ExecuteScalar());
+                        var result = cmd.ExecuteScalar();
+                        return result != null ? Convert.ToInt32(result) : 0;
                     }
                 }
             }
             catch
             {
+                return 0;
+            }
+        }
+
+        public int ObterQuantidadeProjetosUsuario(int usuarioId)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = @"
+                        SELECT COUNT(DISTINCT P.Codigo)
+                        FROM Projeto P
+                        INNER JOIN Projeto_Membros PM ON P.Codigo = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        return Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao contar projetos: " + ex.Message;
                 return 0;
             }
         }

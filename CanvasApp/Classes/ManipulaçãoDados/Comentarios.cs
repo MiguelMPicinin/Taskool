@@ -42,7 +42,7 @@ namespace CanvasApp.Classes.Databases
                 {
                     string sql = @"SELECT * FROM Tarefas_Comentarios 
                                  WHERE CodTarefa = @CodTarefa 
-                                 ORDER BY Codigo DESC";
+                                 ORDER BY Data DESC";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@CodTarefa", codTarefa);
@@ -53,7 +53,7 @@ namespace CanvasApp.Classes.Databases
                                 comentarios.Add(new Tarefas_Comentarios
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
-                                    CodUsuario = reader["CodUsuario"].ToString(),
+                                    CodUsuario = Convert.ToInt32(reader["CodUsuario"]),
                                     CodTarefa = Convert.ToInt32(reader["CodTarefa"]),
                                     Comentario = reader["Comentario"].ToString(),
                                     Data = Convert.ToDateTime(reader["Data"])
@@ -70,9 +70,48 @@ namespace CanvasApp.Classes.Databases
             return comentarios;
         }
 
-        public string FormatarDataComentario(DateTime data)
+        public bool ExcluirComentario(int codComentario)
         {
-            return data.ToString("dd/MM/yyyy HH:mm");
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = "DELETE FROM Tarefas_Comentarios WHERE Codigo = @Codigo";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Codigo", codComentario);
+                        cmd.ExecuteNonQuery();
+                        Mensagem = "Comentário excluído com sucesso.";
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao excluir comentário: " + ex.Message;
+                return false;
+            }
+        }
+
+        public int ObterQuantidadeComentariosPorTarefa(int codTarefa)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = "SELECT COUNT(*) FROM Tarefas_Comentarios WHERE CodTarefa = @CodTarefa";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@CodTarefa", codTarefa);
+                        return Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao contar comentários: " + ex.Message;
+                return 0;
+            }
         }
     }
 }
