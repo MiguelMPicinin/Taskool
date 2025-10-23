@@ -8,7 +8,7 @@ namespace CanvasApp.Classes.Databases
 {
     public class TarefasDB : BaseDB
     {
-        // CONSTRUTORES ADICIONADOS
+        // CONSTRUTORES
         public TarefasDB() { }
 
         public TarefasDB(NotificacoesDB notificacoesDB, ProjetosDB projetosDB, UsuarioDB usuarioDB, MembrosDB membrosDB, AlarmeDB alarmeDB, SubtarefasDB subtarefasDB, ComentariosDB comentariosDB)
@@ -16,7 +16,7 @@ namespace CanvasApp.Classes.Databases
             // Inicialização das dependências se necessário
         }
 
-        // MÉTODOS ADICIONADOS PARA CORRIGIR OS ERROS
+        // MÉTODOS DE ALARME CORRIGIDOS
         public List<Projeto_Tarefas> ObterTarefasComAlarmeHoje(int usuarioId)
         {
             DateTime hoje = DateTime.Today;
@@ -85,7 +85,7 @@ namespace CanvasApp.Classes.Databases
             return tarefas;
         }
 
-        // MÉTODOS DE QUANTIDADE ADICIONADOS
+        // MÉTODOS DE QUANTIDADE PARA DASHBOARD
         public int ObterQuantidadeTarefasComAlarmeHoje(int usuarioId)
         {
             DateTime hoje = DateTime.Today;
@@ -138,7 +138,144 @@ namespace CanvasApp.Classes.Databases
             }
         }
 
-        // MÉTODO DE DIAGNÓSTICO ADICIONADO
+        // MÉTODOS CORRIGIDOS PARA DASHBOARD - COM ALARME
+        public int ObterQuantidadeTarefasConcluidasComAlarmeHoje(int usuarioId)
+        {
+            try
+            {
+                DateTime hoje = DateTime.Today;
+                DateTime amanha = hoje.AddDays(1);
+
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                        SELECT COUNT(DISTINCT PT.Codigo)
+                        FROM Projeto_Tarefas PT
+                        INNER JOIN Alarme A ON PT.Codigo = A.CodTarefa
+                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId
+                        AND A.Data >= @hoje AND A.Data < @amanha
+                        AND PT.isConcluida = 1";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        cmd.Parameters.AddWithValue("@hoje", hoje);
+                        cmd.Parameters.AddWithValue("@amanha", amanha);
+                        return Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao contar tarefas concluídas de hoje: " + ex.Message;
+                return 0;
+            }
+        }
+
+        public int ObterQuantidadeTarefasPendentesComAlarmeHoje(int usuarioId)
+        {
+            try
+            {
+                DateTime hoje = DateTime.Today;
+                DateTime amanha = hoje.AddDays(1);
+
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                        SELECT COUNT(DISTINCT PT.Codigo)
+                        FROM Projeto_Tarefas PT
+                        INNER JOIN Alarme A ON PT.Codigo = A.CodTarefa
+                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId
+                        AND A.Data >= @hoje AND A.Data < @amanha
+                        AND PT.isConcluida = 0";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        cmd.Parameters.AddWithValue("@hoje", hoje);
+                        cmd.Parameters.AddWithValue("@amanha", amanha);
+                        return Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao contar tarefas pendentes de hoje: " + ex.Message;
+                return 0;
+            }
+        }
+
+        public int ObterQuantidadeTarefasConcluidasComAlarmeSemana(int usuarioId)
+        {
+            try
+            {
+                DateTime inicioSemana = GetInicioSemana(DateTime.Today);
+                DateTime fimSemana = inicioSemana.AddDays(7);
+
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                        SELECT COUNT(DISTINCT PT.Codigo)
+                        FROM Projeto_Tarefas PT
+                        INNER JOIN Alarme A ON PT.Codigo = A.CodTarefa
+                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId
+                        AND A.Data >= @inicioSemana AND A.Data < @fimSemana
+                        AND PT.isConcluida = 1";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        cmd.Parameters.AddWithValue("@inicioSemana", inicioSemana);
+                        cmd.Parameters.AddWithValue("@fimSemana", fimSemana);
+                        return Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao contar tarefas concluídas da semana: " + ex.Message;
+                return 0;
+            }
+        }
+
+        public int ObterQuantidadeTarefasPendentesComAlarmeSemana(int usuarioId)
+        {
+            try
+            {
+                DateTime inicioSemana = GetInicioSemana(DateTime.Today);
+                DateTime fimSemana = inicioSemana.AddDays(7);
+
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                        SELECT COUNT(DISTINCT PT.Codigo)
+                        FROM Projeto_Tarefas PT
+                        INNER JOIN Alarme A ON PT.Codigo = A.CodTarefa
+                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId
+                        AND A.Data >= @inicioSemana AND A.Data < @fimSemana
+                        AND PT.isConcluida = 0";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        cmd.Parameters.AddWithValue("@inicioSemana", inicioSemana);
+                        cmd.Parameters.AddWithValue("@fimSemana", fimSemana);
+                        return Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao contar tarefas pendentes da semana: " + ex.Message;
+                return 0;
+            }
+        }
+
+        // MÉTODO DE DIAGNÓSTICO
         public void DiagnosticoCompletoBrasil(int usuarioId)
         {
             try
@@ -148,7 +285,6 @@ namespace CanvasApp.Classes.Databases
                 Console.WriteLine($"Tarefas com alarme semana: {ObterQuantidadeTarefasComAlarmeSemana(usuarioId)}");
                 Console.WriteLine($"Tarefas com alarme mês: {ObterQuantidadeTarefasComAlarmeMes(usuarioId)}");
 
-                // Diagnóstico adicional
                 var tarefasTotais = ObterQuantidadeTarefasTotaisDoUsuario(usuarioId);
                 var tarefasConcluidas = ObterQuantidadeTarefasTotaisConcluidasDoUsuario(usuarioId);
                 var tarefasPendentes = ObterQuantidadeTarefasTotaisPendentesDoUsuario(usuarioId);
@@ -164,7 +300,7 @@ namespace CanvasApp.Classes.Databases
             }
         }
 
-        // MÉTODO ADICIONADO PARA PROJETOS COMPARTILHADOS
+        // MÉTODO PARA PROJETOS COMPARTILHADOS
         public bool CriarTarefaCompartilhada(Projeto_Tarefas tarefa)
         {
             return InserirTarefa(tarefa);
@@ -177,6 +313,7 @@ namespace CanvasApp.Classes.Databases
             return data.AddDays(-1 * diff).Date;
         }
 
+        // MÉTODOS CRUD BÁSICOS
         public bool InserirTarefa(Projeto_Tarefas tarefa)
         {
             try
@@ -621,142 +758,6 @@ namespace CanvasApp.Classes.Databases
             }
         }
 
-        public int ObterQuantidadeTarefasConcluidasComAlarmeHoje(int usuarioId)
-        {
-            try
-            {
-                DateTime hoje = DateTime.Today;
-                DateTime amanha = hoje.AddDays(1);
-
-                using (SqlConnection conn = GetConnection())
-                {
-                    string query = @"
-                        SELECT COUNT(DISTINCT PT.Codigo)
-                        FROM Projeto_Tarefas PT
-                        INNER JOIN Alarme A ON PT.Codigo = A.CodTarefa
-                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
-                        WHERE PM.CodMembro = @usuarioId
-                        AND A.Data >= @hoje AND A.Data < @amanha
-                        AND PT.isConcluida = 1";
-
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
-                        cmd.Parameters.AddWithValue("@hoje", hoje);
-                        cmd.Parameters.AddWithValue("@amanha", amanha);
-                        return Convert.ToInt32(cmd.ExecuteScalar());
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Mensagem = "Erro ao contar tarefas concluídas de hoje: " + ex.Message;
-                return 0;
-            }
-        }
-
-        public int ObterQuantidadeTarefasPendentesComAlarmeHoje(int usuarioId)
-        {
-            try
-            {
-                DateTime hoje = DateTime.Today;
-                DateTime amanha = hoje.AddDays(1);
-
-                using (SqlConnection conn = GetConnection())
-                {
-                    string query = @"
-                        SELECT COUNT(DISTINCT PT.Codigo)
-                        FROM Projeto_Tarefas PT
-                        INNER JOIN Alarme A ON PT.Codigo = A.CodTarefa
-                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
-                        WHERE PM.CodMembro = @usuarioId
-                        AND A.Data >= @hoje AND A.Data < @amanha
-                        AND PT.isConcluida = 0";
-
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
-                        cmd.Parameters.AddWithValue("@hoje", hoje);
-                        cmd.Parameters.AddWithValue("@amanha", amanha);
-                        return Convert.ToInt32(cmd.ExecuteScalar());
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Mensagem = "Erro ao contar tarefas pendentes de hoje: " + ex.Message;
-                return 0;
-            }
-        }
-
-        public int ObterQuantidadeTarefasConcluidasComAlarmeSemana(int usuarioId)
-        {
-            try
-            {
-                DateTime inicioSemana = GetInicioSemana(DateTime.Today);
-                DateTime fimSemana = inicioSemana.AddDays(7);
-
-                using (SqlConnection conn = GetConnection())
-                {
-                    string query = @"
-                        SELECT COUNT(DISTINCT PT.Codigo)
-                        FROM Projeto_Tarefas PT
-                        INNER JOIN Alarme A ON PT.Codigo = A.CodTarefa
-                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
-                        WHERE PM.CodMembro = @usuarioId
-                        AND A.Data >= @inicioSemana AND A.Data < @fimSemana
-                        AND PT.isConcluida = 1";
-
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
-                        cmd.Parameters.AddWithValue("@inicioSemana", inicioSemana);
-                        cmd.Parameters.AddWithValue("@fimSemana", fimSemana);
-                        return Convert.ToInt32(cmd.ExecuteScalar());
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Mensagem = "Erro ao contar tarefas concluídas da semana: " + ex.Message;
-                return 0;
-            }
-        }
-
-        public int ObterQuantidadeTarefasPendentesComAlarmeSemana(int usuarioId)
-        {
-            try
-            {
-                DateTime inicioSemana = GetInicioSemana(DateTime.Today);
-                DateTime fimSemana = inicioSemana.AddDays(7);
-
-                using (SqlConnection conn = GetConnection())
-                {
-                    string query = @"
-                        SELECT COUNT(DISTINCT PT.Codigo)
-                        FROM Projeto_Tarefas PT
-                        INNER JOIN Alarme A ON PT.Codigo = A.CodTarefa
-                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
-                        WHERE PM.CodMembro = @usuarioId
-                        AND A.Data >= @inicioSemana AND A.Data < @fimSemana
-                        AND PT.isConcluida = 0";
-
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
-                        cmd.Parameters.AddWithValue("@inicioSemana", inicioSemana);
-                        cmd.Parameters.AddWithValue("@fimSemana", fimSemana);
-                        return Convert.ToInt32(cmd.ExecuteScalar());
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Mensagem = "Erro ao contar tarefas pendentes da semana: " + ex.Message;
-                return 0;
-            }
-        }
-
         public List<Projeto_Tarefas> ObterTarefasTotaisConcluidasDoUsuario(int usuarioId)
         {
             List<Projeto_Tarefas> tarefas = new List<Projeto_Tarefas>();
@@ -795,6 +796,48 @@ namespace CanvasApp.Classes.Databases
             catch (Exception ex)
             {
                 Mensagem = "Erro ao buscar tarefas concluídas: " + ex.Message;
+            }
+            return tarefas;
+        }
+
+        public List<Projeto_Tarefas> ObterTarefasTotaisPendentesDoUsuario(int usuarioId)
+        {
+            List<Projeto_Tarefas> tarefas = new List<Projeto_Tarefas>();
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                        SELECT PT.Codigo, PT.Descricao, PT.isConcluida, PT.CodProjeto, PT.CodUsuario
+                        FROM Projeto_Tarefas PT
+                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId AND PT.isConcluida = 0
+                        ORDER BY PT.Codigo DESC";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                var codUsuarioValue = reader["CodUsuario"];
+                                tarefas.Add(new Projeto_Tarefas
+                                {
+                                    Codigo = Convert.ToInt32(reader["Codigo"]),
+                                    Descricao = reader["Descricao"].ToString(),
+                                    isConcluida = Convert.ToBoolean(reader["isConcluida"]),
+                                    CodProjeto = Convert.ToInt32(reader["CodProjeto"]),
+                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue)
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao buscar tarefas pendentes: " + ex.Message;
             }
             return tarefas;
         }

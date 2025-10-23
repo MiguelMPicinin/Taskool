@@ -309,6 +309,28 @@ namespace CanvasApp.Classes.Databases
             }
         }
 
+        // CORREÇÃO: Método sobrecarregado para aceitar string como CodUsuario
+        public bool DefinirPrazoELembrete(int codTarefa, string codUsuario, DateTime data, TimeSpan hora, RepeticaoAlarme repeticao)
+        {
+            try
+            {
+                // Converter string para int
+                if (!int.TryParse(codUsuario, out int codUsuarioInt))
+                {
+                    Mensagem = "Código de usuário inválido!";
+                    return false;
+                }
+
+                return DefinirPrazoELembrete(codTarefa, codUsuarioInt, data, hora, repeticao);
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao definir prazo e lembrete: " + ex.Message;
+                return false;
+            }
+        }
+
+        // CORREÇÃO: Método original com int como CodUsuario
         public bool DefinirPrazoELembrete(int codTarefa, int codUsuario, DateTime data, TimeSpan hora, RepeticaoAlarme repeticao)
         {
             try

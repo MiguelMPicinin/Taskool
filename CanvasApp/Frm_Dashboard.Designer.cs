@@ -28,12 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.Graph_TarefasPorProjeto = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.Graph_ProgressoSemanal = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.Btn_PDF = new System.Windows.Forms.Button();
@@ -43,17 +43,23 @@
             this.Btn_Avancar = new System.Windows.Forms.Button();
             this.Grp_Hoje = new System.Windows.Forms.GroupBox();
             this.Pnl_HojePendentes = new System.Windows.Forms.Panel();
+            this.Lbl_HojePendentes = new System.Windows.Forms.Label();
             this.Pnl_HojeConcluida = new System.Windows.Forms.Panel();
+            this.Lbl_HojeConcluidas = new System.Windows.Forms.Label();
             this.Lbl_Titulo = new System.Windows.Forms.Label();
             this.Lbl_Hoje = new System.Windows.Forms.Label();
             this.Lbl_Semana = new System.Windows.Forms.Label();
             this.Lbl_Total = new System.Windows.Forms.Label();
             this.Grp_Semana = new System.Windows.Forms.GroupBox();
             this.Pnl_SemanaPendentes = new System.Windows.Forms.Panel();
+            this.Lbl_SemanaPendentes = new System.Windows.Forms.Label();
             this.Pnl_SemanaConcluida = new System.Windows.Forms.Panel();
+            this.Lbl_SemanaConcluidas = new System.Windows.Forms.Label();
             this.Grp_Total = new System.Windows.Forms.GroupBox();
             this.Pnl_Total_Pendentes = new System.Windows.Forms.Panel();
+            this.Lbl_TotalPendentes = new System.Windows.Forms.Label();
             this.Pnl_TotalConcluidas = new System.Windows.Forms.Panel();
+            this.Lbl_TotalConcluidas = new System.Windows.Forms.Label();
             this.Pnl_Total = new System.Windows.Forms.Panel();
             this.Lbl_Porcentagem2 = new System.Windows.Forms.Label();
             this.Lbl_TarefasPendentes = new System.Windows.Forms.Label();
@@ -83,12 +89,6 @@
             this.Pnl_CC7 = new System.Windows.Forms.Panel();
             this.Lbl_Conteudo7 = new System.Windows.Forms.Label();
             this.Lbl_Tarefa7 = new System.Windows.Forms.Label();
-            this.Lbl_HojeConcluidas = new System.Windows.Forms.Label();
-            this.Lbl_HojePendentes = new System.Windows.Forms.Label();
-            this.Lbl_SemanaPendentes = new System.Windows.Forms.Label();
-            this.Lbl_TotalPendentes = new System.Windows.Forms.Label();
-            this.Lbl_TotalConcluidas = new System.Windows.Forms.Label();
-            this.Lbl_SemanaConcluidas = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.Graph_TarefasPorProjeto)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Graph_ProgressoSemanal)).BeginInit();
             this.Grp_Hoje.SuspendLayout();
@@ -113,32 +113,32 @@
             // 
             // Graph_TarefasPorProjeto
             // 
-            chartArea3.Name = "ChartArea1";
-            this.Graph_TarefasPorProjeto.ChartAreas.Add(chartArea3);
-            legend3.Name = "Legend1";
-            this.Graph_TarefasPorProjeto.Legends.Add(legend3);
+            chartArea1.Name = "ChartArea1";
+            this.Graph_TarefasPorProjeto.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.Graph_TarefasPorProjeto.Legends.Add(legend1);
             this.Graph_TarefasPorProjeto.Location = new System.Drawing.Point(461, 132);
             this.Graph_TarefasPorProjeto.Name = "Graph_TarefasPorProjeto";
-            series3.ChartArea = "ChartArea1";
-            series3.Legend = "Legend1";
-            series3.Name = "Series1";
-            this.Graph_TarefasPorProjeto.Series.Add(series3);
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.Graph_TarefasPorProjeto.Series.Add(series1);
             this.Graph_TarefasPorProjeto.Size = new System.Drawing.Size(331, 249);
             this.Graph_TarefasPorProjeto.TabIndex = 0;
             this.Graph_TarefasPorProjeto.Text = "Por Projetos";
             // 
             // Graph_ProgressoSemanal
             // 
-            chartArea4.Name = "ChartArea1";
-            this.Graph_ProgressoSemanal.ChartAreas.Add(chartArea4);
-            legend4.Name = "Legend1";
-            this.Graph_ProgressoSemanal.Legends.Add(legend4);
+            chartArea2.Name = "ChartArea1";
+            this.Graph_ProgressoSemanal.ChartAreas.Add(chartArea2);
+            legend2.Name = "Legend1";
+            this.Graph_ProgressoSemanal.Legends.Add(legend2);
             this.Graph_ProgressoSemanal.Location = new System.Drawing.Point(136, 165);
             this.Graph_ProgressoSemanal.Name = "Graph_ProgressoSemanal";
-            series4.ChartArea = "ChartArea1";
-            series4.Legend = "Legend1";
-            series4.Name = "Series1";
-            this.Graph_ProgressoSemanal.Series.Add(series4);
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.Graph_ProgressoSemanal.Series.Add(series2);
             this.Graph_ProgressoSemanal.Size = new System.Drawing.Size(319, 172);
             this.Graph_ProgressoSemanal.TabIndex = 1;
             this.Graph_ProgressoSemanal.Text = "chart2";
@@ -209,6 +209,16 @@
             this.Pnl_HojePendentes.Size = new System.Drawing.Size(66, 47);
             this.Pnl_HojePendentes.TabIndex = 1;
             // 
+            // Lbl_HojePendentes
+            // 
+            this.Lbl_HojePendentes.AutoSize = true;
+            this.Lbl_HojePendentes.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.Lbl_HojePendentes.Location = new System.Drawing.Point(17, 19);
+            this.Lbl_HojePendentes.Name = "Lbl_HojePendentes";
+            this.Lbl_HojePendentes.Size = new System.Drawing.Size(35, 13);
+            this.Lbl_HojePendentes.TabIndex = 1;
+            this.Lbl_HojePendentes.Text = "label2";
+            // 
             // Pnl_HojeConcluida
             // 
             this.Pnl_HojeConcluida.BackColor = System.Drawing.SystemColors.ButtonHighlight;
@@ -217,6 +227,16 @@
             this.Pnl_HojeConcluida.Name = "Pnl_HojeConcluida";
             this.Pnl_HojeConcluida.Size = new System.Drawing.Size(66, 52);
             this.Pnl_HojeConcluida.TabIndex = 0;
+            // 
+            // Lbl_HojeConcluidas
+            // 
+            this.Lbl_HojeConcluidas.AutoSize = true;
+            this.Lbl_HojeConcluidas.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.Lbl_HojeConcluidas.Location = new System.Drawing.Point(17, 19);
+            this.Lbl_HojeConcluidas.Name = "Lbl_HojeConcluidas";
+            this.Lbl_HojeConcluidas.Size = new System.Drawing.Size(35, 13);
+            this.Lbl_HojeConcluidas.TabIndex = 0;
+            this.Lbl_HojeConcluidas.Text = "label1";
             // 
             // Lbl_Titulo
             // 
@@ -280,6 +300,16 @@
             this.Pnl_SemanaPendentes.Size = new System.Drawing.Size(66, 50);
             this.Pnl_SemanaPendentes.TabIndex = 1;
             // 
+            // Lbl_SemanaPendentes
+            // 
+            this.Lbl_SemanaPendentes.AutoSize = true;
+            this.Lbl_SemanaPendentes.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.Lbl_SemanaPendentes.Location = new System.Drawing.Point(18, 19);
+            this.Lbl_SemanaPendentes.Name = "Lbl_SemanaPendentes";
+            this.Lbl_SemanaPendentes.Size = new System.Drawing.Size(35, 13);
+            this.Lbl_SemanaPendentes.TabIndex = 2;
+            this.Lbl_SemanaPendentes.Text = "label3";
+            // 
             // Pnl_SemanaConcluida
             // 
             this.Pnl_SemanaConcluida.BackColor = System.Drawing.SystemColors.ButtonHighlight;
@@ -288,6 +318,16 @@
             this.Pnl_SemanaConcluida.Name = "Pnl_SemanaConcluida";
             this.Pnl_SemanaConcluida.Size = new System.Drawing.Size(66, 49);
             this.Pnl_SemanaConcluida.TabIndex = 0;
+            // 
+            // Lbl_SemanaConcluidas
+            // 
+            this.Lbl_SemanaConcluidas.AutoSize = true;
+            this.Lbl_SemanaConcluidas.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.Lbl_SemanaConcluidas.Location = new System.Drawing.Point(17, 16);
+            this.Lbl_SemanaConcluidas.Name = "Lbl_SemanaConcluidas";
+            this.Lbl_SemanaConcluidas.Size = new System.Drawing.Size(35, 13);
+            this.Lbl_SemanaConcluidas.TabIndex = 3;
+            this.Lbl_SemanaConcluidas.Text = "label6";
             // 
             // Grp_Total
             // 
@@ -308,6 +348,16 @@
             this.Pnl_Total_Pendentes.Size = new System.Drawing.Size(66, 50);
             this.Pnl_Total_Pendentes.TabIndex = 1;
             // 
+            // Lbl_TotalPendentes
+            // 
+            this.Lbl_TotalPendentes.AutoSize = true;
+            this.Lbl_TotalPendentes.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.Lbl_TotalPendentes.Location = new System.Drawing.Point(19, 21);
+            this.Lbl_TotalPendentes.Name = "Lbl_TotalPendentes";
+            this.Lbl_TotalPendentes.Size = new System.Drawing.Size(35, 13);
+            this.Lbl_TotalPendentes.TabIndex = 3;
+            this.Lbl_TotalPendentes.Text = "label4";
+            // 
             // Pnl_TotalConcluidas
             // 
             this.Pnl_TotalConcluidas.BackColor = System.Drawing.SystemColors.ButtonHighlight;
@@ -316,6 +366,16 @@
             this.Pnl_TotalConcluidas.Name = "Pnl_TotalConcluidas";
             this.Pnl_TotalConcluidas.Size = new System.Drawing.Size(66, 49);
             this.Pnl_TotalConcluidas.TabIndex = 0;
+            // 
+            // Lbl_TotalConcluidas
+            // 
+            this.Lbl_TotalConcluidas.AutoSize = true;
+            this.Lbl_TotalConcluidas.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.Lbl_TotalConcluidas.Location = new System.Drawing.Point(17, 16);
+            this.Lbl_TotalConcluidas.Name = "Lbl_TotalConcluidas";
+            this.Lbl_TotalConcluidas.Size = new System.Drawing.Size(35, 13);
+            this.Lbl_TotalConcluidas.TabIndex = 4;
+            this.Lbl_TotalConcluidas.Text = "label5";
             // 
             // Pnl_Total
             // 
@@ -609,66 +669,6 @@
             this.Lbl_Tarefa7.Size = new System.Drawing.Size(41, 13);
             this.Lbl_Tarefa7.TabIndex = 32;
             this.Lbl_Tarefa7.Text = "label15";
-            // 
-            // Lbl_HojeConcluidas
-            // 
-            this.Lbl_HojeConcluidas.AutoSize = true;
-            this.Lbl_HojeConcluidas.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
-            this.Lbl_HojeConcluidas.Location = new System.Drawing.Point(17, 19);
-            this.Lbl_HojeConcluidas.Name = "Lbl_HojeConcluidas";
-            this.Lbl_HojeConcluidas.Size = new System.Drawing.Size(35, 13);
-            this.Lbl_HojeConcluidas.TabIndex = 0;
-            this.Lbl_HojeConcluidas.Text = "label1";
-            // 
-            // Lbl_HojePendentes
-            // 
-            this.Lbl_HojePendentes.AutoSize = true;
-            this.Lbl_HojePendentes.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
-            this.Lbl_HojePendentes.Location = new System.Drawing.Point(17, 19);
-            this.Lbl_HojePendentes.Name = "Lbl_HojePendentes";
-            this.Lbl_HojePendentes.Size = new System.Drawing.Size(35, 13);
-            this.Lbl_HojePendentes.TabIndex = 1;
-            this.Lbl_HojePendentes.Text = "label2";
-            // 
-            // Lbl_SemanaPendentes
-            // 
-            this.Lbl_SemanaPendentes.AutoSize = true;
-            this.Lbl_SemanaPendentes.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
-            this.Lbl_SemanaPendentes.Location = new System.Drawing.Point(18, 19);
-            this.Lbl_SemanaPendentes.Name = "Lbl_SemanaPendentes";
-            this.Lbl_SemanaPendentes.Size = new System.Drawing.Size(35, 13);
-            this.Lbl_SemanaPendentes.TabIndex = 2;
-            this.Lbl_SemanaPendentes.Text = "label3";
-            // 
-            // Lbl_TotalPendentes
-            // 
-            this.Lbl_TotalPendentes.AutoSize = true;
-            this.Lbl_TotalPendentes.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
-            this.Lbl_TotalPendentes.Location = new System.Drawing.Point(19, 21);
-            this.Lbl_TotalPendentes.Name = "Lbl_TotalPendentes";
-            this.Lbl_TotalPendentes.Size = new System.Drawing.Size(35, 13);
-            this.Lbl_TotalPendentes.TabIndex = 3;
-            this.Lbl_TotalPendentes.Text = "label4";
-            // 
-            // Lbl_TotalConcluidas
-            // 
-            this.Lbl_TotalConcluidas.AutoSize = true;
-            this.Lbl_TotalConcluidas.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
-            this.Lbl_TotalConcluidas.Location = new System.Drawing.Point(17, 16);
-            this.Lbl_TotalConcluidas.Name = "Lbl_TotalConcluidas";
-            this.Lbl_TotalConcluidas.Size = new System.Drawing.Size(35, 13);
-            this.Lbl_TotalConcluidas.TabIndex = 4;
-            this.Lbl_TotalConcluidas.Text = "label5";
-            // 
-            // Lbl_SemanaConcluidas
-            // 
-            this.Lbl_SemanaConcluidas.AutoSize = true;
-            this.Lbl_SemanaConcluidas.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
-            this.Lbl_SemanaConcluidas.Location = new System.Drawing.Point(17, 16);
-            this.Lbl_SemanaConcluidas.Name = "Lbl_SemanaConcluidas";
-            this.Lbl_SemanaConcluidas.Size = new System.Drawing.Size(35, 13);
-            this.Lbl_SemanaConcluidas.TabIndex = 3;
-            this.Lbl_SemanaConcluidas.Text = "label6";
             // 
             // Frm_Dashboard
             // 

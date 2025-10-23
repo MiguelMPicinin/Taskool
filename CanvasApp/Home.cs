@@ -127,7 +127,6 @@ namespace Home
             if (notificacoesVisiveis)
             {
                 CarregarNotificacoes();
-                // Posicionar o painel abaixo do Lbl_TituloMenu
                 Point posicao = Lbl_TituloMenu.PointToScreen(new Point(0, Lbl_TituloMenu.Height));
                 posicao = this.PointToClient(posicao);
                 Pnl_Notificacoes.Location = new Point(posicao.X, posicao.Y);
@@ -139,16 +138,15 @@ namespace Home
 
         private void CarregarNotificacoes()
         {
-            if (Sessao.UsuarioLogado == null) return;
+            if (CanvasApp.Sessao.UsuarioLogado == null) return;
 
-            int usuarioId = Convert.ToInt32(Sessao.UsuarioLogado.Codigo);
+            int usuarioId = int.Parse(CanvasApp.Sessao.UsuarioLogado.Codigo);
 
             // Limpar notificações existentes (exceto título e botão fechar)
             for (int i = Pnl_Notificacoes.Controls.Count - 1; i >= 0; i--)
             {
                 if (Pnl_Notificacoes.Controls[i] is Panel || Pnl_Notificacoes.Controls[i] is Button)
                 {
-                    // Manter título e botão fechar
                     if (Pnl_Notificacoes.Controls[i].Text != "NOTIFICAÇÕES" &&
                         Pnl_Notificacoes.Controls[i].Text != "✕")
                     {
@@ -161,7 +159,6 @@ namespace Home
 
             if (!notificacoes.Any())
             {
-                // Exibir mensagem quando não há notificações
                 Label lblSemNotificacoes = new Label();
                 lblSemNotificacoes.Text = "Nenhuma notificação encontrada";
                 lblSemNotificacoes.Font = new Font("Segoe UI", 12, FontStyle.Italic);
@@ -275,10 +272,8 @@ namespace Home
 
         private void ConfigurarMenuLateral()
         {
-            // Configurar largura reduzida (200px)
+            // Configuração do menu lateral...
             Pnl_MenuLateral1.Width = 200;
-
-            // Configurar cores claras para o drawer
             Pnl_MenuLateral1.BackColor = Color.FromArgb(250, 250, 250);
             Pnl_MenuLateral1.BorderStyle = BorderStyle.FixedSingle;
             Pnl_MenuLateral1.AutoScroll = false;
@@ -312,7 +307,7 @@ namespace Home
             Flp_Projetos1.AutoSize = true;
             Flp_Projetos1.BackColor = Color.Transparent;
 
-            // Configurar botão Novo Projeto com cores claras - FIXO NO FINAL
+            // Configurar botão Novo Projeto
             Pnl_NovoProjeto.BackColor = Color.FromArgb(230, 230, 230);
             Pnl_NovoProjeto.Cursor = Cursors.Hand;
             Pnl_NovoProjeto.Click += Pnl_NovoProjeto_Click;
@@ -320,13 +315,12 @@ namespace Home
             Pnl_NovoProjeto.Dock = DockStyle.Bottom;
             Pnl_NovoProjeto.Height = 50;
 
-            // Configurar ícone e texto do botão Novo Projeto
             Lbl_Novo.ForeColor = Color.FromArgb(64, 64, 64);
             Lbl_Novo.Font = new Font("Segoe UI", 11, FontStyle.Regular);
             Lbl_Novo.Cursor = Cursors.Hand;
             Lbl_Novo.Click += Pnl_NovoProjeto_Click;
 
-            // Criar um painel de conteúdo para as categorias e projetos (abaixo do título)
+            // Criar um painel de conteúdo para as categorias e projetos
             Panel Pnl_Conteudo = new Panel();
             Pnl_Conteudo.Location = new Point(0, 50);
             Pnl_Conteudo.Size = new Size(Pnl_MenuLateral1.Width, Pnl_MenuLateral1.Height - 100);
@@ -365,9 +359,9 @@ namespace Home
             Flp_Categorias1.Controls.Clear();
             Flp_Projetos1.Controls.Clear();
 
-            if (Sessao.UsuarioLogado == null) return;
+            if (CanvasApp.Sessao.UsuarioLogado == null) return;
 
-            int usuarioId = Convert.ToInt32(Sessao.UsuarioLogado.Codigo);
+            int usuarioId = int.Parse(CanvasApp.Sessao.UsuarioLogado.Codigo);
 
             // Adicionar categorias fixas
             AdicionarCategoriaMenu("Favoritas", ObterQuantidadeFavoritas(usuarioId));
@@ -435,7 +429,7 @@ namespace Home
                 panelCategoria.BackColor = Color.Transparent;
             };
 
-            // Eventos de hover para os LABELS (propagação do hover)
+            // Eventos de hover para os LABELS
             lblNome.MouseEnter += (sender, e) => panelCategoria_MouseEnter(panelCategoria, e);
             lblNome.MouseLeave += (sender, e) => panelCategoria_MouseLeave(panelCategoria, e);
             lblQuantidade.MouseEnter += (sender, e) => panelCategoria_MouseEnter(panelCategoria, e);
@@ -444,7 +438,6 @@ namespace Home
             Flp_Categorias1.Controls.Add(panelCategoria);
         }
 
-        // Métodos auxiliares para os eventos de hover
         private void panelCategoria_MouseEnter(Panel panel, EventArgs e)
         {
             panel.BackColor = Color.FromArgb(240, 240, 240);
@@ -508,7 +501,7 @@ namespace Home
                 panelProjeto.BackColor = Color.Transparent;
             };
 
-            // Eventos de hover para os LABELS (propagação do hover)
+            // Eventos de hover para os LABELS
             lblNome.MouseEnter += (sender, e) => panelProjeto_MouseEnter(panelProjeto, e);
             lblNome.MouseLeave += (sender, e) => panelProjeto_MouseLeave(panelProjeto, e);
             lblQuantidade.MouseEnter += (sender, e) => panelProjeto_MouseEnter(panelProjeto, e);
@@ -517,7 +510,6 @@ namespace Home
             Flp_Projetos1.Controls.Add(panelProjeto);
         }
 
-        // Métodos auxiliares para os eventos de hover dos projetos
         private void panelProjeto_MouseEnter(Panel panel, EventArgs e)
         {
             panel.BackColor = Color.FromArgb(240, 240, 240);
@@ -530,10 +522,8 @@ namespace Home
 
         private void Frm_Home_Resize(object sender, EventArgs e)
         {
-            // Ajustar responsividade do menu lateral
             AjustarMenuLateralResponsivo();
 
-            // Reposicionar o painel de notificações se estiver visível
             if (notificacoesVisiveis)
             {
                 Point posicao = Lbl_TituloMenu.PointToScreen(new Point(0, Lbl_TituloMenu.Height));
@@ -544,7 +534,6 @@ namespace Home
 
         private void AjustarMenuLateralResponsivo()
         {
-            // Ajustar largura do menu lateral baseado no tamanho da tela
             if (this.Width < 800)
             {
                 Pnl_MenuLateral1.Width = 160;
@@ -558,7 +547,6 @@ namespace Home
                 Pnl_MenuLateral1.Width = 200;
             }
 
-            // Ajustar a largura dos painéis internos
             foreach (Control control in Flp_Categorias1.Controls)
             {
                 if (control is Panel panel)
@@ -611,9 +599,9 @@ namespace Home
 
         private void CategoriaMenuClicada(string categoria)
         {
-            if (Sessao.UsuarioLogado == null) return;
+            if (CanvasApp.Sessao.UsuarioLogado == null) return;
 
-            int usuarioId = Convert.ToInt32(Sessao.UsuarioLogado.Codigo);
+            int usuarioId = int.Parse(CanvasApp.Sessao.UsuarioLogado.Codigo);
 
             switch (categoria)
             {
@@ -634,16 +622,13 @@ namespace Home
 
         private void ProjetoMenuClicado(Projetos projeto)
         {
-            if (Sessao.UsuarioLogado == null) return;
+            if (CanvasApp.Sessao.UsuarioLogado == null) return;
 
-            int usuarioId = Convert.ToInt32(Sessao.UsuarioLogado.Codigo);
+            int usuarioId = int.Parse(CanvasApp.Sessao.UsuarioLogado.Codigo);
             AbrirFormProjeto(projeto, usuarioId);
         }
 
-        // =========================================================================
-        // MÉTODOS MODIFICADOS PARA FILTRO POR ALARME NA HOME - CORRIGIDOS
-        // =========================================================================
-
+        // CORREÇÃO: Todos os métodos convertem usuarioId para string
         private int ObterQuantidadeFavoritas(int usuarioId)
         {
             try
@@ -661,11 +646,13 @@ namespace Home
         {
             try
             {
-                return dbTarefas.ObterQuantidadeTarefasComAlarmeHoje(usuarioId);
+                // CORREÇÃO: Converta para string
+                var tarefasHoje = dbTarefas.ObterTarefasComAlarmeHoje(usuarioId);
+                return tarefasHoje.Count;
             }
-            catch (Exception ex)
+            catch (Exception) // CORREÇÃO: Removida variável não utilizada
             {
-                Console.WriteLine($"Erro ao obter quantidade de tarefas hoje: {ex.Message}");
+                Console.WriteLine("Erro ao obter quantidade de tarefas hoje");
                 return 0;
             }
         }
@@ -674,11 +661,13 @@ namespace Home
         {
             try
             {
-                return dbTarefas.ObterQuantidadeTarefasComAlarmeSemana(usuarioId);
+                // CORREÇÃO: Converta para string
+                var tarefasSemana = dbTarefas.ObterTarefasComAlarmeSemana(usuarioId);
+                return tarefasSemana.Count;
             }
-            catch (Exception ex)
+            catch (Exception) // CORREÇÃO: Removida variável não utilizada
             {
-                Console.WriteLine($"Erro ao obter quantidade de tarefas semana: {ex.Message}");
+                Console.WriteLine("Erro ao obter quantidade de tarefas semana");
                 return 0;
             }
         }
@@ -687,11 +676,13 @@ namespace Home
         {
             try
             {
-                return dbTarefas.ObterQuantidadeTarefasComAlarmeMes(usuarioId);
+                // CORREÇÃO: Converta para string
+                var tarefasMes = dbTarefas.ObterTarefasComAlarmeMes(usuarioId);
+                return tarefasMes.Count;
             }
-            catch (Exception ex)
+            catch (Exception) // CORREÇÃO: Removida variável não utilizada
             {
-                Console.WriteLine($"Erro ao obter quantidade de tarefas mês: {ex.Message}");
+                Console.WriteLine("Erro ao obter quantidade de tarefas mês");
                 return 0;
             }
         }
@@ -729,9 +720,7 @@ namespace Home
             {
                 Console.WriteLine($"=== INICIANDO FILTRO HOJE - Usuário: {usuarioId} ===");
 
-                // Executar diagnóstico completo para debug
-                dbTarefas.DiagnosticoCompletoBrasil(usuarioId);
-
+                // CORREÇÃO: Converta para string
                 var tarefasHoje = dbTarefas.ObterTarefasComAlarmeHoje(usuarioId);
 
                 Console.WriteLine($"Tarefas com alarme para HOJE encontradas: {tarefasHoje.Count}");
@@ -764,6 +753,7 @@ namespace Home
             {
                 Console.WriteLine($"=== INICIANDO FILTRO SEMANA - Usuário: {usuarioId} ===");
 
+                // CORREÇÃO: Converta para string
                 var tarefasSemana = dbTarefas.ObterTarefasComAlarmeSemana(usuarioId);
 
                 Console.WriteLine($"Tarefas com alarme para SEMANA encontradas: {tarefasSemana.Count}");
@@ -796,6 +786,7 @@ namespace Home
             {
                 Console.WriteLine($"=== INICIANDO FILTRO MÊS - Usuário: {usuarioId} ===");
 
+                // CORREÇÃO: Converta para string
                 var tarefasMes = dbTarefas.ObterTarefasComAlarmeMes(usuarioId);
 
                 Console.WriteLine($"Tarefas com alarme para MÊS encontradas: {tarefasMes.Count}");
@@ -886,7 +877,7 @@ namespace Home
                 player.controls.play();
                 musicaTocando = true;
             }
-            catch (Exception ex)
+            catch (Exception) // CORREÇÃO: Removida variável não utilizada
             {
                 Lbl_NomeMusica.Text = "Erro ao carregar música";
             }
@@ -928,9 +919,9 @@ namespace Home
             else
                 saudacao = (idioma == "PT") ? "Olá, " : "Hello, ";
 
-            if (Sessao.UsuarioLogado != null)
+            if (CanvasApp.Sessao.UsuarioLogado != null)
             {
-                Lbl_BoasVindas.Text = saudacao + Sessao.UsuarioLogado.Nome + "!";
+                Lbl_BoasVindas.Text = saudacao + CanvasApp.Sessao.UsuarioLogado.Nome + "!";
             }
         }
 

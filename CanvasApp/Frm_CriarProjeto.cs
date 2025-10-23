@@ -377,7 +377,7 @@ namespace CanvasApp
 
         private void Frm_CriarProjeto_Load(object sender, EventArgs e)
         {
-            proprietario = Sessao.UsuarioLogado;
+            proprietario = Sessao.UsuarioLogado.Cd;
             membrosAdicionados.Clear();
             AtualizarListaMembros();
 

@@ -27,6 +27,7 @@ namespace CanvasApp.Forms
             this.tarefaAtual = tarefa;
             this.usuarioLogado = Sessao.UsuarioLogado;
 
+            // ✅ CORREÇÃO: Inicializar os campos readonly diretamente no construtor
             _alarmeDB = new AlarmeDB();
             _subtarefasDB = new SubtarefasDB();
             _comentariosDB = new ComentariosDB();
@@ -43,42 +44,77 @@ namespace CanvasApp.Forms
 
         private void ConfigurarLayoutDetalhes()
         {
-            Btn_FecharJanela.Click += Bin_FecharJanela_Click;
+            ConfigurarEventos();
+            ConfigurarComboBoxRepeticao();
+            ConfigurarDateTimePickers();
+            ConfigurarSubtarefas();
+            ConfigurarComentarios();
+            ConfigurarBotaoAtribuirResponsavel();
 
+            Pnl_ChatComentarios.Visible = false;
+            Pnl_ChatComentarios.BringToFront();
+            MostrarSelecaoDataAlarme();
+        }
+
+        private void ConfigurarEventos()
+        {
+            Btn_FecharJanela.Click += Bin_FecharJanela_Click;
             Lbl_DefinirDataLembrete.Click += Lbl_DefinirDataLembrete_Click;
             Btn_FecharData.Click += Bin_FecharData_Click;
-
             Btn_SalvarData.Click += Btn_SalvarData_Click;
-            Btn_SalvarData.Visible = false;
+            Btn_AbrirChat.Click += Btn_AbrirChat_Click;
+            Btn_FecharChat.Click += Bin_FecharChat_Click;
+            Btn_EnviarComentario.Click += Bin_EnviarComentario_Click;
+            Txt_NovoComentarioChat.KeyDown += Txt_NovoComentarioChat_KeyDown;
+            Dtp_Prazo.ValueChanged += Dtp_Prazo_ValueChanged;
+        }
 
+        private void ConfigurarComboBoxRepeticao()
+        {
             Cbo_Repeticao.Items.AddRange(new string[] {
-                "Nunca repetir", "Repetir todos os dias", "Repetir toda semana", "Repetir todo mês"
+                "Nunca repetir (apenas alarmar na data de término)",
+                "Repetir todos os dias (até chegar a data de término)",
+                "Repetir toda semana (até chegar a data de término, repetir toda semana, na segunda-feira)",
+                "Repetir todo mês (até chegar a data de término, repetir todo mês, no primeiro dia útil do mês)"
             });
             Cbo_Repeticao.SelectedIndex = 0;
+        }
 
+        private void ConfigurarDateTimePickers()
+        {
             Dtp_Prazo.Value = DateTime.Now.Date;
             Dtp_HoraAlarme.Value = DateTime.Now.Date.AddHours(9);
+        }
 
+        private void ConfigurarSubtarefas()
+        {
             Txt_NovaSubtarefa.KeyDown += Txt_NovaSubtarefa_KeyDown;
 
-            btnAdicionarSubtarefa = new Button
+            btnAdicionarSubtarefa = CriarBotaoSubtarefa();
+            if (Flw_Subtarefas.Parent != null)
+            {
+                Flw_Subtarefas.Parent.Controls.Add(btnAdicionarSubtarefa);
+            }
+        }
+
+        private Button CriarBotaoSubtarefa()
+        {
+            return new Button
             {
                 Text = "+",
                 Size = new Size(30, 23),
                 Location = new Point(Txt_NovaSubtarefa.Right + 5, Txt_NovaSubtarefa.Top),
                 Name = "Btn_AdicionarSubtarefa"
             };
-            btnAdicionarSubtarefa.Click += (s, e) => AdicionarNovaSubtarefa();
-            if (Flw_Subtarefas.Parent != null)
-            {
-                Flw_Subtarefas.Parent.Controls.Add(btnAdicionarSubtarefa);
-            }
+        }
 
-            Btn_AbrirChat.Click += Btn_AbrirChat_Click;
-            Btn_FecharChat.Click += Bin_FecharChat_Click;
-            Btn_EnviarComentario.Click += Bin_EnviarComentario_Click;
-            Txt_NovoComentarioChat.KeyDown += Txt_NovoComentarioChat_KeyDown;
+        private void ConfigurarComentarios()
+        {
+            // Configuração básica já feita em ConfigurarEventos()
+        }
 
+        private void ConfigurarBotaoAtribuirResponsavel()
+        {
             var btnAtribuirResponsavel = new Button
             {
                 Text = "Atribuir Responsáveis",
@@ -88,18 +124,17 @@ namespace CanvasApp.Forms
                 ForeColor = Color.White,
                 Font = new Font("Segoe UI", 9, FontStyle.Bold)
             };
+
             btnAtribuirResponsavel.Click += (s, e) =>
             {
-                Frm_AtribuirResponsavelTarefa frmAtribuir = new Frm_AtribuirResponsavelTarefa(tarefaAtual);
-                frmAtribuir.ShowDialog();
-                CarregarDadosTarefa();
+                using (var frmAtribuir = new Frm_AtribuirResponsavelTarefa(tarefaAtual))
+                {
+                    frmAtribuir.ShowDialog();
+                    CarregarDadosTarefa();
+                }
             };
+
             this.Controls.Add(btnAtribuirResponsavel);
-
-            Pnl_ChatComentarios.Visible = false;
-            Pnl_ChatComentarios.BringToFront();
-
-            OcultarSelecaoDataAlarme();
         }
 
         private void CarregarDadosTarefa()
@@ -107,34 +142,18 @@ namespace CanvasApp.Forms
             Txt_TituloTarefa.Text = tarefaAtual.Descricao;
             CarregarPrazoAlarme();
             CarregarSubtarefas();
-            CarregarComentarios();
             AtualizarPreviewComentarios();
         }
 
         private void MostrarSelecaoDataAlarme()
         {
-            Dtp_Prazo.Visible = true;
-            Dtp_HoraAlarme.Visible = true;
-            Cbo_Repeticao.Visible = true;
-            Btn_SalvarData.Visible = true;
-            Lbl_DefinirDataLembrete.Visible = false;
-            Lbl_PrazoExtenso.Visible = false;
-            Btn_FecharData.Visible = false;
+            var controles = new Control[] { Dtp_Prazo, Dtp_HoraAlarme, Cbo_Repeticao, Btn_SalvarData };
 
-            // CORREÇÃO: Garantir que os controles fiquem na frente
-            Dtp_Prazo.BringToFront();
-            Dtp_HoraAlarme.BringToFront();
-            Cbo_Repeticao.BringToFront();
-            Btn_SalvarData.BringToFront();
-        }
-
-        private void OcultarSelecaoDataAlarme()
-        {
-            Dtp_Prazo.Visible = false;
-            Dtp_HoraAlarme.Visible = false;
-            Cbo_Repeticao.Visible = false;
-            Btn_SalvarData.Visible = false;
-            Lbl_DefinirDataLembrete.Visible = true;
+            foreach (var controle in controles)
+            {
+                controle.Visible = true;
+                controle.BringToFront();
+            }
         }
 
         private void CarregarPrazoAlarme()
@@ -145,46 +164,52 @@ namespace CanvasApp.Forms
 
                 if (alarme != null)
                 {
-                    Dtp_Prazo.Value = alarme.Data;
-
-                    // CORREÇÃO: Converter TimeSpan para DateTime corretamente
-                    DateTime dataComHora = DateTime.Today.Add(alarme.Hora);
-                    Dtp_HoraAlarme.Value = dataComHora;
-
-                    // CORREÇÃO: Mapear corretamente o enum de repetição
-                    Cbo_Repeticao.SelectedIndex = (int)alarme.Repeticao;
-
-                    Lbl_DefinirDataLembrete.Text = "Ajustar Prazo e Lembrete";
-                    Lbl_PrazoExtenso.Text = _alarmeDB.ObterDescricaoPrazo(alarme.Data);
-                    Lbl_PrazoExtenso.Visible = true;
-                    Btn_FecharData.Visible = true;
-
-                    // CORREÇÃO: Garantir que está oculto quando há alarme
-                    OcultarSelecaoDataAlarme();
+                    ConfigurarControlesComAlarme(alarme);
                 }
                 else
                 {
-                    Lbl_DefinirDataLembrete.Text = "Definir Data e Lembrete";
-                    Lbl_PrazoExtenso.Visible = false;
-                    Btn_FecharData.Visible = false;
-
-                    Dtp_Prazo.Value = DateTime.Now.Date;
-                    Dtp_HoraAlarme.Value = DateTime.Now.Date.AddHours(9);
-                    Cbo_Repeticao.SelectedIndex = 0;
-
-                    // CORREÇÃO: Garantir que está oculto quando não há alarme
-                    OcultarSelecaoDataAlarme();
+                    ConfigurarControlesSemAlarme();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao carregar prazo: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                TratarErro("carregar prazo e alarme", ex);
             }
+        }
+
+        private void ConfigurarControlesComAlarme(Alarme alarme)
+        {
+            Dtp_Prazo.Value = alarme.Data;
+            Dtp_HoraAlarme.Value = DateTime.Today.Add(alarme.Hora);
+
+            if (Cbo_Repeticao.Items.Count > 0)
+            {
+                int indexRepeticao = (int)alarme.Repeticao;
+                Cbo_Repeticao.SelectedIndex = (indexRepeticao >= 0 && indexRepeticao < Cbo_Repeticao.Items.Count)
+                    ? indexRepeticao : 0;
+            }
+
+            Lbl_DefinirDataLembrete.Text = "Prazo e Lembrete Definidos";
+            Lbl_PrazoExtenso.Text = _alarmeDB.ObterDescricaoPrazo(alarme.Data);
+            Lbl_PrazoExtenso.Visible = true;
+            Btn_FecharData.Visible = true;
+        }
+
+        private void ConfigurarControlesSemAlarme()
+        {
+            Lbl_DefinirDataLembrete.Text = "Definir Data e Lembrete";
+            Lbl_PrazoExtenso.Visible = false;
+            Btn_FecharData.Visible = false;
+
+            ConfigurarDateTimePickers();
+            if (Cbo_Repeticao.Items.Count > 0)
+                Cbo_Repeticao.SelectedIndex = 0;
         }
 
         private void Lbl_DefinirDataLembrete_Click(object sender, EventArgs e)
         {
             MostrarSelecaoDataAlarme();
+            Lbl_DefinirDataLembrete.Text = "Ajustar Prazo e Alarme";
         }
 
         private void Btn_SalvarData_Click(object sender, EventArgs e)
@@ -196,24 +221,21 @@ namespace CanvasApp.Forms
         {
             try
             {
-                // CORREÇÃO: Usar enum RepeticaoAlarme diretamente
+                if (!ValidarDataAlarme()) return;
+
                 var repeticao = (RepeticaoAlarme)Cbo_Repeticao.SelectedIndex;
 
-                if (Dtp_Prazo.Value < DateTime.Today)
+                if (!int.TryParse(usuarioLogado.Codigo.ToString(), out int codUsuarioInt))
                 {
-                    MessageBox.Show("A data não pode ser anterior a hoje!", "Data Inválida", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Erro: Código do usuário inválido!", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                // CORREÇÃO: Salvar data e hora corretamente
-                DateTime dataPrazo = Dtp_Prazo.Value.Date;
-                TimeSpan horaAlarme = Dtp_HoraAlarme.Value.TimeOfDay;
-
                 if (_alarmeDB.DefinirPrazoELembrete(
                     tarefaAtual.Codigo,
-                    usuarioLogado.Codigo,
-                    dataPrazo,
-                    horaAlarme,
+                    codUsuarioInt,
+                    Dtp_Prazo.Value.Date,
+                    Dtp_HoraAlarme.Value.TimeOfDay,
                     repeticao))
                 {
                     MessageBox.Show("Prazo e alarme salvos com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -226,8 +248,18 @@ namespace CanvasApp.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao salvar alarme: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                TratarErro("salvar alarme", ex);
             }
+        }
+
+        private bool ValidarDataAlarme()
+        {
+            if (Dtp_Prazo.Value < DateTime.Today)
+            {
+                MessageBox.Show("A data não pode ser anterior a hoje!", "Data Inválida", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+            return true;
         }
 
         private void Bin_FecharData_Click(object sender, EventArgs e)
@@ -253,7 +285,7 @@ namespace CanvasApp.Forms
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Erro ao remover alarme: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    TratarErro("remover alarme", ex);
                 }
             }
         }
@@ -273,20 +305,12 @@ namespace CanvasApp.Forms
 
                 if (!listaSubtarefas.Any())
                 {
-                    var lblSemSubtarefas = new Label
-                    {
-                        Text = "Nenhuma subtarefa adicionada",
-                        Font = new Font("Segoe UI", 9, FontStyle.Italic),
-                        ForeColor = Color.Gray,
-                        TextAlign = ContentAlignment.MiddleCenter,
-                        Dock = DockStyle.Fill
-                    };
-                    Flw_Subtarefas.Controls.Add(lblSemSubtarefas);
+                    AdicionarLabelSemItens(Flw_Subtarefas, "Nenhuma subtarefa adicionada");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao carregar subtarefas: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                TratarErro("carregar subtarefas", ex);
             }
         }
 
@@ -329,7 +353,7 @@ namespace CanvasApp.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao adicionar subtarefa: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                TratarErro("adicionar subtarefa", ex);
             }
         }
 
@@ -337,78 +361,9 @@ namespace CanvasApp.Forms
         {
             try
             {
-                Panel pnlSub = new Panel
-                {
-                    Height = 35,
-                    Width = Flw_Subtarefas.Width - 25,
-                    Tag = sub.Codigo,
-                    Margin = new Padding(0, 3, 0, 3),
-                    BackColor = Color.White,
-                    BorderStyle = BorderStyle.FixedSingle
-                };
-
-                CheckBox chk = new CheckBox
-                {
-                    Checked = sub.isConcluida,
-                    Text = sub.Texto,
-                    Location = new Point(8, 8),
-                    AutoSize = true,
-                    Font = new Font("Segoe UI", 9),
-                    Tag = sub.Codigo
-                };
-
-                chk.CheckedChanged += (s, e) =>
-                {
-                    try
-                    {
-                        sub.isConcluida = chk.Checked;
-                        if (!_subtarefasDB.AtualizarSubtarefa(sub))
-                        {
-                            MessageBox.Show(_subtarefasDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            chk.Checked = !chk.Checked;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Erro ao atualizar subtarefa: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                };
-
-                Button btnExcluir = new Button
-                {
-                    Text = "×",
-                    Size = new Size(25, 25),
-                    Location = new Point(pnlSub.Width - 35, 5),
-                    Tag = sub.Codigo,
-                    Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                    ForeColor = Color.Red,
-                    BackColor = Color.Transparent,
-                    FlatStyle = FlatStyle.Flat,
-                    Cursor = Cursors.Hand
-                };
-
-                btnExcluir.FlatAppearance.BorderSize = 0;
-                btnExcluir.Click += (s, e) =>
-                {
-                    if (MessageBox.Show("Deseja excluir esta subtarefa?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                    {
-                        try
-                        {
-                            if (_subtarefasDB.ExcluirSubtarefa(sub.Codigo))
-                            {
-                                CarregarSubtarefas();
-                            }
-                            else
-                            {
-                                MessageBox.Show(_subtarefasDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"Erro ao excluir subtarefa: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                    }
-                };
+                var pnlSub = CriarPanelSubtarefa(sub);
+                var chk = CriarCheckboxSubtarefa(sub);
+                var btnExcluir = CriarBotaoExcluirSubtarefa(sub);
 
                 pnlSub.Controls.Add(chk);
                 pnlSub.Controls.Add(btnExcluir);
@@ -416,20 +371,95 @@ namespace CanvasApp.Forms
             }
             catch (Exception ex)
             {
-                // Ignorar erro
+                Console.WriteLine($"Erro ao criar controle de subtarefa: {ex.Message}");
             }
         }
 
-        private void CarregarComentarios()
+        private Panel CriarPanelSubtarefa(Tarefas_SubTarefas sub)
+        {
+            return new Panel
+            {
+                Height = 35,
+                Width = Flw_Subtarefas.Width - 25,
+                Tag = sub.Codigo,
+                Margin = new Padding(0, 3, 0, 3),
+                BackColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle
+            };
+        }
+
+        private CheckBox CriarCheckboxSubtarefa(Tarefas_SubTarefas sub)
+        {
+            var chk = new CheckBox
+            {
+                Checked = sub.isConcluida,
+                Text = sub.Texto,
+                Location = new Point(8, 8),
+                AutoSize = true,
+                Font = new Font("Segoe UI", 9),
+                Tag = sub.Codigo
+            };
+
+            chk.CheckedChanged += (s, e) => AtualizarStatusSubtarefa(sub, chk);
+            return chk;
+        }
+
+        private void AtualizarStatusSubtarefa(Tarefas_SubTarefas sub, CheckBox chk)
         {
             try
             {
-                var comentarios = _comentariosDB.ObterComentariosPorTarefa(tarefaAtual.Codigo);
-                Btn_AbrirChat.Text = $"Comentários ({comentarios.Count})";
+                sub.isConcluida = chk.Checked;
+                if (!_subtarefasDB.AtualizarSubtarefa(sub))
+                {
+                    MessageBox.Show(_subtarefasDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    chk.Checked = !chk.Checked;
+                }
             }
             catch (Exception ex)
             {
-                // Ignorar erro
+                TratarErro("atualizar subtarefa", ex);
+            }
+        }
+
+        private Button CriarBotaoExcluirSubtarefa(Tarefas_SubTarefas sub)
+        {
+            var btnExcluir = new Button
+            {
+                Text = "×",
+                Size = new Size(25, 25),
+                Location = new Point(Flw_Subtarefas.Width - 60, 5),
+                Tag = sub.Codigo,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                ForeColor = Color.Red,
+                BackColor = Color.Transparent,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+
+            btnExcluir.FlatAppearance.BorderSize = 0;
+            btnExcluir.Click += (s, e) => ExcluirSubtarefa(sub);
+            return btnExcluir;
+        }
+
+        private void ExcluirSubtarefa(Tarefas_SubTarefas sub)
+        {
+            if (MessageBox.Show("Deseja excluir esta subtarefa?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                try
+                {
+                    if (_subtarefasDB.ExcluirSubtarefa(sub.Codigo))
+                    {
+                        CarregarSubtarefas();
+                    }
+                    else
+                    {
+                        MessageBox.Show(_subtarefasDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TratarErro("excluir subtarefa", ex);
+                }
             }
         }
 
@@ -460,6 +490,7 @@ namespace CanvasApp.Forms
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Erro ao atualizar preview de comentários: {ex.Message}");
                 Lbl_PreviewComentarios.Text = "Erro ao carregar comentários.";
             }
         }
@@ -474,7 +505,7 @@ namespace CanvasApp.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao abrir chat: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                TratarErro("abrir chat", ex);
             }
         }
 
@@ -504,22 +535,12 @@ namespace CanvasApp.Forms
 
                 if (!comentarios.Any())
                 {
-                    var lblSemComentarios = new Label
-                    {
-                        Text = "Nenhum comentário ainda. Seja o primeiro a comentar!",
-                        Font = new Font("Segoe UI", 10, FontStyle.Italic),
-                        ForeColor = Color.Gray,
-                        TextAlign = ContentAlignment.MiddleCenter,
-                        Dock = DockStyle.Fill,
-                        AutoSize = false,
-                        Height = 50
-                    };
-                    Flw_ChatComentarios.Controls.Add(lblSemComentarios);
+                    AdicionarLabelSemItens(Flw_ChatComentarios, "Nenhum comentário ainda. Seja o primeiro a comentar!");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao carregar comentários: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                TratarErro("carregar comentários no chat", ex);
             }
         }
 
@@ -560,7 +581,6 @@ namespace CanvasApp.Forms
                     CarregarComentariosNoChat();
                     Txt_NovoComentarioChat.Clear();
                     AtualizarPreviewComentarios();
-                    CarregarComentarios();
                 }
                 else
                 {
@@ -569,7 +589,7 @@ namespace CanvasApp.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao enviar comentário: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                TratarErro("enviar comentário", ex);
             }
         }
 
@@ -577,60 +597,10 @@ namespace CanvasApp.Forms
         {
             try
             {
-                Panel pnlCom = new Panel
-                {
-                    Width = Flw_ChatComentarios.Width - 25,
-                    Margin = new Padding(5),
-                    BorderStyle = BorderStyle.FixedSingle,
-                    Tag = com.Codigo,
-                    BackColor = com.CodUsuario == usuarioLogado.Codigo ?
-                        Color.LightCyan : Color.White
-                };
-
-                var usuario = _usuarioDB.ObterUsuarioPorCodigo(com.CodUsuario);
-                string nomeUsuario = usuario?.NomeUsuario ?? "Usuário";
-                string dataFormatada = com.Data.ToString("dd/MM/yyyy HH:mm");
-
-                Label lblInicial = new Label
-                {
-                    Text = nomeUsuario.Substring(0, 1).ToUpper(),
-                    Location = new Point(8, 8),
-                    Size = new Size(25, 25),
-                    BackColor = Color.LightBlue,
-                    TextAlign = ContentAlignment.MiddleCenter,
-                    Font = new Font("Segoe UI", 9, FontStyle.Bold),
-                    ForeColor = Color.White
-                };
-
-                Label lblHeader = new Label
-                {
-                    Text = $"{nomeUsuario} - {dataFormatada}",
-                    Location = new Point(40, 8),
-                    AutoSize = true,
-                    Font = new Font("Segoe UI", 8, FontStyle.Bold),
-                    ForeColor = Color.DarkGray
-                };
-
-                TextBox txtComentario = new TextBox
-                {
-                    Text = com.Comentario,
-                    Location = new Point(40, 30),
-                    Size = new Size(pnlCom.Width - 50, 0),
-                    BorderStyle = BorderStyle.None,
-                    Font = new Font("Segoe UI", 9),
-                    BackColor = pnlCom.BackColor,
-                    Multiline = true,
-                    ReadOnly = true,
-                    ScrollBars = ScrollBars.None
-                };
-
-                using (Graphics g = CreateGraphics())
-                {
-                    SizeF size = g.MeasureString(txtComentario.Text, txtComentario.Font, txtComentario.Width);
-                    txtComentario.Height = (int)Math.Ceiling(size.Height) + 10;
-                }
-
-                pnlCom.Height = txtComentario.Bottom + 10;
+                var pnlCom = CriarPanelComentario(com);
+                var lblInicial = CriarLabelInicialComentario(com);
+                var lblHeader = CriarLabelHeaderComentario(com);
+                var txtComentario = CriarTextBoxComentario(com, pnlCom);
 
                 pnlCom.Controls.Add(lblInicial);
                 pnlCom.Controls.Add(lblHeader);
@@ -640,8 +610,99 @@ namespace CanvasApp.Forms
             }
             catch (Exception ex)
             {
-                // Ignorar erro
+                Console.WriteLine($"Erro ao criar controle de comentário: {ex.Message}");
             }
+        }
+
+        private Panel CriarPanelComentario(Tarefas_Comentarios com)
+        {
+            return new Panel
+            {
+                Width = Flw_ChatComentarios.Width - 25,
+                Margin = new Padding(5),
+                BorderStyle = BorderStyle.FixedSingle,
+                Tag = com.Codigo,
+                BackColor = com.CodUsuario == usuarioLogado.Codigo ? Color.LightCyan : Color.White
+            };
+        }
+
+        private Label CriarLabelInicialComentario(Tarefas_Comentarios com)
+        {
+            var usuario = _usuarioDB.ObterUsuarioPorCodigo(com.CodUsuario);
+            string nomeUsuario = usuario?.NomeUsuario ?? "Usuário";
+
+            return new Label
+            {
+                Text = nomeUsuario.Substring(0, 1).ToUpper(),
+                Location = new Point(8, 8),
+                Size = new Size(25, 25),
+                BackColor = Color.LightBlue,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                ForeColor = Color.White
+            };
+        }
+
+        private Label CriarLabelHeaderComentario(Tarefas_Comentarios com)
+        {
+            var usuario = _usuarioDB.ObterUsuarioPorCodigo(com.CodUsuario);
+            string nomeUsuario = usuario?.NomeUsuario ?? "Usuário";
+            string dataFormatada = com.Data.ToString("dd/MM/yyyy HH:mm");
+
+            return new Label
+            {
+                Text = $"{nomeUsuario} - {dataFormatada}",
+                Location = new Point(40, 8),
+                AutoSize = true,
+                Font = new Font("Segoe UI", 8, FontStyle.Bold),
+                ForeColor = Color.DarkGray
+            };
+        }
+
+        private TextBox CriarTextBoxComentario(Tarefas_Comentarios com, Panel pnlCom)
+        {
+            var txtComentario = new TextBox
+            {
+                Text = com.Comentario,
+                Location = new Point(40, 30),
+                Size = new Size(pnlCom.Width - 50, 0),
+                BorderStyle = BorderStyle.None,
+                Font = new Font("Segoe UI", 9),
+                BackColor = pnlCom.BackColor,
+                Multiline = true,
+                ReadOnly = true,
+                ScrollBars = ScrollBars.None
+            };
+
+            using (Graphics g = CreateGraphics())
+            {
+                SizeF size = g.MeasureString(txtComentario.Text, txtComentario.Font, txtComentario.Width);
+                txtComentario.Height = (int)Math.Ceiling(size.Height) + 10;
+            }
+
+            pnlCom.Height = txtComentario.Bottom + 10;
+            return txtComentario;
+        }
+
+        private void AdicionarLabelSemItens(FlowLayoutPanel panel, string texto)
+        {
+            var label = new Label
+            {
+                Text = texto,
+                Font = new Font("Segoe UI", 9, FontStyle.Italic),
+                ForeColor = Color.Gray,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Dock = DockStyle.Fill,
+                AutoSize = false,
+                Height = 50
+            };
+            panel.Controls.Add(label);
+        }
+
+        private void TratarErro(string operacao, Exception ex)
+        {
+            Console.WriteLine($"Erro ao {operacao}: {ex.Message}");
+            MessageBox.Show($"Erro ao {operacao}: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void Bin_FecharJanela_Click(object sender, EventArgs e)
@@ -665,45 +726,13 @@ namespace CanvasApp.Forms
 
         private void Frm_TarefasDetalhes_Load(object sender, EventArgs e)
         {
-            Dtp_Prazo.ValueChanged += Dtp_Prazo_ValueChanged;
             this.StartPosition = FormStartPosition.CenterScreen;
             Txt_TituloTarefa.Focus();
         }
 
         private void Frm_TarefasDetalhes_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (btnAdicionarSubtarefa != null)
-            {
-                btnAdicionarSubtarefa.Dispose();
-            }
-        }
-
-        // CORREÇÃO: Adicionar método para verificar se os controles estão visíveis
-        private void VerificarVisibilidadeControles()
-        {
-            // Garantir que os controles estejam na posição correta
-            if (Dtp_Prazo != null && Lbl_DefinirDataLembrete != null)
-            {
-                Dtp_Prazo.Location = new Point(Lbl_DefinirDataLembrete.Left, Lbl_DefinirDataLembrete.Top);
-                Dtp_HoraAlarme.Location = new Point(Dtp_Prazo.Right + 10, Lbl_DefinirDataLembrete.Top);
-                Cbo_Repeticao.Location = new Point(Dtp_HoraAlarme.Right + 10, Lbl_DefinirDataLembrete.Top);
-                Btn_SalvarData.Location = new Point(Cbo_Repeticao.Right + 10, Lbl_DefinirDataLembrete.Top);
-            }
-        }
-
-        // CORREÇÃO: Sobrescrever OnLoad para garantir inicialização correta
-        protected override void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);
-            VerificarVisibilidadeControles();
-            CarregarDadosTarefa();
-        }
-
-        // CORREÇÃO: Sobrescrever OnSizeChanged para ajustar layout
-        protected override void OnSizeChanged(EventArgs e)
-        {
-            base.OnSizeChanged(e);
-            VerificarVisibilidadeControles();
+            btnAdicionarSubtarefa?.Dispose();
         }
 
         // Eventos vazios necessários do designer
