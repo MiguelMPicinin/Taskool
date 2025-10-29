@@ -24,12 +24,12 @@ namespace CanvasApp.Forms
         private Label Lbl_Ilustracao;
         private TextBox Txt_BuscaResponsavel;
         private Button Btn_Concluir;
-        private ListView Lst_SugestoesResponsavel; // CORREÇÃO: Mudado para ListView
+        private ListView Lst_SugestoesResponsavel;
 
         public Frm_AtribuirResponsavelTarefa(Projeto_Tarefas tarefa)
         {
             _tarefa = tarefa;
-            _usuarioLogado = Sessao.UsuarioLogado;
+            _usuarioLogado = Sessao.UsuarioLogado; // CORREÇÃO: Agora são do mesmo tipo
 
             // Inicializar as dependências corretamente
             var notificacoesDB = new NotificacoesDB();
@@ -54,7 +54,7 @@ namespace CanvasApp.Forms
             this.Lbl_Ilustracao = new Label();
             this.Txt_BuscaResponsavel = new TextBox();
             this.Btn_Concluir = new Button();
-            this.Lst_SugestoesResponsavel = new ListView(); // CORREÇÃO: Mudado para ListView
+            this.Lst_SugestoesResponsavel = new ListView();
             this.SuspendLayout();
 
             // Lbl_Titulo
@@ -89,7 +89,7 @@ namespace CanvasApp.Forms
             this.Txt_BuscaResponsavel.Size = new Size(300, 20);
             this.Txt_BuscaResponsavel.TabIndex = 3;
 
-            // Lst_SugestoesResponsavel - CORREÇÃO: Configurado como ListView
+            // Lst_SugestoesResponsavel
             this.Lst_SugestoesResponsavel.Location = new Point(20, 205);
             this.Lst_SugestoesResponsavel.Name = "Lst_SugestoesResponsavel";
             this.Lst_SugestoesResponsavel.Size = new Size(300, 100);
@@ -151,7 +151,6 @@ namespace CanvasApp.Forms
             Btn_Concluir.ForeColor = Color.White;
             Btn_Concluir.Font = new Font("Segoe UI", 9, FontStyle.Bold);
 
-            // CORREÇÃO: Configurar ListView para sugestões (igual Frm_CriarProjeto)
             Lst_SugestoesResponsavel.Font = new Font("Segoe UI", 9);
             Lst_SugestoesResponsavel.BackColor = Color.White;
             Lst_SugestoesResponsavel.BorderStyle = BorderStyle.FixedSingle;
@@ -197,7 +196,6 @@ namespace CanvasApp.Forms
 
             try
             {
-                // CORREÇÃO: Usar busca similar ao Frm_CriarProjeto
                 var resultados = _usuarioDB.BuscarUsuariosPorTexto(textoBusca);
 
                 // Filtrar apenas membros do projeto atual
@@ -320,7 +318,6 @@ namespace CanvasApp.Forms
 
         private void Txt_Responsavel_Leave(object sender, EventArgs e)
         {
-            // CORREÇÃO: Usar timer para evitar conflito com clique na lista
             var timer = new Timer { Interval = 150 };
             timer.Tick += (s, args) =>
             {
@@ -338,7 +335,6 @@ namespace CanvasApp.Forms
 
         private void Lst_SugestoesResponsavel_Leave(object sender, EventArgs e)
         {
-            // CORREÇÃO: Usar timer para evitar conflito com clique na lista
             var timer = new Timer { Interval = 150 };
             timer.Tick += (s, args) =>
             {
@@ -363,8 +359,7 @@ namespace CanvasApp.Forms
                 _responsavelAtual = usuario;
                 AtualizarFiguraResponsavel();
 
-                // CORREÇÃO: Atribuir a tarefa ao usuário
-                if (!_tarefasDB.AtribuirTarefaUsuario(_tarefa.Codigo, Convert.ToInt32(usuario.Codigo)))
+                if (!_tarefasDB.AtribuirTarefaUsuario(_tarefa.Codigo, usuario.Codigo))
                 {
                     MessageBox.Show($"Erro ao atribuir tarefa: {_tarefasDB.Mensagem}", "Erro",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -373,7 +368,7 @@ namespace CanvasApp.Forms
                     return;
                 }
 
-                _tarefa.CodUsuario = Convert.ToInt32(usuario.Codigo);
+                _tarefa.CodUsuario = usuario.Codigo;
 
                 Txt_BuscaResponsavel.Clear();
                 Lst_SugestoesResponsavel.Visible = false;
@@ -467,7 +462,6 @@ namespace CanvasApp.Forms
                 path.AddEllipse(0, 0, circulo.Width, circulo.Height);
                 circulo.Region = new Region(path);
 
-                // CORREÇÃO: Garantir que a inicial seja exibida corretamente
                 var lblInicial = new Label
                 {
                     Text = ObterInicialUsuario(usuario.Nome),
@@ -534,8 +528,7 @@ namespace CanvasApp.Forms
 
                 if (_tarefa.CodUsuario > 0)
                 {
-                    var usuarioResponsavel = _usuarioDB.ObterUsuarioPorCodigo(Convert.ToInt32(_tarefa.CodUsuario));
-                    if (usuarioResponsavel != null)
+                    var usuarioResponsavel = _usuarioDB.ObterUsuarioPorCodigo(_tarefa.CodUsuario.Value); if (usuarioResponsavel != null)
                     {
                         _responsavelAtual = usuarioResponsavel;
                     }

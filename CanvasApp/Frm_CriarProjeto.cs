@@ -34,7 +34,7 @@ namespace CanvasApp
         private void InitializeUI()
         {
             this.BackColor = Tema.corAtual;
-            this.usuarioLogadoId = Convert.ToInt32(Sessao.UsuarioLogado.Codigo);
+            this.usuarioLogadoId = Sessao.UsuarioLogado.Codigo;
 
             Tbp_Membros.Text = "Membros da Lista";
             Tbp_Opcoes.Text = "Opções da lista";
@@ -305,7 +305,7 @@ namespace CanvasApp
             var projeto = new Projetos
             {
                 Nome = nomeProjeto,
-                CodUsuario = Convert.ToInt32(proprietario.Codigo),
+                CodUsuario = proprietario.Codigo,
                 NaoPertube = Rbtn_ToggleSwitch.Checked
             };
 
@@ -326,7 +326,7 @@ namespace CanvasApp
                 return;
             }
 
-            var projetosUsuario = dbProjetos.ObterProjetosPorUsuario(Convert.ToInt32(proprietario.Codigo));
+            var projetosUsuario = dbProjetos.ObterProjetosPorUsuario(proprietario.Codigo);
             var projetoCompleto = projetosUsuario?.FirstOrDefault(p => p.Nome == nomeProjeto);
 
             if (projetoCompleto == null)
@@ -342,7 +342,7 @@ namespace CanvasApp
                     if (membro.Codigo == proprietario.Codigo)
                         continue;
 
-                    if (!dbMembros.AdicionarMembroAoProjeto(projetoCompleto.Codigo, Convert.ToInt32(membro.Codigo)))
+                    if (!dbMembros.AdicionarMembroAoProjeto(projetoCompleto.Codigo, membro.Codigo))
                     {
                         MessageBox.Show($"Erro ao adicionar membro {membro.Nome}: {dbMembros.Mensagem}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
@@ -377,7 +377,7 @@ namespace CanvasApp
 
         private void Frm_CriarProjeto_Load(object sender, EventArgs e)
         {
-            proprietario = Sessao.UsuarioLogado.Cd;
+            proprietario = Sessao.UsuarioLogado; // CORREÇÃO: Agora são do mesmo tipo
             membrosAdicionados.Clear();
             AtualizarListaMembros();
 

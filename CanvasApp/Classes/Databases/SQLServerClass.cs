@@ -5,7 +5,7 @@ namespace CanvasApp.Classes.Databases
 {
     public abstract class BaseDB : IDisposable
     {
-        protected readonly string connectionString = "Data Source=Olimpiada\\SQLEXPRESS;Initial Catalog=dbTarefas2;Integrated Security=True;TrustServerCertificate=True";
+        protected readonly string connectionString = "Data Source=Olimpiada\\SQLEXPRESS;Initial Catalog=dbTarefas4;Integrated Security=True;TrustServerCertificate=True";
         public string Mensagem { get; protected set; }
         public bool Status { get; protected set; }
 

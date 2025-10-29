@@ -140,7 +140,7 @@ namespace Home
         {
             if (CanvasApp.Sessao.UsuarioLogado == null) return;
 
-            int usuarioId = int.Parse(CanvasApp.Sessao.UsuarioLogado.Codigo);
+            int usuarioId = Sessao.UsuarioLogado.Codigo;
 
             // Limpar notificações existentes (exceto título e botão fechar)
             for (int i = Pnl_Notificacoes.Controls.Count - 1; i >= 0; i--)
@@ -361,7 +361,7 @@ namespace Home
 
             if (CanvasApp.Sessao.UsuarioLogado == null) return;
 
-            int usuarioId = int.Parse(CanvasApp.Sessao.UsuarioLogado.Codigo);
+            int usuarioId = Sessao.UsuarioLogado.Codigo;
 
             // Adicionar categorias fixas
             AdicionarCategoriaMenu("Favoritas", ObterQuantidadeFavoritas(usuarioId));
@@ -601,7 +601,7 @@ namespace Home
         {
             if (CanvasApp.Sessao.UsuarioLogado == null) return;
 
-            int usuarioId = int.Parse(CanvasApp.Sessao.UsuarioLogado.Codigo);
+            int usuarioId = Convert.ToInt32(Sessao.UsuarioLogado);
 
             switch (categoria)
             {
@@ -624,8 +624,9 @@ namespace Home
         {
             if (CanvasApp.Sessao.UsuarioLogado == null) return;
 
-            int usuarioId = int.Parse(CanvasApp.Sessao.UsuarioLogado.Codigo);
+            int usuarioId = Sessao.UsuarioLogado.Codigo; 
             AbrirFormProjeto(projeto, usuarioId);
+
         }
 
         // CORREÇÃO: Todos os métodos convertem usuarioId para string

@@ -309,32 +309,18 @@ namespace CanvasApp.Classes.Databases
             }
         }
 
-        // CORREÇÃO: Método sobrecarregado para aceitar string como CodUsuario
-        public bool DefinirPrazoELembrete(int codTarefa, string codUsuario, DateTime data, TimeSpan hora, RepeticaoAlarme repeticao)
-        {
-            try
-            {
-                // Converter string para int
-                if (!int.TryParse(codUsuario, out int codUsuarioInt))
-                {
-                    Mensagem = "Código de usuário inválido!";
-                    return false;
-                }
-
-                return DefinirPrazoELembrete(codTarefa, codUsuarioInt, data, hora, repeticao);
-            }
-            catch (Exception ex)
-            {
-                Mensagem = "Erro ao definir prazo e lembrete: " + ex.Message;
-                return false;
-            }
-        }
-
         // CORREÇÃO: Método original com int como CodUsuario
         public bool DefinirPrazoELembrete(int codTarefa, int codUsuario, DateTime data, TimeSpan hora, RepeticaoAlarme repeticao)
         {
             try
             {
+                // CORREÇÃO: Validar se a data está dentro dos limites do SQL Server
+                if (data < new DateTime(1753, 1, 1))
+                {
+                    Mensagem = "Data inválida para o SQL Server. Use uma data posterior a 01/01/1753.";
+                    return false;
+                }
+
                 using (SqlConnection conn = GetConnection())
                 {
                     string checkSql = "SELECT Codigo FROM Alarme WHERE CodTarefa = @CodTarefa";
@@ -348,7 +334,7 @@ namespace CanvasApp.Classes.Databases
                         {
                             int codAlarme = Convert.ToInt32(result);
                             string updateSql = @"UPDATE Alarme SET Data = @Data, Hora = @Hora, Repeticao = @Repeticao, CodUsuario = @CodUsuario 
-                                               WHERE Codigo = @CodAlarme";
+                                       WHERE Codigo = @CodAlarme";
                             using (SqlCommand updateCmd = new SqlCommand(updateSql, conn))
                             {
                                 updateCmd.Parameters.AddWithValue("@Data", data);
@@ -362,7 +348,7 @@ namespace CanvasApp.Classes.Databases
                         else
                         {
                             string insertSql = @"INSERT INTO Alarme (CodTarefa, CodUsuario, Data, Hora, Repeticao) 
-                                               VALUES (@CodTarefa, @CodUsuario, @Data, @Hora, @Repeticao)";
+                                       VALUES (@CodTarefa, @CodUsuario, @Data, @Hora, @Repeticao)";
                             using (SqlCommand insertCmd = new SqlCommand(insertSql, conn))
                             {
                                 insertCmd.Parameters.AddWithValue("@CodTarefa", codTarefa);

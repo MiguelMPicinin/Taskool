@@ -19,6 +19,7 @@ namespace CanvasApp
         private UsuarioDB usuarioDB;
         private TarefasDB tarefasDB;
         private ProjetosDB projetosDB;
+        private AlarmeDB alarmeDB;
         private int usuarioId;
 
         private DateTime currentWeek;
@@ -28,64 +29,113 @@ namespace CanvasApp
         {
             InitializeComponent();
 
-            // CORREÇÃO: Obter usuário da sessão corretamente
+            // Inicialização do usuário
             if (Sessao.UsuarioLogado != null)
             {
-                usuarioId = int.Parse(Sessao.UsuarioLogado.Codigo);
+                usuarioId = Sessao.UsuarioLogado.Codigo;
             }
             else
             {
-                usuarioId = 1; // Fallback para desenvolvimento
+                usuarioId = 1;
             }
 
             currentWeek = GetInicioSemana(DateTime.Today);
 
+            // Inicialização dos serviços e bancos de dados
             pdfService = new PdfService();
             ftpManager = new FTPManager();
             usuarioDB = new UsuarioDB();
             tarefasDB = new TarefasDB();
             projetosDB = new ProjetosDB();
+            alarmeDB = new AlarmeDB();
 
-            // Configurações iniciais
+            // Configuração inicial da UI
             Pnl_CC5.Visible = false;
             Pnl_CC6.Visible = false;
             Pnl_CC7.Visible = false;
 
+            // Configuração de eventos
+            ConfigurarEventos();
+
+            // Configuração dos gráficos
+            ConfigurarGraphProgressoSemanal();
+
+            // CORREÇÃO: Atualizar visibilidade do botão na inicialização
+            AtualizarVisibilidadeBotaoAvancar();
+        }
+
+        private void ConfigurarEventos()
+        {
             this.Load += (s, e) =>
             {
                 TestarConexaoBanco();
                 AtualizarTextosTarefas();
-                AtualizarStatusGraficoCircular();
-                AtualizarStatusGraficoSemana();
+                AtualizarGraficoCircular();
+                AtualizarGraficoSemanal();
+                AtualizarVisibilidadeBotaoAvancar();
             };
 
-            // Configurar eventos
             Btn_Anterior.Click += (s, e) =>
             {
                 currentWeek = currentWeek.AddDays(-7);
-                AtualizarStatusGraficoSemana();
+                AtualizarGraficoSemanal();
+                AtualizarVisibilidadeBotaoAvancar();
             };
 
             Btn_Avancar.Click += (s, e) =>
             {
-                currentWeek = currentWeek.AddDays(7);
-                AtualizarStatusGraficoSemana();
+                DateTime nextWeek = currentWeek.AddDays(7);
+                DateTime currentDate = DateTime.Today;
+                DateTime maxWeek = GetInicioSemana(currentDate);
+
+                if (nextWeek <= maxWeek)
+                {
+                    currentWeek = nextWeek;
+                    AtualizarGraficoSemanal();
+                    AtualizarVisibilidadeBotaoAvancar();
+                }
+                else
+                {
+                    MessageBox.Show("Não é possível visualizar semanas futuras.", "Aviso",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             };
 
             Btn_ApenasUteis.Click += (s, e) =>
             {
                 apenasDiasUteis = !apenasDiasUteis;
-                AtualizarStatusGraficoSemana();
+                AtualizarGraficoSemanal();
                 Btn_ApenasUteis.Text = apenasDiasUteis ? "Mostrar todos os dias" : "Considerar apenas dias úteis";
             };
 
-            // Configurar evento de clique no gráfico de pizza
             if (Graph_TarefasPorProjeto != null)
             {
                 Graph_TarefasPorProjeto.Click += Graph_TarefasPorProjeto_Click;
             }
 
-            ConfigurarGraphProgressoSemanal();
+            Btn_PDF.Click += Btn_PDF_Click;
+            Btn_FTP.Click += Btn_FTP_Click;
+        }
+
+        private void AtualizarVisibilidadeBotaoAvancar()
+        {
+            try
+            {
+                DateTime semanaAtual = GetInicioSemana(DateTime.Today);
+                DateTime proximaSemana = currentWeek.AddDays(7);
+
+                Btn_Avancar.Visible = (proximaSemana <= semanaAtual);
+
+                Console.WriteLine($"🔍 Controle de botão: CurrentWeek: {currentWeek:dd/MM/yyyy}");
+                Console.WriteLine($"🔍 Controle de botão: Próxima semana: {proximaSemana:dd/MM/yyyy}");
+                Console.WriteLine($"🔍 Controle de botão: Semana atual: {semanaAtual:dd/MM/yyyy}");
+                Console.WriteLine($"🔍 Controle de botão: Botão visível: {Btn_Avancar.Visible}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erro ao atualizar visibilidade do botão: {ex.Message}");
+                Btn_Avancar.Visible = false;
+            }
         }
 
         private void TestarConexaoBanco()
@@ -100,19 +150,25 @@ namespace CanvasApp
             }
         }
 
+        // MÉTODO PRINCIPAL CORRIGIDO - USANDO DATA LIMITE EM VEZ DE ALARME
         private void AtualizarTextosTarefas()
         {
             try
             {
-                int total = tarefasDB.ObterQuantidadeTarefasTotaisDoUsuario(usuarioId);
-                int totalConcluidas = tarefasDB.ObterQuantidadeTarefasTotaisConcluidasDoUsuario(usuarioId);
-                int totalPendentes = tarefasDB.ObterQuantidadeTarefasTotaisPendentesDoUsuario(usuarioId);
+                // Obter totais gerais
+                var todasTarefas = tarefasDB.ObterTodasTarefasDoUsuario(usuarioId);
+                int total = todasTarefas.Count;
+                int totalConcluidas = todasTarefas.Count(t => t.isConcluida);
+                int totalPendentes = todasTarefas.Count(t => !t.isConcluida);
 
-                // CORREÇÃO: Usar métodos que retornam listas e contar
-                int tarefasHojeConcluidas = ObterTarefasConcluidasComAlarmeHoje(usuarioId).Count;
-                int tarefasHojePendentes = ObterTarefasPendentesComAlarmeHoje(usuarioId).Count;
-                int tarefasSemanaConcluidas = ObterTarefasConcluidasComAlarmeSemana(usuarioId).Count;
-                int tarefasSemanaPendentes = ObterTarefasPendentesComAlarmeSemana(usuarioId).Count;
+                // CORREÇÃO: Usar métodos baseados em DATA LIMITE
+                var resultadoHoje = tarefasDB.ContarTarefasComDataLimiteHoje(usuarioId);
+                int tarefasHojeConcluidas = resultadoHoje.concluidas;
+                int tarefasHojePendentes = resultadoHoje.pendentes;
+
+                var resultadoSemana = tarefasDB.ContarTarefasComDataLimiteSemana(usuarioId);
+                int tarefasSemanaConcluidas = resultadoSemana.concluidas;
+                int tarefasSemanaPendentes = resultadoSemana.pendentes;
 
                 double porcentagemConcluidas = total > 0 ? Math.Round((totalConcluidas * 100.0) / total, 1) : 0;
                 double porcentagemPendentes = total > 0 ? Math.Round((totalPendentes * 100.0) / total, 1) : 0;
@@ -129,76 +185,106 @@ namespace CanvasApp
                 Lbl_Porcentagem2.Text = $"Faltam fazer {porcentagemPendentes}% das tarefas";
 
                 Console.WriteLine($"✅ Dashboard atualizado - Total: {total}, Concluídas: {totalConcluidas}");
+                Console.WriteLine($"📅 Hoje (DATA LIMITE): {tarefasHojeConcluidas} concluídas, {tarefasHojePendentes} pendentes");
+                Console.WriteLine($"📅 Semana (DATA LIMITE): {tarefasSemanaConcluidas} concluídas, {tarefasSemanaPendentes} pendentes");
+
+                // Log detalhado para debug
+                var tarefasHojeDetalhadas = tarefasDB.ObterTarefasComDataLimiteHoje(usuarioId);
+                var tarefasSemanaDetalhadas = tarefasDB.ObterTarefasComDataLimiteSemana(usuarioId);
+
+                Console.WriteLine($"📋 Tarefas com data limite HOJE (detalhado): {tarefasHojeDetalhadas.Count} tarefas");
+                foreach (var tarefa in tarefasHojeDetalhadas)
+                {
+                    Console.WriteLine($"   - Tarefa {tarefa.Codigo}: '{tarefa.Descricao}' - Concluída: {tarefa.isConcluida}");
+                }
+
+                Console.WriteLine($"📋 Tarefas com data limite SEMANA (detalhado): {tarefasSemanaDetalhadas.Count} tarefas");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao atualizar dashboard: {ex.Message}", "Erro",
-                              MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Console.WriteLine($"❌ Erro em AtualizarTextosTarefas: {ex.Message}");
+                MessageBox.Show($"Erro ao atualizar dashboard: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        // CORREÇÃO: Método para obter tarefas concluídas com alarme hoje
-        private List<Projeto_Tarefas> ObterTarefasConcluidasComAlarmeHoje(int usuarioId)
+        // MÉTODO ATUALIZADO PARA GRÁFICO SEMANAL COM DATA LIMITE
+        private void AtualizarGraficoSemanal()
         {
             try
             {
-                var todasTarefasHoje = tarefasDB.ObterTarefasComAlarmeHoje(usuarioId); // CORREÇÃO: Convert para string
-                return todasTarefasHoje.Where(t => t.isConcluida).ToList();
+                if (Graph_ProgressoSemanal == null) return;
+
+                // Limpar séries
+                foreach (var series in Graph_ProgressoSemanal.Series)
+                {
+                    series.Points.Clear();
+                }
+
+                DateTime inicioSemana = currentWeek;
+                DateTime fimSemana = currentWeek.AddDays(6);
+
+                // Não permitir semanas futuras
+                DateTime semanaAtual = GetInicioSemana(DateTime.Today);
+                if (inicioSemana > semanaAtual)
+                {
+                    currentWeek = semanaAtual;
+                    inicioSemana = currentWeek;
+                    fimSemana = currentWeek.AddDays(6);
+                }
+
+                Lbl_Titulo.Text = $"Progresso Semanal - {inicioSemana:dd/MM/yyyy} a {fimSemana:dd/MM/yyyy}";
+
+                // CORREÇÃO: Obter tarefas com DATA LIMITE na semana
+                var tarefasComDataLimiteSemana = tarefasDB.ObterTarefasComDataLimiteNoPeriodo(usuarioId, inicioSemana, fimSemana.AddDays(1))
+                    .ToList();
+
+                var dias = ObterDiasDaSemana(inicioSemana);
+
+                int maxTarefas = 0;
+
+                foreach (var dia in dias)
+                {
+                    string nomeDia = ObterNomeDia(dia);
+
+                    // CORREÇÃO: Contagem baseada em DATA LIMITE
+                    var tarefasDoDia = tarefasComDataLimiteSemana
+                        .Where(t => t.dataLimite.Date == dia.Date)
+                        .ToList();
+
+                    int concluidas = tarefasDoDia.Count(t => t.isConcluida);
+                    int pendentes = tarefasDoDia.Count(t => !t.isConcluida);
+
+                    Console.WriteLine($"📅 {nomeDia} ({dia:dd/MM}): {concluidas} concluídas, {pendentes} pendentes (por DATA LIMITE)");
+
+                    // Adicionar às séries
+                    if (Graph_ProgressoSemanal.Series.Count >= 2)
+                    {
+                        Graph_ProgressoSemanal.Series["TarefasConcluidas"].Points.AddXY(nomeDia, concluidas);
+                        Graph_ProgressoSemanal.Series["TarefasPendentes"].Points.AddXY(nomeDia, pendentes);
+                    }
+
+                    if (concluidas + pendentes > maxTarefas)
+                        maxTarefas = concluidas + pendentes;
+                }
+
+                // Ajustar escala do eixo Y
+                if (Graph_ProgressoSemanal.ChartAreas.Count > 0)
+                {
+                    ChartArea area = Graph_ProgressoSemanal.ChartAreas[0];
+                    area.AxisY.Minimum = 0;
+                    area.AxisY.Maximum = Math.Max(maxTarefas + 1, 2);
+                    area.AxisY.Interval = 1;
+                }
+
+                Graph_ProgressoSemanal.Invalidate();
+
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao obter tarefas concluídas hoje: {ex.Message}");
-                return new List<Projeto_Tarefas>();
+                Console.WriteLine($"💥 ERRO no gráfico semanal: {ex.Message}");
             }
         }
 
-        // CORREÇÃO: Método para obter tarefas pendentes com alarme hoje
-        private List<Projeto_Tarefas> ObterTarefasPendentesComAlarmeHoje(int usuarioId)
-        {
-            try
-            {
-                var todasTarefasHoje = tarefasDB.ObterTarefasComAlarmeHoje(usuarioId); // CORREÇÃO: Convert para string
-                return todasTarefasHoje.Where(t => !t.isConcluida).ToList();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Erro ao obter tarefas pendentes hoje: {ex.Message}");
-                return new List<Projeto_Tarefas>();
-            }
-        }
-
-        // CORREÇÃO: Método para obter tarefas concluídas com alarme semana
-        private List<Projeto_Tarefas> ObterTarefasConcluidasComAlarmeSemana(int usuarioId)
-        {
-            try
-            {
-                var todasTarefasSemana = tarefasDB.ObterTarefasComAlarmeSemana(usuarioId); // CORREÇÃO: Convert para string
-                return todasTarefasSemana.Where(t => t.isConcluida).ToList();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Erro ao obter tarefas concluídas semana: {ex.Message}");
-                return new List<Projeto_Tarefas>();
-            }
-        }
-
-        // CORREÇÃO: Método para obter tarefas pendentes com alarme semana
-        private List<Projeto_Tarefas> ObterTarefasPendentesComAlarmeSemana(int usuarioId)
-        {
-            try
-            {
-                var todasTarefasSemana = tarefasDB.ObterTarefasComAlarmeSemana(usuarioId); // CORREÇÃO: Convert para string
-                return todasTarefasSemana.Where(t => !t.isConcluida).ToList();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Erro ao obter tarefas pendentes semana: {ex.Message}");
-                return new List<Projeto_Tarefas>();
-            }
-        }
-
-        private void AtualizarStatusGraficoCircular()
+        private void AtualizarGraficoCircular()
         {
             try
             {
@@ -210,7 +296,6 @@ namespace CanvasApp
                     return;
                 }
 
-                Console.WriteLine($"✅ Gráfico circular: {dados.Count} projetos carregados");
                 ConfigurarChartCirculo(dados);
             }
             catch (Exception ex)
@@ -219,7 +304,7 @@ namespace CanvasApp
             }
         }
 
-        private void ConfigurarChartCirculo(List<ProjetosTarefasDatas> dados)
+        private void ConfigurarChartCirculo(List<CanvasApp.Classes.Databases.ProjetosTarefasDatas> dados)
         {
             if (Graph_TarefasPorProjeto == null) return;
 
@@ -271,15 +356,6 @@ namespace CanvasApp
             Graph_TarefasPorProjeto.Titles.Add(title);
         }
 
-        private Color GetCorPorIndice(int index)
-        {
-            Color[] cores = {
-                Color.SteelBlue, Color.Orange, Color.Purple,
-                Color.Teal, Color.Maroon, Color.Olive, Color.Navy
-            };
-            return cores[index % cores.Length];
-        }
-
         private void Graph_TarefasPorProjeto_Click(object sender, EventArgs e)
         {
             try
@@ -301,8 +377,7 @@ namespace CanvasApp
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao abrir lista de tarefas: {ex.Message}", "Erro",
-                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao abrir lista de tarefas: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -315,7 +390,7 @@ namespace CanvasApp
                 using (var formLista = new Form())
                 {
                     formLista.Text = $"Tarefas do Projeto: {nomeProjeto}";
-                    formLista.Size = new Size(600, 400);
+                    formLista.Size = new Size(800, 400);
                     formLista.StartPosition = FormStartPosition.CenterParent;
 
                     var dataGridView = new DataGridView
@@ -326,11 +401,15 @@ namespace CanvasApp
                         DataSource = tarefasProjeto.Select(t => new
                         {
                             Descricao = t.Descricao,
+                            DataLimite = t.dataLimite != DateTime.MinValue ? t.dataLimite.ToString("dd/MM/yyyy") : "Não definida",
+                            DataConclusao = t.isConcluida && t.dataConclusao != DateTime.MinValue ? t.dataConclusao.ToString("dd/MM/yyyy") : "",
                             Status = t.isConcluida ? "Concluída" : "Pendente"
                         }).ToList()
                     };
 
                     dataGridView.Columns["Descricao"].HeaderText = "Descrição da Tarefa";
+                    dataGridView.Columns["DataLimite"].HeaderText = "Data Limite";
+                    dataGridView.Columns["DataConclusao"].HeaderText = "Data Conclusão";
                     dataGridView.Columns["Status"].HeaderText = "Status";
 
                     formLista.Controls.Add(dataGridView);
@@ -339,18 +418,13 @@ namespace CanvasApp
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao carregar tarefas do projeto: {ex.Message}", "Erro",
-                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao carregar tarefas do projeto: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void ConfigurarGraphProgressoSemanal()
         {
-            if (Graph_ProgressoSemanal == null)
-            {
-                Console.WriteLine("❌ Graph_ProgressoSemanal é nulo!");
-                return;
-            }
+            if (Graph_ProgressoSemanal == null) return;
 
             try
             {
@@ -370,145 +444,55 @@ namespace CanvasApp
 
                 Graph_ProgressoSemanal.ChartAreas.Add(chartArea);
 
-                Series series = new Series("TarefasConcluidas");
-                series.ChartType = SeriesChartType.Column;
-                series.Color = Color.SteelBlue;
-                series.BorderColor = Color.DarkBlue;
-                series.BorderWidth = 2;
-                series.IsValueShownAsLabel = true;
-                series.LabelFormat = "0";
-                series.Font = new Font("Arial", 10, FontStyle.Bold);
-                series.LabelForeColor = Color.White;
+                // Série para tarefas concluídas
+                Series seriesConcluidas = new Series("TarefasConcluidas");
+                seriesConcluidas.ChartType = SeriesChartType.Column;
+                seriesConcluidas.Color = Color.SteelBlue;
+                seriesConcluidas.BorderColor = Color.DarkBlue;
+                seriesConcluidas.BorderWidth = 2;
+                seriesConcluidas.IsValueShownAsLabel = true;
+                seriesConcluidas.LabelFormat = "0";
+                seriesConcluidas.Font = new Font("Arial", 10, FontStyle.Bold);
+                seriesConcluidas.LabelForeColor = Color.White;
 
-                Graph_ProgressoSemanal.Series.Add(series);
+                // Série para tarefas pendentes
+                Series seriesPendentes = new Series("TarefasPendentes");
+                seriesPendentes.ChartType = SeriesChartType.Column;
+                seriesPendentes.Color = Color.Orange;
+                seriesPendentes.BorderColor = Color.DarkOrange;
+                seriesPendentes.BorderWidth = 2;
+                seriesPendentes.IsValueShownAsLabel = true;
+                seriesPendentes.LabelFormat = "0";
+                seriesPendentes.Font = new Font("Arial", 10, FontStyle.Bold);
+                seriesPendentes.LabelForeColor = Color.White;
+
+                Graph_ProgressoSemanal.Series.Add(seriesConcluidas);
+                Graph_ProgressoSemanal.Series.Add(seriesPendentes);
 
                 Graph_ProgressoSemanal.Titles.Clear();
                 Title title = new Title();
                 title.Font = new Font("Arial", 12, FontStyle.Bold);
-                title.Text = "Progresso Semanal de Tarefas Concluídas";
+                title.Text = "Progresso Semanal de Tarefas";
                 Graph_ProgressoSemanal.Titles.Add(title);
+
+                // Adicionar legenda
+                Legend legend = new Legend();
+                legend.Docking = Docking.Top;
+                legend.Font = new Font("Arial", 10, FontStyle.Bold);
+                Graph_ProgressoSemanal.Legends.Add(legend);
 
                 Console.WriteLine("✅ Gráfico semanal configurado com sucesso!");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"❌ Erro na configuração do gráfico: {ex.Message}");
-                MessageBox.Show($"Erro ao configurar gráfico: {ex.Message}", "Erro",
-                              MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void AtualizarStatusGraficoSemana()
-        {
-            try
-            {
-                if (Graph_ProgressoSemanal == null)
-                {
-                    MessageBox.Show("Gráfico semanal não foi inicializado corretamente.", "Erro",
-                                  MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                Console.WriteLine("🔄 Iniciando atualização do gráfico semanal...");
-
-                if (Graph_ProgressoSemanal.Series.Count > 0)
-                {
-                    Graph_ProgressoSemanal.Series[0].Points.Clear();
-                }
-                else
-                {
-                    MessageBox.Show("Série do gráfico não encontrada.", "Erro",
-                                  MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                DateTime inicioSemana = currentWeek;
-                DateTime fimSemana = currentWeek.AddDays(6);
-
-                Lbl_Titulo.Text = $"Progresso Semanal - {inicioSemana:dd/MM/yyyy} a {fimSemana:dd/MM/yyyy}";
-                Console.WriteLine($"📅 Período: {inicioSemana:dd/MM} a {fimSemana:dd/MM}");
-
-                DateTime inicioSemanaAtual = GetInicioSemana(DateTime.Today);
-                Btn_Avancar.Visible = currentWeek < inicioSemanaAtual;
-
-                var dias = ObterDiasDaSemana(inicioSemana);
-                int maxTarefas = 0;
-
-                Console.WriteLine($"📊 Processando {dias.Count} dias para o gráfico...");
-
-                foreach (var dia in dias)
-                {
-                    string nomeDia = ObterNomeDia(dia);
-                    int tarefasConcluidas = ObterTarefasConcluidasPorDia(usuarioId, dia);
-
-                    DataPoint ponto = new DataPoint();
-                    ponto.SetValueXY(nomeDia, tarefasConcluidas);
-                    ponto.Label = tarefasConcluidas.ToString();
-                    ponto.Font = new Font("Arial", 10, FontStyle.Bold);
-                    ponto.LabelForeColor = Color.White;
-
-                    Graph_ProgressoSemanal.Series[0].Points.Add(ponto);
-
-                    if (tarefasConcluidas > maxTarefas)
-                        maxTarefas = tarefasConcluidas;
-
-                    Console.WriteLine($"📌 {nomeDia}: {tarefasConcluidas} tarefas");
-                }
-
-                if (Graph_ProgressoSemanal.ChartAreas.Count > 0)
-                {
-                    ChartArea area = Graph_ProgressoSemanal.ChartAreas[0];
-                    area.AxisY.Minimum = 0;
-                    area.AxisY.Maximum = Math.Max(maxTarefas + 1, 2);
-                    area.AxisY.Interval = 1;
-                    area.AxisY.LabelStyle.Format = "0";
-
-                    area.AxisX.LabelStyle.Font = new Font("Arial", 9, FontStyle.Bold);
-                    area.AxisY.LabelStyle.Font = new Font("Arial", 9, FontStyle.Bold);
-                }
-
-                Graph_ProgressoSemanal.Invalidate();
-                Graph_ProgressoSemanal.Update();
-                Graph_ProgressoSemanal.Refresh();
-
-                Console.WriteLine($"✅ Gráfico semanal atualizado! Máximo: {maxTarefas} tarefas");
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"💥 ERRO CRÍTICO no gráfico semanal: {ex.Message}");
-                MessageBox.Show($"Erro crítico ao atualizar gráfico semanal:\n{ex.Message}",
-                              "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private int ObterTarefasConcluidasPorDia(int usuarioId, DateTime data)
-        {
-            try
-            {
-                int tarefasDoDia = tarefasDB.ObterQuantidadeTarefasConcluidasPorData(usuarioId, data);
-
-                if (tarefasDoDia == 0)
-                {
-                    tarefasDoDia = tarefasDB.ObterQuantidadeTarefasConcluidasPorDataAlternativo(usuarioId, data);
-                }
-
-                Console.WriteLine($"✅ {ObterNomeDia(data)} ({data:dd/MM}): {tarefasDoDia} tarefas concluídas");
-                return tarefasDoDia;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"❌ Erro crítico ao obter tarefas do dia {data:dd/MM/yyyy}: {ex.Message}");
-                return 0;
-            }
-        }
-
+        // MÉTODOS AUXILIARES
         private List<DateTime> ObterDiasDaSemana(DateTime inicioSemana)
         {
             var dias = new List<DateTime>();
-
-            Console.WriteLine($"📅 Gerando dias a partir de {inicioSemana:dd/MM/yyyy} ({ObterNomeDia(inicioSemana)})");
-            Console.WriteLine($"🔧 Modo dias úteis: {(apenasDiasUteis ? "SIM" : "NÃO")}");
 
             for (int i = 0; i < 7; i++)
             {
@@ -519,37 +503,32 @@ namespace CanvasApp
                 if (incluirDia)
                 {
                     dias.Add(dia);
-                    Console.WriteLine($"   ✅ {ObterNomeDia(dia)} ({dia:dd/MM/yyyy}) - {(ehDiaUtil ? "Dia útil" : "Fim de semana")}");
-                }
-                else
-                {
-                    Console.WriteLine($"   ❌ {ObterNomeDia(dia)} ({dia:dd/MM/yyyy}) - EXCLUÍDO (fim de semana)");
                 }
             }
 
-            Console.WriteLine($"📊 Total de dias no gráfico: {dias.Count}");
             return dias;
         }
 
         private string ObterNomeDia(DateTime data)
         {
-            try
-            {
-                CultureInfo culture = new CultureInfo("pt-BR");
-                string nomeDia = culture.DateTimeFormat.GetDayName(data.DayOfWeek);
-                return culture.TextInfo.ToTitleCase(nomeDia);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"❌ Erro ao obter nome do dia: {ex.Message}");
-                return data.DayOfWeek.ToString();
-            }
+            CultureInfo culture = new CultureInfo("pt-BR");
+            string nomeDia = culture.DateTimeFormat.GetDayName(data.DayOfWeek);
+            return culture.TextInfo.ToTitleCase(nomeDia);
         }
 
         private DateTime GetInicioSemana(DateTime data)
         {
             int diff = (7 + (data.DayOfWeek - DayOfWeek.Sunday)) % 7;
             return data.AddDays(-1 * diff).Date;
+        }
+
+        private Color GetCorPorIndice(int index)
+        {
+            Color[] cores = {
+                Color.SteelBlue, Color.Orange, Color.Purple,
+                Color.Teal, Color.Maroon, Color.Olive, Color.Navy
+            };
+            return cores[index % cores.Length];
         }
 
         private void Btn_PDF_Click(object sender, EventArgs e)
@@ -569,22 +548,19 @@ namespace CanvasApp
 
                         if (sucesso)
                         {
-                            MessageBox.Show("Dashboard exportado para PDF com sucesso!", "Sucesso",
-                                          MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            MessageBox.Show("Dashboard exportado para PDF com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao exportar PDF: {ex.Message}", "Erro",
-                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao exportar PDF: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void Btn_FTP_Click(object sender, EventArgs e)
         {
-            // Implementação do FTP...
             MessageBox.Show("Funcionalidade FTP em desenvolvimento");
         }
 
@@ -592,17 +568,25 @@ namespace CanvasApp
         {
             try
             {
-                int totalTarefas = tarefasDB.ObterQuantidadeTarefasTotaisDoUsuario(usuarioId);
-                int totalConcluidas = tarefasDB.ObterQuantidadeTarefasTotaisConcluidasDoUsuario(usuarioId);
-                int totalPendentes = tarefasDB.ObterQuantidadeTarefasTotaisPendentesDoUsuario(usuarioId);
+                var todasTarefas = tarefasDB.ObterTodasTarefasDoUsuario(usuarioId);
+                int totalTarefas = todasTarefas.Count;
+                int totalConcluidas = todasTarefas.Count(t => t.isConcluida);
+                int totalPendentes = todasTarefas.Count(t => !t.isConcluida);
 
-                int tarefasHojeConcluidas = ObterTarefasConcluidasComAlarmeHoje(usuarioId).Count;
-                int tarefasHojePendentes = ObterTarefasPendentesComAlarmeHoje(usuarioId).Count;
+                // CORREÇÃO: Usar métodos baseados em DATA LIMITE
+                var resultadoHojePDF = tarefasDB.ContarTarefasComDataLimiteHoje(usuarioId);
+                int tarefasHojeConcluidasPDF = resultadoHojePDF.concluidas;
+                int tarefasHojePendentesPDF = resultadoHojePDF.pendentes;
 
-                using (var writer = new System.IO.StreamWriter(caminhoArquivo.Replace(".pdf", ".txt")))
+                var resultadoSemanaPDF = tarefasDB.ContarTarefasComDataLimiteSemana(usuarioId);
+                int tarefasSemanaConcluidasPDF = resultadoSemanaPDF.concluidas;
+                int tarefasSemanaPendentesPDF = resultadoSemanaPDF.pendentes;
+
+                using (var writer = new StreamWriter(caminhoArquivo.Replace(".pdf", ".txt")))
                 {
                     writer.WriteLine("=== DASHBOARD DO USUÁRIO ===");
                     writer.WriteLine($"Data: {DateTime.Now:dd/MM/yyyy HH:mm}");
+                    writer.WriteLine($"Usuário ID: {usuarioId}");
                     writer.WriteLine();
                     writer.WriteLine("=== RESUMO DE TAREFAS ===");
                     writer.WriteLine($"Total de Tarefas: {totalTarefas}");
@@ -610,9 +594,13 @@ namespace CanvasApp
                     writer.WriteLine($"Tarefas Pendentes: {totalPendentes}");
                     writer.WriteLine($"Porcentagem de Conclusão: {(totalTarefas > 0 ? Math.Round((totalConcluidas * 100.0) / totalTarefas, 1) : 0)}%");
                     writer.WriteLine();
-                    writer.WriteLine("=== HOJE ===");
-                    writer.WriteLine($"Concluídas: {tarefasHojeConcluidas}");
-                    writer.WriteLine($"Pendentes: {tarefasHojePendentes}");
+                    writer.WriteLine("=== HOJE (COM DATA LIMITE) ===");
+                    writer.WriteLine($"Concluídas: {tarefasHojeConcluidasPDF}");
+                    writer.WriteLine($"Pendentes: {tarefasHojePendentesPDF}");
+                    writer.WriteLine();
+                    writer.WriteLine("=== SEMANA ATUAL (COM DATA LIMITE) ===");
+                    writer.WriteLine($"Concluídas: {tarefasSemanaConcluidasPDF}");
+                    writer.WriteLine($"Pendentes: {tarefasSemanaPendentesPDF}");
                 }
 
                 File.Move(caminhoArquivo.Replace(".pdf", ".txt"), caminhoArquivo);
@@ -620,8 +608,7 @@ namespace CanvasApp
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao gerar PDF: {ex.Message}", "Erro",
-                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao gerar PDF: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }

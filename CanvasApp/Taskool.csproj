@@ -219,6 +219,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>dbTarefas2DataSet.xsd</DependentUpon>
     </Compile>
+    <Compile Include="dbTarefas4DataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dbTarefas4DataSet.xsd</DependentUpon>
+    </Compile>
     <Compile Include="FormOpcoesFTP.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -343,6 +348,17 @@
     </None>
     <None Include="dbTarefas2DataSet.xss">
       <DependentUpon>dbTarefas2DataSet.xsd</DependentUpon>
+    </None>
+    <None Include="dbTarefas4DataSet.xsc">
+      <DependentUpon>dbTarefas4DataSet.xsd</DependentUpon>
+    </None>
+    <None Include="dbTarefas4DataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dbTarefas4DataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="dbTarefas4DataSet.xss">
+      <DependentUpon>dbTarefas4DataSet.xsd</DependentUpon>
     </None>
     <None Include="Mensagens\mensagens.json" />
     <None Include="packages.config" />

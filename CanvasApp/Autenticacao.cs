@@ -14,13 +14,13 @@ namespace CanvasApp
 {
     public partial class Frm_Autenticacao : Form
     {
-        private bool _capsLockAvisado = false; // Variável para controlar se já avisou sobre o CAPS LOCK
+        private bool _capsLockAvisado = false;
 
         public Frm_Autenticacao()
         {
             InitializeComponent();
             InitializeUI();
-            VerificarCapsLock(); // Verificar ao carregar o formulário
+            VerificarCapsLock();
         }
 
         private void InitializeUI()
@@ -44,11 +44,11 @@ namespace CanvasApp
                 if (capsLockAtivo && !_capsLockAvisado)
                 {
                     MessageBox.Show("Atenção!: Você está com o CAPS LOCK ativado.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    _capsLockAvisado = true; // Marcar que já avisou
+                    _capsLockAvisado = true;
                 }
                 else if (!capsLockAtivo)
                 {
-                    _capsLockAvisado = false; // Resetar quando CAPS LOCK for desativado
+                    _capsLockAvisado = false;
                 }
             }
             catch (Exception ex)
@@ -84,7 +84,6 @@ namespace CanvasApp
             {
                 string loginDigitado = Txt_Login.Text.Trim();
 
-                // Validação de campos obrigatórios
                 if (string.IsNullOrEmpty(loginDigitado) || pictureBox1.Image == null)
                 {
                     SystemSounds.Beep.Play();
@@ -94,17 +93,15 @@ namespace CanvasApp
 
                 using (UsuarioDB dbUsuarios = new UsuarioDB())
                 {
-                    // Verifica se a conexão com o banco de dados foi bem-sucedida
                     if (!dbUsuarios.Status)
                     {
                         MessageBox.Show($"Erro de conexão com o banco: {dbUsuarios.Mensagem}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
 
-                    // Busca o usuário no banco de dados
+                    // CORREÇÃO: Usar método corrigido
                     var usuario = dbUsuarios.BuscarPorLogin(loginDigitado);
 
-                    // Verifica se o usuário foi encontrado
                     if (usuario == null)
                     {
                         MessageBox.Show("Usuário não encontrado.", "Erro!", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -120,23 +117,23 @@ namespace CanvasApp
                         return;
                     }
 
-                    // Verifica se a foto do usuário existe no banco
                     if (usuario.Foto == null)
                     {
                         MessageBox.Show("A imagem de credencial do usuário não foi cadastrada no banco de dados. Por favor, entre em contato com o suporte.", "Erro!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
 
-                    // Converte a imagem selecionada para um array de bytes
                     byte[] imagemSelecionada = ImageToByteArray(pictureBox1.Image);
 
-                    // Compara as imagens
                     bool imagensIguais = imagemSelecionada.SequenceEqual(usuario.Foto);
 
                     if (imagensIguais)
                     {
                         MessageBox.Show("Autenticação bem-sucedida.", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                        // CORREÇÃO: Garantir que o usuário é do tipo correto
                         Sessao.UsuarioLogado = usuario;
+
                         Frm_Home f = new Frm_Home();
                         f.Show();
                         this.Hide();
@@ -189,17 +186,16 @@ namespace CanvasApp
 
         private void Txt_Login_TextChanged(object sender, EventArgs e)
         {
-            VerificarCapsLock(); // Verificar sempre que o texto mudar
+            VerificarCapsLock();
         }
 
         private void Txt_Login_Enter(object sender, EventArgs e)
         {
-            VerificarCapsLock(); // Verificar quando o campo receber foco
+            VerificarCapsLock();
         }
 
         private void Txt_Login_KeyDown(object sender, KeyEventArgs e)
         {
-            // Verificar quando a tecla Caps Lock for pressionada
             if (e.KeyCode == Keys.CapsLock)
             {
                 VerificarCapsLock();

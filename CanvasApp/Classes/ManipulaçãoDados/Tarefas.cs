@@ -16,7 +16,246 @@ namespace CanvasApp.Classes.Databases
             // Inicialização das dependências se necessário
         }
 
-        // MÉTODOS DE ALARME CORRIGIDOS
+        // MÉTODO AUXILIAR PARA VALIDAR DATAS
+        private object ValidarDataParaSQL(DateTime data)
+        {
+            // SQL Server não aceita datas anteriores a 1/1/1753
+            if (data == DateTime.MinValue || data < new DateTime(1753, 1, 1))
+                return DBNull.Value;
+            return data;
+        }
+
+        // MÉTODO CRIADO PARA CORRIGIR O ERRO CS1061
+        public bool CriarTarefaCompartilhada(Projeto_Tarefas tarefa)
+        {
+            return InserirTarefa(tarefa);
+        }
+
+        // NOVOS MÉTODOS DE CONTAGEM BASEADOS EM ALARME - ADICIONADOS
+        public (int concluidas, int pendentes) ContarTarefasComAlarmeHoje(int usuarioId)
+        {
+            try
+            {
+                DateTime hoje = DateTime.Today;
+                DateTime amanha = hoje.AddDays(1);
+
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                        SELECT 
+                            PT.Codigo,
+                            PT.isConcluida
+                        FROM Projeto_Tarefas PT
+                        INNER JOIN Alarme A ON PT.Codigo = A.CodTarefa
+                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId
+                        AND A.Data >= @hoje AND A.Data < @amanha
+                        AND PT.isConcluida IN (0, 1)";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        cmd.Parameters.AddWithValue("@hoje", hoje);
+                        cmd.Parameters.AddWithValue("@amanha", amanha);
+
+                        List<bool> statusTarefas = new List<bool>();
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                bool isConcluida = Convert.ToBoolean(reader["isConcluida"]);
+                                statusTarefas.Add(isConcluida);
+                            }
+                        }
+
+                        int concluidas = statusTarefas.Count(status => status == true);
+                        int pendentes = statusTarefas.Count(status => status == false);
+
+                        Console.WriteLine($"🔔 Tarefas com alarme HOJE: {concluidas} concluídas, {pendentes} pendentes (Total: {statusTarefas.Count})");
+                        return (concluidas, pendentes);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erro ao contar tarefas com alarme hoje: {ex.Message}");
+                return (0, 0);
+            }
+        }
+
+        public (int concluidas, int pendentes) ContarTarefasComAlarmeSemana(int usuarioId)
+        {
+            try
+            {
+                DateTime inicioSemana = GetInicioSemana(DateTime.Today);
+                DateTime fimSemana = inicioSemana.AddDays(7);
+
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                        SELECT 
+                            PT.Codigo,
+                            PT.isConcluida
+                        FROM Projeto_Tarefas PT
+                        INNER JOIN Alarme A ON PT.Codigo = A.CodTarefa
+                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId
+                        AND A.Data >= @inicioSemana AND A.Data < @fimSemana
+                        AND PT.isConcluida IN (0, 1)";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        cmd.Parameters.AddWithValue("@inicioSemana", inicioSemana);
+                        cmd.Parameters.AddWithValue("@fimSemana", fimSemana);
+
+                        List<bool> statusTarefas = new List<bool>();
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                bool isConcluida = Convert.ToBoolean(reader["isConcluida"]);
+                                statusTarefas.Add(isConcluida);
+                            }
+                        }
+
+                        int concluidas = statusTarefas.Count(status => status == true);
+                        int pendentes = statusTarefas.Count(status => status == false);
+
+                        Console.WriteLine($"🔔 Tarefas com alarme SEMANA: {concluidas} concluídas, {pendentes} pendentes (Total: {statusTarefas.Count})");
+                        return (concluidas, pendentes);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erro ao contar tarefas com alarme semana: {ex.Message}");
+                return (0, 0);
+            }
+        }
+
+        // NOVOS MÉTODOS DE CONTAGEM BASEADOS EM DATA LIMITE
+        public (int concluidas, int pendentes) ContarTarefasComDataLimiteHoje(int usuarioId)
+        {
+            try
+            {
+                DateTime hoje = DateTime.Today;
+                DateTime amanha = hoje.AddDays(1);
+
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                        SELECT 
+                            PT.isConcluida
+                        FROM Projeto_Tarefas PT
+                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId
+                        AND PT.dataLimite >= @hoje AND PT.dataLimite < @amanha
+                        AND PT.isConcluida IN (0, 1)";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        cmd.Parameters.AddWithValue("@hoje", hoje);
+                        cmd.Parameters.AddWithValue("@amanha", amanha);
+
+                        List<bool> statusTarefas = new List<bool>();
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                bool isConcluida = Convert.ToBoolean(reader["isConcluida"]);
+                                statusTarefas.Add(isConcluida);
+                            }
+                        }
+
+                        int concluidas = statusTarefas.Count(status => status == true);
+                        int pendentes = statusTarefas.Count(status => status == false);
+
+                        Console.WriteLine($"📅 Tarefas com data limite HOJE: {concluidas} concluídas, {pendentes} pendentes (Total: {statusTarefas.Count})");
+                        return (concluidas, pendentes);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erro ao contar tarefas com data limite hoje: {ex.Message}");
+                return (0, 0);
+            }
+        }
+
+        public (int concluidas, int pendentes) ContarTarefasComDataLimiteSemana(int usuarioId)
+        {
+            try
+            {
+                DateTime inicioSemana = GetInicioSemana(DateTime.Today);
+                DateTime fimSemana = inicioSemana.AddDays(7);
+
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                        SELECT 
+                            PT.isConcluida
+                        FROM Projeto_Tarefas PT
+                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId
+                        AND PT.dataLimite >= @inicioSemana AND PT.dataLimite < @fimSemana
+                        AND PT.isConcluida IN (0, 1)";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        cmd.Parameters.AddWithValue("@inicioSemana", inicioSemana);
+                        cmd.Parameters.AddWithValue("@fimSemana", fimSemana);
+
+                        List<bool> statusTarefas = new List<bool>();
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                bool isConcluida = Convert.ToBoolean(reader["isConcluida"]);
+                                statusTarefas.Add(isConcluida);
+                            }
+                        }
+
+                        int concluidas = statusTarefas.Count(status => status == true);
+                        int pendentes = statusTarefas.Count(status => status == false);
+
+                        Console.WriteLine($"📅 Tarefas com data limite SEMANA: {concluidas} concluídas, {pendentes} pendentes (Total: {statusTarefas.Count})");
+                        return (concluidas, pendentes);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erro ao contar tarefas com data limite semana: {ex.Message}");
+                return (0, 0);
+            }
+        }
+
+        // MÉTODO AUXILIAR PARA OBTER DATA DO ALARME - ADICIONADO
+        public DateTime ObterDataAlarmeTarefa(int codTarefa)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = "SELECT Data FROM Alarme WHERE CodTarefa = @CodTarefa";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@CodTarefa", codTarefa);
+                        var result = cmd.ExecuteScalar();
+                        return result != null ? Convert.ToDateTime(result) : DateTime.MinValue;
+                    }
+                }
+            }
+            catch
+            {
+                return DateTime.MinValue;
+            }
+        }
+
+        // MÉTODOS DE ALARME CORRIGIDOS (MANTIDOS)
         public List<Projeto_Tarefas> ObterTarefasComAlarmeHoje(int usuarioId)
         {
             DateTime hoje = DateTime.Today;
@@ -46,7 +285,8 @@ namespace CanvasApp.Classes.Databases
                 using (SqlConnection conn = GetConnection())
                 {
                     string query = @"
-                        SELECT DISTINCT PT.Codigo, PT.Descricao, PT.isConcluida, PT.CodProjeto, PT.CodUsuario
+                        SELECT DISTINCT PT.Codigo, PT.Descricao, PT.isConcluida, PT.CodProjeto, PT.CodUsuario,
+                               PT.dataLimite, PT.dataConclusao
                         FROM Projeto_Tarefas PT
                         INNER JOIN Alarme A ON PT.Codigo = A.CodTarefa
                         INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
@@ -65,13 +305,18 @@ namespace CanvasApp.Classes.Databases
                             while (reader.Read())
                             {
                                 var codUsuarioValue = reader["CodUsuario"];
+                                var dataLimiteValue = reader["dataLimite"];
+                                var dataConclusaoValue = reader["dataConclusao"];
+
                                 tarefas.Add(new Projeto_Tarefas
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
                                     Descricao = reader["Descricao"].ToString(),
                                     isConcluida = Convert.ToBoolean(reader["isConcluida"]),
                                     CodProjeto = Convert.ToInt32(reader["CodProjeto"]),
-                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue)
+                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue),
+                                    dataLimite = dataLimiteValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataLimiteValue),
+                                    dataConclusao = dataConclusaoValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataConclusaoValue)
                                 });
                             }
                         }
@@ -85,7 +330,7 @@ namespace CanvasApp.Classes.Databases
             return tarefas;
         }
 
-        // MÉTODOS DE QUANTIDADE PARA DASHBOARD
+        // MÉTODOS DE QUANTIDADE PARA DASHBOARD (MANTIDOS)
         public int ObterQuantidadeTarefasComAlarmeHoje(int usuarioId)
         {
             DateTime hoje = DateTime.Today;
@@ -138,7 +383,7 @@ namespace CanvasApp.Classes.Databases
             }
         }
 
-        // MÉTODOS CORRIGIDOS PARA DASHBOARD - COM ALARME
+        // MÉTODOS CORRIGIDOS PARA DASHBOARD - COM ALARME (MANTIDOS)
         public int ObterQuantidadeTarefasConcluidasComAlarmeHoje(int usuarioId)
         {
             try
@@ -275,7 +520,317 @@ namespace CanvasApp.Classes.Databases
             }
         }
 
-        // MÉTODO DE DIAGNÓSTICO
+        // NOVOS MÉTODOS PARA DATA LIMITE (MANTIDOS)
+        public List<Projeto_Tarefas> ObterTarefasComDataLimiteHoje(int usuarioId)
+        {
+            DateTime hoje = DateTime.Today;
+            DateTime amanha = hoje.AddDays(1);
+            return ObterTarefasComDataLimiteNoPeriodo(usuarioId, hoje, amanha);
+        }
+
+        public List<Projeto_Tarefas> ObterTarefasComDataLimiteSemana(int usuarioId)
+        {
+            DateTime inicioSemana = GetInicioSemana(DateTime.Today);
+            DateTime fimSemana = inicioSemana.AddDays(7);
+            return ObterTarefasComDataLimiteNoPeriodo(usuarioId, inicioSemana, fimSemana);
+        }
+
+        // CORREÇÃO: MÉTODO ALTERADO PARA PÚBLICO PARA RESOLVER CS0122
+        public List<Projeto_Tarefas> ObterTarefasComDataLimiteNoPeriodo(int usuarioId, DateTime inicio, DateTime fim)
+        {
+            List<Projeto_Tarefas> tarefas = new List<Projeto_Tarefas>();
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                        SELECT DISTINCT 
+                            PT.Codigo, PT.Descricao, PT.isConcluida, PT.CodProjeto, PT.CodUsuario,
+                            PT.dataLimite, PT.dataConclusao
+                        FROM Projeto_Tarefas PT
+                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId
+                        AND PT.dataLimite >= @inicio AND PT.dataLimite < @fim
+                        ORDER BY PT.dataLimite ASC";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        cmd.Parameters.AddWithValue("@inicio", inicio);
+                        cmd.Parameters.AddWithValue("@fim", fim);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                var codUsuarioValue = reader["CodUsuario"];
+                                var dataLimiteValue = reader["dataLimite"];
+                                var dataConclusaoValue = reader["dataConclusao"];
+
+                                tarefas.Add(new Projeto_Tarefas
+                                {
+                                    Codigo = Convert.ToInt32(reader["Codigo"]),
+                                    Descricao = reader["Descricao"].ToString(),
+                                    isConcluida = Convert.ToBoolean(reader["isConcluida"]),
+                                    CodProjeto = Convert.ToInt32(reader["CodProjeto"]),
+                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue),
+                                    dataLimite = dataLimiteValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataLimiteValue),
+                                    dataConclusao = dataConclusaoValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataConclusaoValue)
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao obter tarefas com data limite no período: " + ex.Message;
+            }
+            return tarefas;
+        }
+
+        // MÉTODOS ALTERNATIVOS (MANTIDOS)
+        public List<Projeto_Tarefas> ObterTarefasComDataLimiteHojeAlternativo(int usuarioId)
+        {
+            try
+            {
+                DateTime hoje = DateTime.Today;
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                SELECT PT.Codigo, PT.Descricao, PT.isConcluida, PT.CodProjeto, PT.CodUsuario,
+                       PT.dataLimite, PT.dataConclusao
+                FROM Projeto_Tarefas PT
+                INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                WHERE PM.CodMembro = @usuarioId
+                AND PT.dataLimite = @hoje
+                ORDER BY PT.dataLimite ASC";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        cmd.Parameters.AddWithValue("@hoje", hoje);
+
+                        List<Projeto_Tarefas> tarefas = new List<Projeto_Tarefas>();
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                var codUsuarioValue = reader["CodUsuario"];
+                                var dataLimiteValue = reader["dataLimite"];
+                                var dataConclusaoValue = reader["dataConclusao"];
+
+                                tarefas.Add(new Projeto_Tarefas
+                                {
+                                    Codigo = Convert.ToInt32(reader["Codigo"]),
+                                    Descricao = reader["Descricao"].ToString(),
+                                    isConcluida = Convert.ToBoolean(reader["isConcluida"]),
+                                    CodProjeto = Convert.ToInt32(reader["CodProjeto"]),
+                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue),
+                                    dataLimite = dataLimiteValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataLimiteValue),
+                                    dataConclusao = dataConclusaoValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataConclusaoValue)
+                                });
+                            }
+                        }
+                        return tarefas;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao obter tarefas de hoje (alternativo): " + ex.Message;
+                return new List<Projeto_Tarefas>();
+            }
+        }
+
+        public List<Projeto_Tarefas> ObterTarefasComDataLimiteSemanaAlternativo(int usuarioId)
+        {
+            try
+            {
+                DateTime inicioSemana = GetInicioSemana(DateTime.Today);
+                DateTime fimSemana = inicioSemana.AddDays(7);
+
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                SELECT PT.Codigo, PT.Descricao, PT.isConcluida, PT.CodProjeto, PT.CodUsuario,
+                       PT.dataLimite, PT.dataConclusao
+                FROM Projeto_Tarefas PT
+                INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                WHERE PM.CodMembro = @usuarioId
+                AND PT.dataLimite >= @inicioSemana AND PT.dataLimite < @fimSemana
+                ORDER BY PT.dataLimite ASC";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        cmd.Parameters.AddWithValue("@inicioSemana", inicioSemana);
+                        cmd.Parameters.AddWithValue("@fimSemana", fimSemana);
+
+                        List<Projeto_Tarefas> tarefas = new List<Projeto_Tarefas>();
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                var codUsuarioValue = reader["CodUsuario"];
+                                var dataLimiteValue = reader["dataLimite"];
+                                var dataConclusaoValue = reader["dataConclusao"];
+
+                                tarefas.Add(new Projeto_Tarefas
+                                {
+                                    Codigo = Convert.ToInt32(reader["Codigo"]),
+                                    Descricao = reader["Descricao"].ToString(),
+                                    isConcluida = Convert.ToBoolean(reader["isConcluida"]),
+                                    CodProjeto = Convert.ToInt32(reader["CodProjeto"]),
+                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue),
+                                    dataLimite = dataLimiteValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataLimiteValue),
+                                    dataConclusao = dataConclusaoValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataConclusaoValue)
+                                });
+                            }
+                        }
+                        return tarefas;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao obter tarefas da semana (alternativo): " + ex.Message;
+                return new List<Projeto_Tarefas>();
+            }
+        }
+
+        public int ObterQuantidadeTarefasConcluidasComDataLimiteHoje(int usuarioId)
+        {
+            try
+            {
+                DateTime hoje = DateTime.Today;
+                DateTime amanha = hoje.AddDays(1);
+
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                        SELECT COUNT(DISTINCT PT.Codigo)
+                        FROM Projeto_Tarefas PT
+                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId
+                        AND PT.dataLimite >= @hoje AND PT.dataLimite < @amanha
+                        AND PT.isConcluida = 1";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        cmd.Parameters.AddWithValue("@hoje", hoje);
+                        cmd.Parameters.AddWithValue("@amanha", amanha);
+                        return Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao contar tarefas concluídas de hoje: " + ex.Message;
+                return 0;
+            }
+        }
+
+        public int ObterQuantidadeTarefasPendentesComDataLimiteHoje(int usuarioId)
+        {
+            try
+            {
+                DateTime hoje = DateTime.Today;
+                DateTime amanha = hoje.AddDays(1);
+
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                        SELECT COUNT(DISTINCT PT.Codigo)
+                        FROM Projeto_Tarefas PT
+                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId
+                        AND PT.dataLimite >= @hoje AND PT.dataLimite < @amanha
+                        AND PT.isConcluida = 0";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        cmd.Parameters.AddWithValue("@hoje", hoje);
+                        cmd.Parameters.AddWithValue("@amanha", amanha);
+                        return Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao contar tarefas pendentes de hoje: " + ex.Message;
+                return 0;
+            }
+        }
+
+        public int ObterQuantidadeTarefasConcluidasComDataLimiteSemana(int usuarioId)
+        {
+            try
+            {
+                DateTime inicioSemana = GetInicioSemana(DateTime.Today);
+                DateTime fimSemana = inicioSemana.AddDays(7);
+
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                        SELECT COUNT(DISTINCT PT.Codigo)
+                        FROM Projeto_Tarefas PT
+                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId
+                        AND PT.dataLimite >= @inicioSemana AND PT.dataLimite < @fimSemana
+                        AND PT.isConcluida = 1";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        cmd.Parameters.AddWithValue("@inicioSemana", inicioSemana);
+                        cmd.Parameters.AddWithValue("@fimSemana", fimSemana);
+                        return Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao contar tarefas concluídas da semana: " + ex.Message;
+                return 0;
+            }
+        }
+
+        public int ObterQuantidadeTarefasPendentesComDataLimiteSemana(int usuarioId)
+        {
+            try
+            {
+                DateTime inicioSemana = GetInicioSemana(DateTime.Today);
+                DateTime fimSemana = inicioSemana.AddDays(7);
+
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                        SELECT COUNT(DISTINCT PT.Codigo)
+                        FROM Projeto_Tarefas PT
+                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId
+                        AND PT.dataLimite >= @inicioSemana AND PT.dataLimite < @fimSemana
+                        AND PT.isConcluida = 0";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        cmd.Parameters.AddWithValue("@inicioSemana", inicioSemana);
+                        cmd.Parameters.AddWithValue("@fimSemana", fimSemana);
+                        return Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao contar tarefas pendentes da semana: " + ex.Message;
+                return 0;
+            }
+        }
+
+        // MÉTODO DE DIAGNÓSTICO (MANTIDO)
         public void DiagnosticoCompletoBrasil(int usuarioId)
         {
             try
@@ -300,34 +855,38 @@ namespace CanvasApp.Classes.Databases
             }
         }
 
-        // MÉTODO PARA PROJETOS COMPARTILHADOS
-        public bool CriarTarefaCompartilhada(Projeto_Tarefas tarefa)
-        {
-            return InserirTarefa(tarefa);
-        }
 
-        // MÉTODO AUXILIAR PARA INÍCIO DA SEMANA
+        // MÉTODO AUXILIAR PARA INÍCIO DA SEMANA (MANTIDO)
         private DateTime GetInicioSemana(DateTime data)
         {
             int diff = (7 + (data.DayOfWeek - DayOfWeek.Sunday)) % 7;
             return data.AddDays(-1 * diff).Date;
         }
 
-        // MÉTODOS CRUD BÁSICOS
+        // MÉTODOS CRUD BÁSICOS ATUALIZADOS - CORRIGIDOS PARA EVITAR ESTOURO DE SQLDATETIME (MANTIDOS)
         public bool InserirTarefa(Projeto_Tarefas tarefa)
         {
             try
             {
                 using (SqlConnection conn = GetConnection())
                 {
-                    string sql = @"INSERT INTO Projeto_Tarefas (Descricao, isConcluida, CodProjeto, CodUsuario) 
-                                 VALUES (@Descricao, @isConcluida, @CodProjeto, @CodUsuario)";
+                    string sql = @"INSERT INTO Projeto_Tarefas (Descricao, isConcluida, CodProjeto, CodUsuario, dataLimite, dataConclusao) 
+                                 VALUES (@Descricao, @isConcluida, @CodProjeto, @CodUsuario, @dataLimite, @dataConclusao)";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@Descricao", tarefa.Descricao);
                         cmd.Parameters.AddWithValue("@isConcluida", tarefa.isConcluida);
                         cmd.Parameters.AddWithValue("@CodProjeto", tarefa.CodProjeto);
-                        cmd.Parameters.AddWithValue("@CodUsuario", tarefa.CodUsuario ?? (object)DBNull.Value);
+
+                        if (tarefa.CodUsuario.HasValue)
+                            cmd.Parameters.AddWithValue("@CodUsuario", tarefa.CodUsuario.Value);
+                        else
+                            cmd.Parameters.AddWithValue("@CodUsuario", DBNull.Value);
+
+                        // CORREÇÃO: Usar método de validação para evitar estouro de SqlDateTime
+                        cmd.Parameters.AddWithValue("@dataLimite", ValidarDataParaSQL(tarefa.dataLimite));
+                        cmd.Parameters.AddWithValue("@dataConclusao", ValidarDataParaSQL(tarefa.dataConclusao));
+
                         cmd.ExecuteNonQuery();
                         Mensagem = "Tarefa inserida com sucesso";
                         return true;
@@ -336,7 +895,35 @@ namespace CanvasApp.Classes.Databases
             }
             catch (Exception ex)
             {
-                Mensagem = "Erro ao inserir Tarefa: " + ex.Message;
+                Mensagem = "Erro ao Inserir Tarefa: " + ex.Message;
+                return false;
+            }
+        }
+
+        // MÉTODO PARA ATUALIZAR DATA LIMITE
+        public bool AtualizarDataLimiteTarefa(int codTarefa, DateTime novaDataLimite)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = @"UPDATE Projeto_Tarefas SET dataLimite = @dataLimite
+                         WHERE Codigo = @Codigo";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@dataLimite", ValidarDataParaSQL(novaDataLimite));
+                        cmd.Parameters.AddWithValue("@Codigo", codTarefa);
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        Mensagem = rowsAffected > 0 ? "Data limite atualizada com sucesso!" : "Tarefa não encontrada.";
+                        return rowsAffected > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao atualizar data limite: " + ex.Message;
                 return false;
             }
         }
@@ -347,12 +934,21 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
-                    string sql = @"UPDATE Projeto_Tarefas SET Descricao = @Descricao, CodUsuario = @CodUsuario
-                                 WHERE Codigo = @Codigo";
+                    string sql = @"UPDATE Projeto_Tarefas SET Descricao = @Descricao, CodUsuario = @CodUsuario,
+                         dataLimite = @dataLimite, dataConclusao = @dataConclusao
+                         WHERE Codigo = @Codigo";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@Descricao", tarefa.Descricao);
-                        cmd.Parameters.AddWithValue("@CodUsuario", tarefa.CodUsuario ?? (object)DBNull.Value);
+
+                        if (tarefa.CodUsuario.HasValue)
+                            cmd.Parameters.AddWithValue("@CodUsuario", tarefa.CodUsuario.Value);
+                        else
+                            cmd.Parameters.AddWithValue("@CodUsuario", DBNull.Value);
+
+                        // CORREÇÃO: Usar método de validação para evitar estouro de SqlDateTime
+                        cmd.Parameters.AddWithValue("@dataLimite", ValidarDataParaSQL(tarefa.dataLimite));
+                        cmd.Parameters.AddWithValue("@dataConclusao", ValidarDataParaSQL(tarefa.dataConclusao));
                         cmd.Parameters.AddWithValue("@Codigo", tarefa.Codigo);
                         cmd.ExecuteNonQuery();
                         Mensagem = "Tarefa atualizada com sucesso.";
@@ -426,7 +1022,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
-                    string sql = @"SELECT Codigo, Descricao, isConcluida, CodProjeto, CodUsuario
+                    string sql = @"SELECT Codigo, Descricao, isConcluida, CodProjeto, CodUsuario, dataLimite, dataConclusao
                                  FROM Projeto_Tarefas WHERE Codigo = @CodTarefa";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -436,13 +1032,18 @@ namespace CanvasApp.Classes.Databases
                             if (reader.Read())
                             {
                                 var codUsuarioValue = reader["CodUsuario"];
+                                var dataLimiteValue = reader["dataLimite"];
+                                var dataConclusaoValue = reader["dataConclusao"];
+
                                 return new Projeto_Tarefas
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
                                     Descricao = reader["Descricao"].ToString(),
                                     isConcluida = Convert.ToBoolean(reader["isConcluida"]),
                                     CodProjeto = Convert.ToInt32(reader["CodProjeto"]),
-                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue)
+                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue),
+                                    dataLimite = dataLimiteValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataLimiteValue),
+                                    dataConclusao = dataConclusaoValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataConclusaoValue)
                                 };
                             }
                             return null;
@@ -465,7 +1066,7 @@ namespace CanvasApp.Classes.Databases
                 using (SqlConnection conn = GetConnection())
                 {
                     string query = @"
-                        SELECT PT.Codigo, PT.Descricao, PT.isConcluida, PT.CodProjeto, PT.CodUsuario
+                        SELECT PT.Codigo, PT.Descricao, PT.isConcluida, PT.CodProjeto, PT.CodUsuario, PT.dataLimite, PT.dataConclusao
                         FROM Projeto_Tarefas PT
                         INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
                         WHERE PM.CodMembro = @usuarioId
@@ -478,13 +1079,18 @@ namespace CanvasApp.Classes.Databases
                             while (reader.Read())
                             {
                                 var codUsuarioValue = reader["CodUsuario"];
+                                var dataLimiteValue = reader["dataLimite"];
+                                var dataConclusaoValue = reader["dataConclusao"];
+
                                 tarefas.Add(new Projeto_Tarefas
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
                                     Descricao = reader["Descricao"].ToString(),
                                     isConcluida = Convert.ToBoolean(reader["isConcluida"]),
                                     CodProjeto = Convert.ToInt32(reader["CodProjeto"]),
-                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue)
+                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue),
+                                    dataLimite = dataLimiteValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataLimiteValue),
+                                    dataConclusao = dataConclusaoValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataConclusaoValue)
                                 });
                             }
                         }
@@ -505,7 +1111,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
-                    string query = @"SELECT Codigo, Descricao, isConcluida, CodProjeto, CodUsuario 
+                    string query = @"SELECT Codigo, Descricao, isConcluida, CodProjeto, CodUsuario, dataLimite, dataConclusao 
                                   FROM Projeto_Tarefas 
                                   WHERE CodProjeto = @projetoId
                                   ORDER BY Codigo DESC";
@@ -517,13 +1123,18 @@ namespace CanvasApp.Classes.Databases
                             while (reader.Read())
                             {
                                 var codUsuarioValue = reader["CodUsuario"];
+                                var dataLimiteValue = reader["dataLimite"];
+                                var dataConclusaoValue = reader["dataConclusao"];
+
                                 tarefas.Add(new Projeto_Tarefas
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
                                     Descricao = reader["Descricao"].ToString(),
                                     isConcluida = Convert.ToBoolean(reader["isConcluida"]),
                                     CodProjeto = Convert.ToInt32(reader["CodProjeto"]),
-                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue)
+                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue),
+                                    dataLimite = dataLimiteValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataLimiteValue),
+                                    dataConclusao = dataConclusaoValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataConclusaoValue)
                                 });
                             }
                         }
@@ -604,7 +1215,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
-                    string query = @"SELECT Codigo, Descricao, isConcluida, CodProjeto, CodUsuario 
+                    string query = @"SELECT Codigo, Descricao, isConcluida, CodProjeto, CodUsuario, dataLimite, dataConclusao 
                                   FROM Projeto_Tarefas 
                                   WHERE CodProjeto = @projetoId AND isConcluida = @isConcluida 
                                   ORDER BY Codigo DESC";
@@ -617,13 +1228,18 @@ namespace CanvasApp.Classes.Databases
                             while (reader.Read())
                             {
                                 var codUsuarioValue = reader["CodUsuario"];
+                                var dataLimiteValue = reader["dataLimite"];
+                                var dataConclusaoValue = reader["dataConclusao"];
+
                                 tarefas.Add(new Projeto_Tarefas
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
                                     Descricao = reader["Descricao"].ToString(),
                                     isConcluida = Convert.ToBoolean(reader["isConcluida"]),
                                     CodProjeto = Convert.ToInt32(reader["CodProjeto"]),
-                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue)
+                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue),
+                                    dataLimite = dataLimiteValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataLimiteValue),
+                                    dataConclusao = dataConclusaoValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataConclusaoValue)
                                 });
                             }
                         }
@@ -766,7 +1382,7 @@ namespace CanvasApp.Classes.Databases
                 using (SqlConnection conn = GetConnection())
                 {
                     string query = @"
-                        SELECT PT.Codigo, PT.Descricao, PT.isConcluida, PT.CodProjeto, PT.CodUsuario
+                        SELECT PT.Codigo, PT.Descricao, PT.isConcluida, PT.CodProjeto, PT.CodUsuario, PT.dataLimite, PT.dataConclusao
                         FROM Projeto_Tarefas PT
                         INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
                         WHERE PM.CodMembro = @usuarioId AND PT.isConcluida = 1
@@ -780,13 +1396,18 @@ namespace CanvasApp.Classes.Databases
                             while (reader.Read())
                             {
                                 var codUsuarioValue = reader["CodUsuario"];
+                                var dataLimiteValue = reader["dataLimite"];
+                                var dataConclusaoValue = reader["dataConclusao"];
+
                                 tarefas.Add(new Projeto_Tarefas
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
                                     Descricao = reader["Descricao"].ToString(),
                                     isConcluida = Convert.ToBoolean(reader["isConcluida"]),
                                     CodProjeto = Convert.ToInt32(reader["CodProjeto"]),
-                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue)
+                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue),
+                                    dataLimite = dataLimiteValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataLimiteValue),
+                                    dataConclusao = dataConclusaoValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataConclusaoValue)
                                 });
                             }
                         }
@@ -808,7 +1429,7 @@ namespace CanvasApp.Classes.Databases
                 using (SqlConnection conn = GetConnection())
                 {
                     string query = @"
-                        SELECT PT.Codigo, PT.Descricao, PT.isConcluida, PT.CodProjeto, PT.CodUsuario
+                        SELECT PT.Codigo, PT.Descricao, PT.isConcluida, PT.CodProjeto, PT.CodUsuario, PT.dataLimite, PT.dataConclusao
                         FROM Projeto_Tarefas PT
                         INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
                         WHERE PM.CodMembro = @usuarioId AND PT.isConcluida = 0
@@ -822,13 +1443,18 @@ namespace CanvasApp.Classes.Databases
                             while (reader.Read())
                             {
                                 var codUsuarioValue = reader["CodUsuario"];
+                                var dataLimiteValue = reader["dataLimite"];
+                                var dataConclusaoValue = reader["dataConclusao"];
+
                                 tarefas.Add(new Projeto_Tarefas
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
                                     Descricao = reader["Descricao"].ToString(),
                                     isConcluida = Convert.ToBoolean(reader["isConcluida"]),
                                     CodProjeto = Convert.ToInt32(reader["CodProjeto"]),
-                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue)
+                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue),
+                                    dataLimite = dataLimiteValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataLimiteValue),
+                                    dataConclusao = dataConclusaoValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataConclusaoValue)
                                 });
                             }
                         }
@@ -957,5 +1583,16 @@ namespace CanvasApp.Classes.Databases
             }
             return dados;
         }
+
+        public List<Projeto_Tarefas> ObterTodasTarefasDoUsuario(int usuarioId)
+        {
+            return ObterTarefasPorUsuario(usuarioId);
+        }
+    }
+
+    public class ProjetosTarefasDatas
+    {
+        public string NomeProjeto { get; set; }
+        public int QuantidadeTarefas { get; set; }
     }
 }

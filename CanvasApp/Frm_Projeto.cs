@@ -1049,12 +1049,15 @@ namespace CanvasApp
             {
                 Descricao = descricao,
                 isConcluida = false,
-                CodProjeto = projetoSelecionado.Codigo
+                CodProjeto = projetoSelecionado.Codigo,
+                CodUsuario = usuarioLogadoId,
+                // NOVO: Data limite padrão de 7 dias
+                dataLimite = DateTime.Today.AddDays(7),
+                dataConclusao = DateTime.MinValue
             };
 
             bool sucesso;
 
-            // CORREÇÃO: Chamada correta do método CriarTarefaCompartilhada
             if (projetoSelecionado.CodUsuario != usuarioLogadoId)
             {
                 sucesso = dbTarefas.CriarTarefaCompartilhada(novaTarefa);
@@ -1066,18 +1069,26 @@ namespace CanvasApp
 
             if (sucesso)
             {
-                tarefasPendentes.Insert(0, novaTarefa);
+                tarefasPendentes = dbTarefas.ObterTarefasPendentesPorProjeto(projetoSelecionado.Codigo);
+
                 Txt_Tarefa.Text = "Adicionar uma tarefa...";
                 Txt_Tarefa.ForeColor = SystemColors.GrayText;
                 Pic_IconPlus.Visible = true;
                 AtualizarInterface();
+
+                MessageBox.Show("Tarefa criada com sucesso!", "Sucesso",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
-                MessageBox.Show("Erro ao salvar a tarefa: " + dbTarefas.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Erro no salvar a tarefa: " + dbTarefas.Mensagem, "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
+        // =========================================================================
+        // MÉTODO PRINCIPAL MODIFICADO: CriarItemTarefa COM POSIÇÕES CORRIGIDAS
+        // =========================================================================
         private Control CriarItemTarefa(Projeto_Tarefas tarefa, bool isConcluida)
         {
             try
@@ -1120,11 +1131,14 @@ namespace CanvasApp
                 };
                 panel.Controls.Add(checkBoxConcluida);
 
+                // CALCULAR LARGURA DISPONÍVEL PARA DESCRIÇÃO
+                int larguraDisponivel = panel.Width - 190; // Reserva espaço para os ícones
+
                 var labelDescricao = new Label
                 {
                     Text = tarefa.Descricao,
                     AutoSize = false,
-                    Width = panel.Width - 150,
+                    Width = larguraDisponivel,
                     Height = 20,
                     Location = new Point(40, 13),
                     Font = new Font("Segoe UI", 9, FontStyle.Regular),
@@ -1140,14 +1154,57 @@ namespace CanvasApp
 
                 panel.Controls.Add(labelDescricao);
 
-                // --- PRIMEIRO: ÍCONE DE FAVORITO ---
+                // --- BOTÃO PARA ALTERAR DATA LIMITE (POSIÇÃO CORRIGIDA) ---
+                var btnDataLimite = new Button
+                {
+                    Width = 30,
+                    Height = 30,
+                    Location = new Point(panel.Width - 150, 15), // POSIÇÃO MAIS À ESQUERDA
+                    Text = "📅",
+                    Font = new Font("Segoe UI Emoji", 12),
+                    FlatStyle = FlatStyle.Flat,
+                    BackColor = Color.Transparent,
+                    Cursor = Cursors.Hand,
+                    Tag = tarefa.Codigo
+                };
+
+                btnDataLimite.FlatAppearance.BorderSize = 0;
+                btnDataLimite.FlatAppearance.MouseOverBackColor = Color.FromArgb(240, 240, 240);
+
+                // Evento de clique para alterar data limite
+                btnDataLimite.Click += (sender, e) =>
+                {
+                    var button = (Button)sender;
+                    int tarefaCodigo = (int)button.Tag;
+
+                    try
+                    {
+                        // Encontrar a tarefa correspondente
+                        var tarefaParaAtualizar = tarefasPendentes.Concat(tarefasConcluidas)
+                            .FirstOrDefault(t => t.Codigo == tarefaCodigo);
+
+                        if (tarefaParaAtualizar != null)
+                        {
+                            AlterarDataLimiteTarefa(tarefaParaAtualizar, panel);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Erro ao alterar data limite: {ex.Message}",
+                            "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                };
+
+                panel.Controls.Add(btnDataLimite);
+
+                // --- ÍCONE DE FAVORITO (POSIÇÃO CORRIGIDA) ---
                 bool estaFavoritado = dbFavoritos.EhFavorito(usuarioLogadoId, tarefa.Codigo);
 
                 var picEstrela = new PictureBox
                 {
-                    Width = 20,
-                    Height = 20,
-                    Location = new Point(panel.Width - 30, 15),
+                    Width = 30,
+                    Height = 30,
+                    Location = new Point(panel.Width - 110, 15), // MAIS ESPAÇO ENTRE ÍCONES
                     SizeMode = PictureBoxSizeMode.StretchImage,
                     Cursor = Cursors.Hand,
                     Tag = new { EstaFavoritado = estaFavoritado, Tarefa = tarefa }
@@ -1184,36 +1241,19 @@ namespace CanvasApp
 
                 panel.Controls.Add(picEstrela);
 
-                // --- SEGUNDO: RESPONSÁVEIS (à esquerda do favorito) ---
-                int posicaoResponsaveis = panel.Width - 60;
+                // --- RESPONSÁVEIS (POSIÇÃO CORRIGIDA) ---
+                int posicaoResponsaveis = panel.Width - 70; // MAIS ESPAÇO
 
                 try
                 {
-                    // CORREÇÃO: Obter responsáveis da tarefa de forma mais robusta
-                    var responsaveis = new List<Usuario>();
-
-                    // Se a tarefa tem um usuário atribuído, adicionar como responsável
-                    if (tarefa.CodUsuario.HasValue && tarefa.CodUsuario > 0)
+                    if (tarefa.CodUsuario.HasValue && tarefa.CodUsuario.Value > 0)
                     {
-                        var usuarioResponsavel = dbUsuario.ObterUsuarioPorCodigo(Convert.ToInt32(tarefa.CodUsuario));
+                        var usuarioResponsavel = dbUsuario.ObterUsuarioPorCodigo(tarefa.CodUsuario.Value);
                         if (usuarioResponsavel != null)
                         {
-                            responsaveis.Add(usuarioResponsavel);
-                        }
-                    }
-
-                    // CORREÇÃO: Adicionar círculos dos responsáveis DA DIREITA PARA ESQUERDA
-                    if (responsaveis.Any())
-                    {
-                        // Ordenar para consistência na exibição
-                        foreach (var responsavel in responsaveis.OrderBy(r => r.Nome))
-                        {
-                            var circuloResponsavel = CriarCirculoResponsavel(responsavel);
+                            var circuloResponsavel = CriarCirculoResponsavel(usuarioResponsavel);
                             circuloResponsavel.Location = new Point(posicaoResponsaveis, 15);
                             panel.Controls.Add(circuloResponsavel);
-
-                            // Mover para a esquerda para o próximo responsável
-                            posicaoResponsaveis -= 30;
                         }
                     }
                 }
@@ -1239,7 +1279,6 @@ namespace CanvasApp
                         };
                         panel.Controls.Add(labelDataAlarme);
 
-                        // Evento de clique na data do alarme
                         labelDataAlarme.Click += (sender, e) => AbrirDetalhesTarefa(tarefa);
                     }
                 }
@@ -1248,11 +1287,18 @@ namespace CanvasApp
                     Console.WriteLine($"Erro ao carregar alarme: {ex.Message}");
                 }
 
+                // Aplicar estilo baseado na data limite atual
+                DateTime dataAtual = tarefa.dataLimite != DateTime.MinValue &&
+                                   tarefa.dataLimite >= new DateTime(1753, 1, 1)
+                                   ? tarefa.dataLimite
+                                   : DateTime.Today.AddDays(7);
+                AtualizarEstiloDataLimite(panel, dataAtual);
+
                 // --- EVENTOS DE CLIQUE ---
                 panel.Click += (sender, e) => AbrirDetalhesTarefa(tarefa);
                 labelDescricao.Click += (sender, e) => AbrirDetalhesTarefa(tarefa);
 
-                // --- EVENTOS DE DUPLO CLIQUE - AGORA ABRE Frm_AtribuirResponsavelTarefa ---
+                // --- EVENTOS DE DUPLO CLIQUE ---
                 panel.DoubleClick += (sender, e) => AbrirAtribuirResponsavel(tarefa);
                 labelDescricao.DoubleClick += (sender, e) => AbrirAtribuirResponsavel(tarefa);
 
@@ -1265,48 +1311,158 @@ namespace CanvasApp
             }
         }
 
-        // --- NOVO MÉTODO PARA ABRIR FORMULÁRIO DE ATRIBUIR RESPONSÁVEL ---
-        private void AbrirAtribuirResponsavel(Projeto_Tarefas tarefa)
+        // =========================================================================
+        // MÉTODO ALTERADO: AlterarDataLimiteTarefa COM MELHOR VISUALIZAÇÃO
+        // =========================================================================
+        private void AlterarDataLimiteTarefa(Projeto_Tarefas tarefa, Panel panelTarefa)
         {
             try
             {
-                // Verificar se o formulário de atribuição já está aberto usando o dicionário
-                if (formulariosAtribuicaoAbertos.ContainsKey(tarefa.Codigo))
+                using (var formData = new Form())
                 {
-                    var formExistente = formulariosAtribuicaoAbertos[tarefa.Codigo];
-                    if (formExistente != null && !formExistente.IsDisposed)
+                    formData.Text = "Alterar Data Limite";
+                    formData.Size = new Size(400, 200); // FORMULÁRIO MAIOR
+                    formData.StartPosition = FormStartPosition.CenterParent;
+                    formData.FormBorderStyle = FormBorderStyle.FixedDialog;
+                    formData.MaximizeBox = false;
+                    formData.MinimizeBox = false;
+                    formData.BackColor = Color.White;
+
+                    // DateTimePicker MAIOR E MELHOR POSICIONADO
+                    var datePicker = new DateTimePicker
                     {
-                        formExistente.BringToFront();
-                        return;
-                    }
-                    else
+                        Format = DateTimePickerFormat.Short,
+                        Location = new Point(100, 50), // MELHOR CENTRALIZADO
+                        Size = new Size(200, 35), // MAIOR
+                        Font = new Font("Segoe UI", 11), // FONTE MAIOR
+                        Value = tarefa.dataLimite != DateTime.MinValue &&
+                               tarefa.dataLimite >= new DateTime(1753, 1, 1)
+                               ? tarefa.dataLimite
+                               : DateTime.Today.AddDays(7)
+                    };
+
+                    // Label para instrução
+                    var lblInstrucao = new Label
                     {
-                        // Remover do dicionário se o formulário foi fechado
-                        formulariosAtribuicaoAbertos.Remove(tarefa.Codigo);
-                    }
+                        Text = "Selecione a nova data limite:",
+                        Location = new Point(100, 20),
+                        Size = new Size(250, 25),
+                        Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                        TextAlign = ContentAlignment.MiddleLeft,
+                        ForeColor = Color.FromArgb(64, 64, 64)
+                    };
+
+                    // Botão Confirmar
+                    var btnConfirmar = new Button
+                    {
+                        Text = "Confirmar",
+                        Location = new Point(100, 110),
+                        Size = new Size(100, 35),
+                        Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                        BackColor = Color.FromArgb(76, 175, 80),
+                        ForeColor = Color.White,
+                        FlatStyle = FlatStyle.Flat,
+                        DialogResult = DialogResult.OK
+                    };
+
+                    // Botão Cancelar
+                    var btnCancelar = new Button
+                    {
+                        Text = "Cancelar",
+                        Location = new Point(210, 110),
+                        Size = new Size(100, 35),
+                        Font = new Font("Segoe UI", 9),
+                        BackColor = Color.FromArgb(244, 67, 54),
+                        ForeColor = Color.White,
+                        FlatStyle = FlatStyle.Flat,
+                        DialogResult = DialogResult.Cancel
+                    };
+
+                    btnConfirmar.Click += (s, e) =>
+                    {
+                        tarefa.dataLimite = datePicker.Value;
+
+                        if (dbTarefas.AtualizarTarefa(tarefa))
+                        {
+                            // Atualizar estilo visual baseado na nova data
+                            AtualizarEstiloDataLimite(panelTarefa, datePicker.Value);
+                            formData.Close();
+
+                            MessageBox.Show("Data limite atualizada com sucesso!", "Sucesso",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        else
+                        {
+                            MessageBox.Show($"Erro ao atualizar data limite: {dbTarefas.Mensagem}",
+                                "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    };
+
+                    btnCancelar.Click += (s, e) =>
+                    {
+                        formData.Close();
+                    };
+
+                    formData.Controls.Add(lblInstrucao);
+                    formData.Controls.Add(datePicker);
+                    formData.Controls.Add(btnConfirmar);
+                    formData.Controls.Add(btnCancelar);
+
+                    formData.AcceptButton = btnConfirmar;
+                    formData.CancelButton = btnCancelar;
+
+                    formData.ShowDialog(this);
                 }
-
-                // Se não estiver aberto, criar novo formulário
-                Frm_AtribuirResponsavelTarefa novoForm = new Frm_AtribuirResponsavelTarefa(tarefa);
-
-                // Adicionar evento para remover do dicionário quando o formulário for fechado
-                novoForm.FormClosed += (s, e) =>
-                {
-                    if (formulariosAtribuicaoAbertos.ContainsKey(tarefa.Codigo))
-                    {
-                        formulariosAtribuicaoAbertos.Remove(tarefa.Codigo);
-                    }
-                };
-
-                novoForm.Show();
-
-                // Adicionar ao dicionário de formulários abertos
-                formulariosAtribuicaoAbertos[tarefa.Codigo] = novoForm;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao abrir formulário de atribuição de responsável: {ex.Message}", "Erro",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao alterar data limite: {ex.Message}",
+                    "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // =========================================================================
+        // MÉTODO AUXILIAR: AtualizarEstiloDataLimite
+        // =========================================================================
+        private void AtualizarEstiloDataLimite(Panel panel, DateTime dataLimite)
+        {
+            var diasRestantes = (dataLimite - DateTime.Today).TotalDays;
+
+            // Encontrar o botão de data limite no panel
+            foreach (Control control in panel.Controls)
+            {
+                if (control is Button btn && btn.Tag != null && btn.Tag is int)
+                {
+                    if (diasRestantes < 0)
+                    {
+                        // Data expirada - vermelho
+                        panel.BackColor = Color.FromArgb(255, 240, 240);
+                        btn.BackColor = Color.FromArgb(255, 200, 200);
+                        btn.ForeColor = Color.Red;
+                    }
+                    else if (diasRestantes <= 1)
+                    {
+                        // Para hoje ou amanhã - laranja
+                        panel.BackColor = Color.FromArgb(255, 250, 240);
+                        btn.BackColor = Color.FromArgb(255, 220, 180);
+                        btn.ForeColor = Color.OrangeRed;
+                    }
+                    else if (diasRestantes <= 3)
+                    {
+                        // Para 2-3 dias - amarelo
+                        panel.BackColor = Color.FromArgb(255, 255, 240);
+                        btn.BackColor = Color.FromArgb(255, 255, 200);
+                        btn.ForeColor = Color.Goldenrod;
+                    }
+                    else
+                    {
+                        // Normal - verde
+                        panel.BackColor = Color.White;
+                        btn.BackColor = Color.FromArgb(230, 255, 230);
+                        btn.ForeColor = Color.DarkGreen;
+                    }
+                    break;
+                }
             }
         }
 
@@ -1391,6 +1547,51 @@ namespace CanvasApp
             // Se não estiver aberto, criar novo formulário
             Frm_TarefasDetalhes novoForm = new Frm_TarefasDetalhes(tarefa);
             novoForm.Show();
+        }
+
+        // --- NOVO MÉTODO PARA ABRIR FORMULÁRIO DE ATRIBUIR RESPONSÁVEL ---
+        private void AbrirAtribuirResponsavel(Projeto_Tarefas tarefa)
+        {
+            try
+            {
+                // Verificar se o formulário de atribuição já está aberto usando o dicionário
+                if (formulariosAtribuicaoAbertos.ContainsKey(tarefa.Codigo))
+                {
+                    var formExistente = formulariosAtribuicaoAbertos[tarefa.Codigo];
+                    if (formExistente != null && !formExistente.IsDisposed)
+                    {
+                        formExistente.BringToFront();
+                        return;
+                    }
+                    else
+                    {
+                        // Remover do dicionário se o formulário foi fechado
+                        formulariosAtribuicaoAbertos.Remove(tarefa.Codigo);
+                    }
+                }
+
+                // Se não estiver aberto, criar novo formulário
+                Frm_AtribuirResponsavelTarefa novoForm = new Frm_AtribuirResponsavelTarefa(tarefa);
+
+                // Adicionar evento para remover do dicionário quando o formulário for fechado
+                novoForm.FormClosed += (s, e) =>
+                {
+                    if (formulariosAtribuicaoAbertos.ContainsKey(tarefa.Codigo))
+                    {
+                        formulariosAtribuicaoAbertos.Remove(tarefa.Codigo);
+                    }
+                };
+
+                novoForm.Show();
+
+                // Adicionar ao dicionário de formulários abertos
+                formulariosAtribuicaoAbertos[tarefa.Codigo] = novoForm;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao abrir formulário de atribuição de responsável: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         // REMOVA estes métodos se já existirem no arquivo Frm_Projeto.Designer.cs

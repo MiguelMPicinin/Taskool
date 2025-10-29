@@ -60,7 +60,57 @@ namespace CanvasApp.Classes.Databases
             }
         }
 
-        // CORREÇÃO: Removido método duplicado AtualizarUsuario
+        // MÉTODO CORRIGIDO: BuscarPorLogin
+        public Usuario BuscarPorLogin(string login)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = @"SELECT * FROM Usuario WHERE NomeUsuario = @Login OR Email = @Login";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Login", login);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                // CORREÇÃO: Converter dados de forma segura
+                                byte[] foto = null;
+                                var fotoData = reader["Foto"];
+                                if (fotoData != DBNull.Value)
+                                {
+                                    foto = (byte[])fotoData;
+                                }
+
+                                return new Usuario
+                                {
+                                    // CORREÇÃO: Usar Convert.ToInt32 para garantir que é int
+                                    Codigo = Convert.ToInt32(reader["Codigo"]),
+                                    Nome = reader["Nome"]?.ToString() ?? "",
+                                    Email = reader["Email"]?.ToString() ?? "",
+                                    NomeUsuario = reader["NomeUsuario"]?.ToString() ?? "",
+                                    DataNascimento = reader["DataNascimento"]?.ToString() ?? "",
+                                    Telefone = reader["Telefone"]?.ToString() ?? "",
+                                    Foto = foto
+                                };
+                            }
+                            else
+                            {
+                                Mensagem = "Usuário não encontrado.";
+                                return null;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao buscar usuário: " + ex.Message;
+                return null;
+            }
+        }
+
         public bool AtualizarUsuarioCompleto(Usuario usuario)
         {
             try
@@ -92,7 +142,6 @@ namespace CanvasApp.Classes.Databases
             }
         }
 
-        // NOVO: Método específico para atualizar perfil com foto
         public bool AtualizarPerfilUsuario(Usuario usuario)
         {
             try
@@ -143,47 +192,6 @@ namespace CanvasApp.Classes.Databases
             }
         }
 
-        public Usuario BuscarPorLogin(string login)
-        {
-            try
-            {
-                using (SqlConnection conn = GetConnection())
-                {
-                    string sql = @"SELECT * FROM Usuario WHERE NomeUsuario = @Login OR Email = @Login";
-                    using (SqlCommand cmd = new SqlCommand(sql, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@Login", login);
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                return new Usuario
-                                {
-                                    Codigo = Convert.ToInt32(reader["Codigo"]),
-                                    Nome = reader["Nome"].ToString(),
-                                    Email = reader["Email"].ToString(),
-                                    NomeUsuario = reader["NomeUsuario"].ToString(),
-                                    DataNascimento = reader["DataNascimento"].ToString(),
-                                    Telefone = reader["Telefone"].ToString(),
-                                    Foto = reader["Foto"] as byte[]
-                                };
-                            }
-                            else
-                            {
-                                Mensagem = "Usuário não encontrado.";
-                                return null;
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Mensagem = "Erro ao buscar usuário: " + ex.Message;
-                return null;
-            }
-        }
-
         public Usuario ObterUsuarioPorCodigo(int codigo)
         {
             try
@@ -198,15 +206,22 @@ namespace CanvasApp.Classes.Databases
                         {
                             if (reader.Read())
                             {
+                                byte[] foto = null;
+                                var fotoData = reader["Foto"];
+                                if (fotoData != DBNull.Value)
+                                {
+                                    foto = (byte[])fotoData;
+                                }
+
                                 return new Usuario
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
-                                    Nome = reader["Nome"].ToString(),
-                                    Email = reader["Email"].ToString(),
-                                    NomeUsuario = reader["NomeUsuario"].ToString(),
-                                    DataNascimento = reader["DataNascimento"].ToString(),
-                                    Telefone = reader["Telefone"].ToString(),
-                                    Foto = reader["Foto"] as byte[]
+                                    Nome = reader["Nome"]?.ToString() ?? "",
+                                    Email = reader["Email"]?.ToString() ?? "",
+                                    NomeUsuario = reader["NomeUsuario"]?.ToString() ?? "",
+                                    DataNascimento = reader["DataNascimento"]?.ToString() ?? "",
+                                    Telefone = reader["Telefone"]?.ToString() ?? "",
+                                    Foto = foto
                                 };
                             }
                         }
@@ -237,15 +252,22 @@ namespace CanvasApp.Classes.Databases
                         {
                             while (reader.Read())
                             {
+                                byte[] foto = null;
+                                var fotoData = reader["Foto"];
+                                if (fotoData != DBNull.Value)
+                                {
+                                    foto = (byte[])fotoData;
+                                }
+
                                 lista.Add(new Usuario
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
-                                    Nome = reader["Nome"].ToString(),
-                                    Email = reader["Email"].ToString(),
-                                    NomeUsuario = reader["NomeUsuario"].ToString(),
-                                    DataNascimento = reader["DataNascimento"].ToString(),
-                                    Telefone = reader["Telefone"].ToString(),
-                                    Foto = reader["Foto"] as byte[]
+                                    Nome = reader["Nome"]?.ToString() ?? "",
+                                    Email = reader["Email"]?.ToString() ?? "",
+                                    NomeUsuario = reader["NomeUsuario"]?.ToString() ?? "",
+                                    DataNascimento = reader["DataNascimento"]?.ToString() ?? "",
+                                    Telefone = reader["Telefone"]?.ToString() ?? "",
+                                    Foto = foto
                                 });
                             }
                         }
@@ -320,7 +342,12 @@ namespace CanvasApp.Classes.Databases
                         {
                             if (reader.Read())
                             {
-                                byte[] fotoBanco = reader["Foto"] as byte[];
+                                byte[] fotoBanco = null;
+                                var fotoData = reader["Foto"];
+                                if (fotoData != DBNull.Value)
+                                {
+                                    fotoBanco = (byte[])fotoData;
+                                }
 
                                 if (fotoBanco != null && foto != null &&
                                     fotoBanco.SequenceEqual(foto))
@@ -328,11 +355,11 @@ namespace CanvasApp.Classes.Databases
                                     return new Usuario
                                     {
                                         Codigo = Convert.ToInt32(reader["Codigo"]),
-                                        Nome = reader["Nome"].ToString(),
-                                        Email = reader["Email"].ToString(),
-                                        NomeUsuario = reader["NomeUsuario"].ToString(),
-                                        DataNascimento = reader["DataNascimento"].ToString(),
-                                        Telefone = reader["Telefone"].ToString(),
+                                        Nome = reader["Nome"]?.ToString() ?? "",
+                                        Email = reader["Email"]?.ToString() ?? "",
+                                        NomeUsuario = reader["NomeUsuario"]?.ToString() ?? "",
+                                        DataNascimento = reader["DataNascimento"]?.ToString() ?? "",
+                                        Telefone = reader["Telefone"]?.ToString() ?? "",
                                         Foto = fotoBanco
                                     };
                                 }
@@ -493,15 +520,22 @@ namespace CanvasApp.Classes.Databases
                         {
                             while (reader.Read())
                             {
+                                byte[] foto = null;
+                                var fotoData = reader["Foto"];
+                                if (fotoData != DBNull.Value)
+                                {
+                                    foto = (byte[])fotoData;
+                                }
+
                                 lista.Add(new Usuario
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
-                                    Nome = reader["Nome"].ToString(),
-                                    Email = reader["Email"].ToString(),
-                                    NomeUsuario = reader["NomeUsuario"].ToString(),
-                                    DataNascimento = reader["DataNascimento"].ToString(),
-                                    Telefone = reader["Telefone"].ToString(),
-                                    Foto = reader["Foto"] as byte[]
+                                    Nome = reader["Nome"]?.ToString() ?? "",
+                                    Email = reader["Email"]?.ToString() ?? "",
+                                    NomeUsuario = reader["NomeUsuario"]?.ToString() ?? "",
+                                    DataNascimento = reader["DataNascimento"]?.ToString() ?? "",
+                                    Telefone = reader["Telefone"]?.ToString() ?? "",
+                                    Foto = foto
                                 });
                             }
                         }
@@ -515,7 +549,6 @@ namespace CanvasApp.Classes.Databases
             return lista;
         }
 
-        // NOVO: Método para obter apenas dados básicos do usuário (sem foto)
         public Usuario ObterUsuarioBasicoPorCodigo(int codigo)
         {
             try
@@ -533,9 +566,9 @@ namespace CanvasApp.Classes.Databases
                                 return new Usuario
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
-                                    Nome = reader["Nome"].ToString(),
-                                    Email = reader["Email"].ToString(),
-                                    NomeUsuario = reader["NomeUsuario"].ToString()
+                                    Nome = reader["Nome"]?.ToString() ?? "",
+                                    Email = reader["Email"]?.ToString() ?? "",
+                                    NomeUsuario = reader["NomeUsuario"]?.ToString() ?? ""
                                 };
                             }
                         }

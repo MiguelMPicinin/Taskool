@@ -18,7 +18,7 @@ namespace CanvasApp.Forms
         private readonly ComentariosDB _comentariosDB;
         private readonly UsuarioDB _usuarioDB;
         private readonly MembrosDB _membrosDB;
-
+       
         private Button btnAdicionarSubtarefa;
 
         public Frm_TarefasDetalhes(Projeto_Tarefas tarefa)
@@ -140,6 +140,14 @@ namespace CanvasApp.Forms
         private void CarregarDadosTarefa()
         {
             Txt_TituloTarefa.Text = tarefaAtual.Descricao;
+
+            // NOVO: Carregar dataLimite se existir
+            if (tarefaAtual.dataLimite != DateTime.MinValue && tarefaAtual.dataLimite >= new DateTime(1753, 1, 1))
+            {
+                // Você pode adicionar um DateTimePicker no Frm_TarefasDetalhes também se quiser
+                Console.WriteLine($"Data limite da tarefa: {tarefaAtual.dataLimite:dd/MM/yyyy}");
+            }
+
             CarregarPrazoAlarme();
             CarregarSubtarefas();
             AtualizarPreviewComentarios();

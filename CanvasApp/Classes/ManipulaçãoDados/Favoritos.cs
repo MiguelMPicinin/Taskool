@@ -82,7 +82,7 @@ namespace CanvasApp.Classes.Databases
                                     Descricao = reader["Descricao"].ToString(),
                                     isConcluida = Convert.ToBoolean(reader["isConcluida"]),
                                     CodProjeto = Convert.ToInt32(reader["CodProjeto"]),
-                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue)
+                                    CodUsuario = Convert.ToInt32(codUsuarioValue)
                                 });
                             }
                         }
