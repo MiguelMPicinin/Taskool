@@ -25,6 +25,10 @@ namespace CanvasApp
         private DateTime currentWeek;
         private bool apenasDiasUteis = false;
 
+        // VARIÁVEIS DO CAMINHO CRÍTICO
+        private List<Projeto_Tarefas> tarefasCaminhoCritico;
+        private bool exibindoMaisTarefas = false;
+
         public Frm_Dashboard()
         {
             InitializeComponent();
@@ -49,6 +53,9 @@ namespace CanvasApp
             projetosDB = new ProjetosDB();
             alarmeDB = new AlarmeDB();
 
+            // CONFIGURAÇÃO INICIAL DO CAMINHO CRÍTICO
+            InicializarCaminhoCritico();
+
             // Configuração inicial da UI
             Pnl_CC5.Visible = false;
             Pnl_CC6.Visible = false;
@@ -64,6 +71,176 @@ namespace CanvasApp
             AtualizarVisibilidadeBotaoAvancar();
         }
 
+        private void InicializarCaminhoCritico()
+        {
+            tarefasCaminhoCritico = new List<Projeto_Tarefas>();
+
+            // Configurar evento do botão Ver Mais
+            Btn_VerMais.Click += Btn_VerMais_Click;
+
+            // Carregar dados iniciais
+            CarregarCaminhoCritico();
+        }
+
+        private void CarregarCaminhoCritico()
+        {
+            try
+            {
+                // Obter tarefas não concluídas com data limite futura, ordenadas pela mais próxima
+                tarefasCaminhoCritico = tarefasDB.ObterTarefasParaCaminhoCritico(usuarioId);
+
+                Console.WriteLine($"📊 Caminho Crítico: {tarefasCaminhoCritico.Count} tarefas encontradas");
+
+                AtualizarExibicaoCaminhoCritico();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erro ao carregar caminho crítico: {ex.Message}");
+                LimparCaminhoCritico();
+            }
+        }
+
+        private void AtualizarExibicaoCaminhoCritico()
+        {
+            try
+            {
+                // Limpar todos os painéis primeiro
+                LimparCaminhoCritico();
+
+                if (!tarefasCaminhoCritico.Any())
+                {
+                    // Não há tarefas para exibir
+                    Btn_VerMais.Visible = false;
+                    return;
+                }
+
+                // Determinar quantas tarefas exibir
+                int tarefasParaExibir = exibindoMaisTarefas ?
+                    Math.Min(tarefasCaminhoCritico.Count, 7) :
+                    Math.Min(tarefasCaminhoCritico.Count, 4);
+
+                // Array de painéis e labels
+                Panel[] panels = { Pnl_CC1, Pnl_CC2, Pnl_CC3, Pnl_CC4, Pnl_CC5, Pnl_CC6, Pnl_CC7 };
+                Label[] labelsConteudo = { Lbl_Conteudo1, Lbl_Conteudo2, Lbl_Conteudo3, Lbl_Conteudo4,
+                                         Lbl_Conteudo5, Lbl_Conteudo6, Lbl_Conteudo7 };
+                Label[] labelsTarefa = { Lbl_Tarefa1, Lbl_Tarefa2, Lbl_Tarefa3, Lbl_Tarefa4,
+                                       Lbl_Tarefa5, Lbl_Tarefa6, Lbl_Tarefa7 };
+
+                // Preencher os painéis visíveis
+                for (int i = 0; i < tarefasParaExibir; i++)
+                {
+                    var tarefa = tarefasCaminhoCritico[i];
+                    panels[i].Visible = true;
+
+                    // Descrição da tarefa (limitando o tamanho se necessário)
+                    string descricao = tarefa.Descricao.Length > 50 ?
+                        tarefa.Descricao.Substring(0, 47) + "..." :
+                        tarefa.Descricao;
+                    labelsConteudo[i].Text = descricao;
+
+                    // Data limite formatada
+                    labelsTarefa[i].Text = $"Limite: {tarefa.dataLimite:dd/MM/yyyy}";
+
+                    // Aplicar estilo baseado na urgência
+                    AplicarEstiloUrgencia(panels[i], labelsTarefa[i], tarefa.dataLimite);
+                }
+
+                // Configurar visibilidade do botão Ver Mais
+                Btn_VerMais.Visible = tarefasCaminhoCritico.Count > 4;
+                Btn_VerMais.Text = exibindoMaisTarefas ? "Ver Menos" : "Ver Mais";
+
+                // Configurar scrollbar se necessário
+                ConfigurarScrollbarCaminhoCritico();
+
+                Console.WriteLine($"✅ Caminho Crítico atualizado: {tarefasParaExibir} tarefas exibidas");
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erro ao atualizar caminho crítico: {ex.Message}");
+                LimparCaminhoCritico();
+            }
+        }
+
+        private void AplicarEstiloUrgencia(Panel panel, Label labelTarefa, DateTime dataLimite)
+        {
+            var diasRestantes = (dataLimite - DateTime.Today).TotalDays;
+
+            if (diasRestantes <= 1)
+            {
+                // Muito urgente (hoje ou amanhã) - vermelho
+                panel.BackColor = Color.FromArgb(255, 240, 240);
+                labelTarefa.ForeColor = Color.Red;
+                labelTarefa.Font = new Font(labelTarefa.Font, FontStyle.Bold);
+            }
+            else if (diasRestantes <= 3)
+            {
+                // Urgente (2-3 dias) - laranja
+                panel.BackColor = Color.FromArgb(255, 250, 240);
+                labelTarefa.ForeColor = Color.OrangeRed;
+                labelTarefa.Font = new Font(labelTarefa.Font, FontStyle.Bold);
+            }
+            else if (diasRestantes <= 7)
+            {
+                // Atenção (4-7 dias) - amarelo
+                panel.BackColor = Color.FromArgb(255, 255, 240);
+                labelTarefa.ForeColor = Color.Goldenrod;
+            }
+            else
+            {
+                // Normal - verde
+                panel.BackColor = Color.FromArgb(240, 255, 240);
+                labelTarefa.ForeColor = Color.DarkGreen;
+            }
+        }
+
+        private void LimparCaminhoCritico()
+        {
+            // Array de painéis
+            Panel[] panels = { Pnl_CC1, Pnl_CC2, Pnl_CC3, Pnl_CC4, Pnl_CC5, Pnl_CC6, Pnl_CC7 };
+            Label[] labelsConteudo = { Lbl_Conteudo1, Lbl_Conteudo2, Lbl_Conteudo3, Lbl_Conteudo4,
+                                     Lbl_Conteudo5, Lbl_Conteudo6, Lbl_Conteudo7 };
+            Label[] labelsTarefa = { Lbl_Tarefa1, Lbl_Tarefa2, Lbl_Tarefa3, Lbl_Tarefa4,
+                                   Lbl_Tarefa5, Lbl_Tarefa6, Lbl_Tarefa7 };
+
+            for (int i = 0; i < panels.Length; i++)
+            {
+                panels[i].Visible = false;
+                labelsConteudo[i].Text = "";
+                labelsTarefa[i].Text = "";
+            }
+
+            Btn_VerMais.Visible = false;
+        }
+
+        private void ConfigurarScrollbarCaminhoCritico()
+        {
+            if (exibindoMaisTarefas && tarefasCaminhoCritico.Count > 4)
+            {
+                Pnl_CaminhoCritico.AutoScroll = true;
+                Pnl_CaminhoCritico.VerticalScroll.Visible = true;
+                Pnl_CaminhoCritico.VerticalScroll.Enabled = true;
+            }
+            else
+            {
+                Pnl_CaminhoCritico.AutoScroll = false;
+                Pnl_CaminhoCritico.VerticalScroll.Visible = false;
+            }
+        }
+
+        private void Btn_VerMais_Click(object sender, EventArgs e)
+        {
+            exibindoMaisTarefas = !exibindoMaisTarefas;
+            AtualizarExibicaoCaminhoCritico();
+        }
+
+        // Método para atualizar quando há mudanças nas tarefas
+        public void AtualizarCaminhoCritico()
+        {
+            CarregarCaminhoCritico();
+        }
+
+        // MÉTODOS EXISTENTES DO DASHBOARD (mantidos conforme seu código original)
         private void ConfigurarEventos()
         {
             this.Load += (s, e) =>
@@ -73,6 +250,7 @@ namespace CanvasApp
                 AtualizarGraficoCircular();
                 AtualizarGraficoSemanal();
                 AtualizarVisibilidadeBotaoAvancar();
+                CarregarCaminhoCritico(); // Garantir que o caminho crítico seja carregado
             };
 
             Btn_Anterior.Click += (s, e) =>
@@ -110,7 +288,7 @@ namespace CanvasApp
 
             if (Graph_TarefasPorProjeto != null)
             {
-                Graph_TarefasPorProjeto.Click += Graph_TarefasPorProjeto_Click;
+                Graph_TarefasPorProjeto.MouseClick += Graph_TarefasPorProjeto_MouseClick;
             }
 
             Btn_PDF.Click += Btn_PDF_Click;
@@ -150,7 +328,6 @@ namespace CanvasApp
             }
         }
 
-        // MÉTODO PRINCIPAL CORRIGIDO - USANDO DATA LIMITE EM VEZ DE ALARME
         private void AtualizarTextosTarefas()
         {
             try
@@ -185,20 +362,7 @@ namespace CanvasApp
                 Lbl_Porcentagem2.Text = $"Faltam fazer {porcentagemPendentes}% das tarefas";
 
                 Console.WriteLine($"✅ Dashboard atualizado - Total: {total}, Concluídas: {totalConcluidas}");
-                Console.WriteLine($"📅 Hoje (DATA LIMITE): {tarefasHojeConcluidas} concluídas, {tarefasHojePendentes} pendentes");
-                Console.WriteLine($"📅 Semana (DATA LIMITE): {tarefasSemanaConcluidas} concluídas, {tarefasSemanaPendentes} pendentes");
 
-                // Log detalhado para debug
-                var tarefasHojeDetalhadas = tarefasDB.ObterTarefasComDataLimiteHoje(usuarioId);
-                var tarefasSemanaDetalhadas = tarefasDB.ObterTarefasComDataLimiteSemana(usuarioId);
-
-                Console.WriteLine($"📋 Tarefas com data limite HOJE (detalhado): {tarefasHojeDetalhadas.Count} tarefas");
-                foreach (var tarefa in tarefasHojeDetalhadas)
-                {
-                    Console.WriteLine($"   - Tarefa {tarefa.Codigo}: '{tarefa.Descricao}' - Concluída: {tarefa.isConcluida}");
-                }
-
-                Console.WriteLine($"📋 Tarefas com data limite SEMANA (detalhado): {tarefasSemanaDetalhadas.Count} tarefas");
             }
             catch (Exception ex)
             {
@@ -206,7 +370,6 @@ namespace CanvasApp
             }
         }
 
-        // MÉTODO ATUALIZADO PARA GRÁFICO SEMANAL COM DATA LIMITE
         private void AtualizarGraficoSemanal()
         {
             try
@@ -304,7 +467,7 @@ namespace CanvasApp
             }
         }
 
-        private void ConfigurarChartCirculo(List<CanvasApp.Classes.Databases.ProjetosTarefasDatas> dados)
+        private void ConfigurarChartCirculo(List<ProjetosTarefasDatas> dados)
         {
             if (Graph_TarefasPorProjeto == null) return;
 
@@ -356,69 +519,132 @@ namespace CanvasApp
             Graph_TarefasPorProjeto.Titles.Add(title);
         }
 
-        private void Graph_TarefasPorProjeto_Click(object sender, EventArgs e)
+        private void Graph_TarefasPorProjeto_MouseClick(object sender, MouseEventArgs e)
         {
             try
             {
-                var hitTest = Graph_TarefasPorProjeto.HitTest(((MouseEventArgs)e).X, ((MouseEventArgs)e).Y);
+                var hit = Graph_TarefasPorProjeto.HitTest(e.X, e.Y);
 
-                if (hitTest.PointIndex >= 0 && hitTest.Series != null)
+                if (hit != null && hit.PointIndex >= 0 && hit.Series != null)
                 {
-                    string projetoNome = hitTest.Series.Points[hitTest.PointIndex].AxisLabel;
+                    // Obter o nome do projeto clicado
+                    string projetoNome = hit.Series.Points[hit.PointIndex].AxisLabel;
 
-                    var projetosUsuario = projetosDB.ObterTodosProjetosUsuario(usuarioId);
-                    var projeto = projetosUsuario.FirstOrDefault(p => p.Nome == projetoNome);
-
-                    if (projeto != null)
+                    if (!string.IsNullOrEmpty(projetoNome))
                     {
-                        AbrirListaTarefasProjeto(projeto.Codigo, projeto.Nome);
+                        Console.WriteLine($"🔍 Projeto clicado: {projetoNome}");
+
+                        // Buscar o projeto pelo nome
+                        var projetosUsuario = projetosDB.ObterTodosProjetosUsuario(usuarioId);
+                        var projeto = projetosUsuario.FirstOrDefault(p =>
+                            p.Nome.Equals(projetoNome, StringComparison.OrdinalIgnoreCase));
+
+                        if (projeto != null)
+                        {
+                            Console.WriteLine($"✅ Projeto encontrado: {projeto.Nome} (ID: {projeto.Codigo})");
+                            AbrirListaTarefasProjeto(projeto.Codigo, projeto.Nome);
+                        }
+                        else
+                        {
+                            MessageBox.Show($"Projeto '{projetoNome}' não encontrado.", "Aviso",
+                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
                     }
+                }
+                else
+                {
+                    Console.WriteLine("ℹ️  Nenhuma fatia do gráfico foi clicada");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao abrir lista de tarefas: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao processar clique no gráfico: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Console.WriteLine($"❌ Erro no clique do gráfico: {ex.Message}");
             }
         }
 
+        // CORREÇÃO: MÉTODO MELHORADO PARA ABRIR LISTA DE TAREFAS
         private void AbrirListaTarefasProjeto(int codProjeto, string nomeProjeto)
         {
             try
             {
                 var tarefasProjeto = tarefasDB.ObterTarefasPorProjeto(codProjeto);
 
+                if (!tarefasProjeto.Any())
+                {
+                    MessageBox.Show($"O projeto '{nomeProjeto}' não possui tarefas.", "Informação",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
                 using (var formLista = new Form())
                 {
                     formLista.Text = $"Tarefas do Projeto: {nomeProjeto}";
-                    formLista.Size = new Size(800, 400);
+                    formLista.Size = new Size(900, 500);
                     formLista.StartPosition = FormStartPosition.CenterParent;
+                    formLista.BackColor = Color.White;
+                    formLista.FormBorderStyle = FormBorderStyle.FixedDialog;
+                    formLista.MaximizeBox = false;
 
+                    // Criar DataGridView
                     var dataGridView = new DataGridView
                     {
                         Dock = DockStyle.Fill,
                         ReadOnly = true,
                         AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-                        DataSource = tarefasProjeto.Select(t => new
-                        {
-                            Descricao = t.Descricao,
-                            DataLimite = t.dataLimite != DateTime.MinValue ? t.dataLimite.ToString("dd/MM/yyyy") : "Não definida",
-                            DataConclusao = t.isConcluida && t.dataConclusao != DateTime.MinValue ? t.dataConclusao.ToString("dd/MM/yyyy") : "",
-                            Status = t.isConcluida ? "Concluída" : "Pendente"
-                        }).ToList()
+                        BackgroundColor = Color.White,
+                        BorderStyle = BorderStyle.None,
+                        Font = new Font("Arial", 10),
+                        AllowUserToAddRows = false,
+                        AllowUserToDeleteRows = false,
+                        AllowUserToOrderColumns = false,
+                        RowHeadersVisible = false
                     };
 
-                    dataGridView.Columns["Descricao"].HeaderText = "Descrição da Tarefa";
-                    dataGridView.Columns["DataLimite"].HeaderText = "Data Limite";
-                    dataGridView.Columns["DataConclusao"].HeaderText = "Data Conclusão";
-                    dataGridView.Columns["Status"].HeaderText = "Status";
+                    // Configurar colunas
+                    dataGridView.Columns.Add("Descricao", "Descrição da Tarefa");
+                    dataGridView.Columns.Add("DataLimite", "Data Limite");
+                    dataGridView.Columns.Add("DataConclusao", "Data Conclusão");
+                    dataGridView.Columns.Add("Status", "Status");
+
+                    // Preencher dados
+                    foreach (var tarefa in tarefasProjeto)
+                    {
+                        string dataLimite = tarefa.dataLimite != DateTime.MinValue &&
+                                           tarefa.dataLimite >= new DateTime(1753, 1, 1)
+                            ? tarefa.dataLimite.ToString("dd/MM/yyyy")
+                            : "Não definida";
+
+                        string dataConclusao = tarefa.isConcluida &&
+                                              tarefa.dataConclusao != DateTime.MinValue &&
+                                              tarefa.dataConclusao >= new DateTime(1753, 1, 1)
+                            ? tarefa.dataConclusao.ToString("dd/MM/yyyy")
+                            : "";
+
+                        string status = tarefa.isConcluida ? "Concluída" : "Pendente";
+
+                        dataGridView.Rows.Add(tarefa.Descricao, dataLimite, dataConclusao, status);
+                    }
+
+                    // Ajustar largura das colunas
+                    dataGridView.Columns["Descricao"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    dataGridView.Columns["DataLimite"].Width = 120;
+                    dataGridView.Columns["DataConclusao"].Width = 120;
+                    dataGridView.Columns["Status"].Width = 100;
 
                     formLista.Controls.Add(dataGridView);
                     formLista.ShowDialog();
                 }
+
+                Console.WriteLine($"✅ Lista de tarefas aberta: {tarefasProjeto.Count} tarefas do projeto '{nomeProjeto}'");
+
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao carregar tarefas do projeto: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Erro ao carregar tarefas do projeto: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Console.WriteLine($"❌ Erro ao abrir lista de tarefas: {ex.Message}");
             }
         }
 
@@ -614,5 +840,7 @@ namespace CanvasApp
         }
 
         private void Lbl_QuantidadeHojeConcluidas_TextChanged(object sender, EventArgs e) { }
+
+        private void Pnl_CC1_Paint(object sender, PaintEventArgs e) { }
     }
 }

@@ -19,6 +19,8 @@ namespace CanvasApp
         private bool isModoFavoritos = false;
         private bool isExibindoConcluidas = false;
         private int usuarioLogadoId;
+        private int codTarefa;
+        private string nomeProjeto;
 
         // Instâncias das dependências necessárias
         private readonly NotificacoesDB dbNotificacoes = new NotificacoesDB();
@@ -1662,6 +1664,20 @@ namespace CanvasApp
                 }
             }
             formulariosAtribuicaoAbertos.Clear();
+        }
+
+        private void Btn_Poker_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            Frm_PlanningPoker fpp = new Frm_PlanningPoker();
+            fpp.ShowDialog();
+        }
+
+        private void Btn_UML_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            Frm_Kanban fk = new Frm_Kanban(projetoSelecionado.Codigo, projetoSelecionado.Nome);
+            fk.ShowDialog();
         }
     }
 }

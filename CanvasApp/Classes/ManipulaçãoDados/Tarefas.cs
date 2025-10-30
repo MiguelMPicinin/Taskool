@@ -1584,15 +1584,208 @@ namespace CanvasApp.Classes.Databases
             return dados;
         }
 
+        public List<Projeto_Tarefas> ObterTarefasParaCaminhoCritico(int usuarioId)
+        {
+            List<Projeto_Tarefas> tarefas = new List<Projeto_Tarefas>();
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"
+                        SELECT DISTINCT 
+                            PT.Codigo, 
+                            PT.Descricao, 
+                            PT.isConcluida, 
+                            PT.CodProjeto, 
+                            PT.CodUsuario,
+                            PT.dataLimite, 
+                            PT.dataConclusao
+                        FROM Projeto_Tarefas PT
+                        INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto
+                        WHERE PM.CodMembro = @usuarioId
+                        AND PT.isConcluida = 0
+                        AND PT.dataLimite >= @dataAtual
+                        AND PT.dataLimite IS NOT NULL
+                        ORDER BY PT.dataLimite ASC";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        cmd.Parameters.AddWithValue("@dataAtual", DateTime.Today);
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                var codUsuarioValue = reader["CodUsuario"];
+                                var dataLimiteValue = reader["dataLimite"];
+                                var dataConclusaoValue = reader["dataConclusao"];
+
+                                tarefas.Add(new Projeto_Tarefas
+                                {
+                                    Codigo = Convert.ToInt32(reader["Codigo"]),
+                                    Descricao = reader["Descricao"].ToString(),
+                                    isConcluida = Convert.ToBoolean(reader["isConcluida"]),
+                                    CodProjeto = Convert.ToInt32(reader["CodProjeto"]),
+                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue),
+                                    dataLimite = dataLimiteValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataLimiteValue),
+                                    dataConclusao = dataConclusaoValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataConclusaoValue)
+                                });
+                            }
+                        }
+                    }
+                }
+
+                Console.WriteLine($"✅ Encontradas {tarefas.Count} tarefas para caminho crítico");
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao obter tarefas para caminho crítico: " + ex.Message;
+                Console.WriteLine($"❌ Erro em ObterTarefasParaCaminhoCritico: {ex.Message}");
+            }
+            return tarefas;
+        }
+
+        public List<Projeto_Tarefas> ListarTarefasPorProjeto(int codProjeto)
+        {
+            List<Projeto_Tarefas> tarefas = new List<Projeto_Tarefas>();
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string query = @"SELECT Codigo, CodProjeto, CodUsuario, CodResponsavel, Descricao, 
+                                       isConcluida, isFazendo, Cor, dataConclusao, dataLimite, NomeProjeto
+                                FROM Projeto_Tarefas 
+                                WHERE CodProjeto = @CodProjeto
+                                ORDER BY Codigo DESC";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@CodProjeto", codProjeto);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                var codUsuarioValue = reader["CodUsuario"];
+                                var codResponsavelValue = reader["CodResponsavel"];
+                                var dataConclusaoValue = reader["dataConclusao"];
+                                var dataLimiteValue = reader["dataLimite"];
+
+                                tarefas.Add(new Projeto_Tarefas
+                                {
+                                    Codigo = Convert.ToInt32(reader["Codigo"]),
+                                    CodProjeto = Convert.ToInt32(reader["CodProjeto"]),
+                                    CodUsuario = codUsuarioValue == DBNull.Value ? null : (int?)Convert.ToInt32(codUsuarioValue),
+                                    CodResponsavel = codResponsavelValue == DBNull.Value ? null : (int?)Convert.ToInt32(codResponsavelValue),
+                                    Descricao = reader["Descricao"].ToString(),
+                                    isConcluida = Convert.ToBoolean(reader["isConcluida"]),
+                                    isFazendo = Convert.ToBoolean(reader["isFazendo"]),
+                                    Cor = reader["Cor"]?.ToString() ?? "#ffe079",
+                                    dataConclusao = dataConclusaoValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataConclusaoValue),
+                                    dataLimite = dataLimiteValue == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dataLimiteValue),
+                                    NomeProjeto = reader["NomeProjeto"].ToString()
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao listar tarefas do projeto: " + ex.Message;
+            }
+            return tarefas;
+        }
+
+        public bool AtualizarStatusKanban(int codTarefa, bool isConcluida, bool isFazendo)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = @"UPDATE Projeto_Tarefas 
+                             SET isConcluida = @isConcluida, 
+                                 isFazendo = @isFazendo,
+                                 dataConclusao = @dataConclusao
+                             WHERE Codigo = @Codigo";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@isConcluida", isConcluida);
+                        cmd.Parameters.AddWithValue("@isFazendo", isFazendo);
+
+                        // Se está concluída, seta data de conclusão, senão limpa
+                        if (isConcluida)
+                            cmd.Parameters.AddWithValue("@dataConclusao", DateTime.Now);
+                        else
+                            cmd.Parameters.AddWithValue("@dataConclusao", DBNull.Value);
+
+                        cmd.Parameters.AddWithValue("@Codigo", codTarefa);
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        Mensagem = rowsAffected > 0 ? "Status atualizado com sucesso!" : "Tarefa não encontrada.";
+                        return rowsAffected > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao atualizar status: " + ex.Message;
+                return false;
+            }
+        }
+
+        public bool InserirTarefaComCor(Projeto_Tarefas tarefa)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = @"INSERT INTO Projeto_Tarefas 
+                             (CodProjeto, CodUsuario, CodResponsavel, Descricao, isConcluida, isFazendo, Cor, dataConclusao, dataLimite, NomeProjeto)
+                             VALUES 
+                             (@CodProjeto, @CodUsuario, @CodResponsavel, @Descricao, @isConcluida, @isFazendo, @Cor, @dataConclusao, @dataLimite, @NomeProjeto)";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@CodProjeto", tarefa.CodProjeto);
+
+                        // Parâmetros opcionais (nullable)
+                        if (tarefa.CodUsuario.HasValue)
+                            cmd.Parameters.AddWithValue("@CodUsuario", tarefa.CodUsuario.Value);
+                        else
+                            cmd.Parameters.AddWithValue("@CodUsuario", DBNull.Value);
+
+                        if (tarefa.CodResponsavel.HasValue)
+                            cmd.Parameters.AddWithValue("@CodResponsavel", tarefa.CodResponsavel.Value);
+                        else
+                            cmd.Parameters.AddWithValue("@CodResponsavel", DBNull.Value);
+
+                        cmd.Parameters.AddWithValue("@Descricao", tarefa.Descricao);
+                        cmd.Parameters.AddWithValue("@isConcluida", tarefa.isConcluida);
+                        cmd.Parameters.AddWithValue("@isFazendo", tarefa.isFazendo);
+                        cmd.Parameters.AddWithValue("@Cor", tarefa.Cor ?? "#ffe079");
+                        cmd.Parameters.AddWithValue("@dataConclusao", ValidarDataParaSQL(tarefa.dataConclusao));
+                        cmd.Parameters.AddWithValue("@dataLimite", ValidarDataParaSQL(tarefa.dataLimite));
+                        cmd.Parameters.AddWithValue("@NomeProjeto", tarefa.NomeProjeto ?? "");
+
+                        cmd.ExecuteNonQuery();
+                        Mensagem = "Tarefa criada com sucesso!";
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao criar tarefa: " + ex.Message;
+                return false;
+            }
+        }
+
+
         public List<Projeto_Tarefas> ObterTodasTarefasDoUsuario(int usuarioId)
         {
             return ObterTarefasPorUsuario(usuarioId);
         }
-    }
-
-    public class ProjetosTarefasDatas
-    {
-        public string NomeProjeto { get; set; }
-        public int QuantidadeTarefas { get; set; }
     }
 }

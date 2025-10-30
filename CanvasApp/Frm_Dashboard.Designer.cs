@@ -28,12 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea9 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend9 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series9 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea10 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend10 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series10 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.Graph_TarefasPorProjeto = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.Graph_ProgressoSemanal = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.Btn_PDF = new System.Windows.Forms.Button();
@@ -113,32 +113,32 @@
             // 
             // Graph_TarefasPorProjeto
             // 
-            chartArea1.Name = "ChartArea1";
-            this.Graph_TarefasPorProjeto.ChartAreas.Add(chartArea1);
-            legend1.Name = "Legend1";
-            this.Graph_TarefasPorProjeto.Legends.Add(legend1);
+            chartArea9.Name = "ChartArea1";
+            this.Graph_TarefasPorProjeto.ChartAreas.Add(chartArea9);
+            legend9.Name = "Legend1";
+            this.Graph_TarefasPorProjeto.Legends.Add(legend9);
             this.Graph_TarefasPorProjeto.Location = new System.Drawing.Point(461, 132);
             this.Graph_TarefasPorProjeto.Name = "Graph_TarefasPorProjeto";
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.Graph_TarefasPorProjeto.Series.Add(series1);
+            series9.ChartArea = "ChartArea1";
+            series9.Legend = "Legend1";
+            series9.Name = "Series1";
+            this.Graph_TarefasPorProjeto.Series.Add(series9);
             this.Graph_TarefasPorProjeto.Size = new System.Drawing.Size(331, 249);
             this.Graph_TarefasPorProjeto.TabIndex = 0;
             this.Graph_TarefasPorProjeto.Text = "Por Projetos";
             // 
             // Graph_ProgressoSemanal
             // 
-            chartArea2.Name = "ChartArea1";
-            this.Graph_ProgressoSemanal.ChartAreas.Add(chartArea2);
-            legend2.Name = "Legend1";
-            this.Graph_ProgressoSemanal.Legends.Add(legend2);
+            chartArea10.Name = "ChartArea1";
+            this.Graph_ProgressoSemanal.ChartAreas.Add(chartArea10);
+            legend10.Name = "Legend1";
+            this.Graph_ProgressoSemanal.Legends.Add(legend10);
             this.Graph_ProgressoSemanal.Location = new System.Drawing.Point(136, 165);
             this.Graph_ProgressoSemanal.Name = "Graph_ProgressoSemanal";
-            series2.ChartArea = "ChartArea1";
-            series2.Legend = "Legend1";
-            series2.Name = "Series1";
-            this.Graph_ProgressoSemanal.Series.Add(series2);
+            series10.ChartArea = "ChartArea1";
+            series10.Legend = "Legend1";
+            series10.Name = "Series1";
+            this.Graph_ProgressoSemanal.Series.Add(series10);
             this.Graph_ProgressoSemanal.Size = new System.Drawing.Size(319, 172);
             this.Graph_ProgressoSemanal.TabIndex = 1;
             this.Graph_ProgressoSemanal.Text = "chart2";
@@ -449,6 +449,7 @@
             this.Pnl_CC1.Name = "Pnl_CC1";
             this.Pnl_CC1.Size = new System.Drawing.Size(107, 53);
             this.Pnl_CC1.TabIndex = 16;
+            this.Pnl_CC1.Paint += new System.Windows.Forms.PaintEventHandler(this.Pnl_CC1_Paint);
             // 
             // Lbl_Conteudo1
             // 
@@ -463,10 +464,10 @@
             // Lbl_Tarefa1
             // 
             this.Lbl_Tarefa1.AutoSize = true;
-            this.Lbl_Tarefa1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Lbl_Tarefa1.Location = new System.Drawing.Point(30, 0);
+            this.Lbl_Tarefa1.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Lbl_Tarefa1.Location = new System.Drawing.Point(5, 0);
             this.Lbl_Tarefa1.Name = "Lbl_Tarefa1";
-            this.Lbl_Tarefa1.Size = new System.Drawing.Size(35, 13);
+            this.Lbl_Tarefa1.Size = new System.Drawing.Size(29, 12);
             this.Lbl_Tarefa1.TabIndex = 24;
             this.Lbl_Tarefa1.Text = "label1";
             // 
@@ -492,10 +493,10 @@
             // Lbl_Tarefa2
             // 
             this.Lbl_Tarefa2.AutoSize = true;
-            this.Lbl_Tarefa2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Lbl_Tarefa2.Location = new System.Drawing.Point(30, 0);
+            this.Lbl_Tarefa2.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Lbl_Tarefa2.Location = new System.Drawing.Point(5, 0);
             this.Lbl_Tarefa2.Name = "Lbl_Tarefa2";
-            this.Lbl_Tarefa2.Size = new System.Drawing.Size(35, 13);
+            this.Lbl_Tarefa2.Size = new System.Drawing.Size(29, 12);
             this.Lbl_Tarefa2.TabIndex = 26;
             this.Lbl_Tarefa2.Text = "label3";
             // 
@@ -521,10 +522,10 @@
             // Lbl_Tarefa3
             // 
             this.Lbl_Tarefa3.AutoSize = true;
-            this.Lbl_Tarefa3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Lbl_Tarefa3.Location = new System.Drawing.Point(30, 0);
+            this.Lbl_Tarefa3.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Lbl_Tarefa3.Location = new System.Drawing.Point(5, 0);
             this.Lbl_Tarefa3.Name = "Lbl_Tarefa3";
-            this.Lbl_Tarefa3.Size = new System.Drawing.Size(35, 13);
+            this.Lbl_Tarefa3.Size = new System.Drawing.Size(29, 12);
             this.Lbl_Tarefa3.TabIndex = 28;
             this.Lbl_Tarefa3.Text = "label6";
             // 
@@ -550,10 +551,10 @@
             // Lbl_Tarefa4
             // 
             this.Lbl_Tarefa4.AutoSize = true;
-            this.Lbl_Tarefa4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Lbl_Tarefa4.Location = new System.Drawing.Point(30, 0);
+            this.Lbl_Tarefa4.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Lbl_Tarefa4.Location = new System.Drawing.Point(5, 0);
             this.Lbl_Tarefa4.Name = "Lbl_Tarefa4";
-            this.Lbl_Tarefa4.Size = new System.Drawing.Size(35, 13);
+            this.Lbl_Tarefa4.Size = new System.Drawing.Size(29, 12);
             this.Lbl_Tarefa4.TabIndex = 30;
             this.Lbl_Tarefa4.Text = "label9";
             // 
@@ -588,10 +589,10 @@
             // Lbl_Tarefa5
             // 
             this.Lbl_Tarefa5.AutoSize = true;
-            this.Lbl_Tarefa5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Lbl_Tarefa5.Location = new System.Drawing.Point(30, 0);
+            this.Lbl_Tarefa5.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Lbl_Tarefa5.Location = new System.Drawing.Point(5, 0);
             this.Lbl_Tarefa5.Name = "Lbl_Tarefa5";
-            this.Lbl_Tarefa5.Size = new System.Drawing.Size(41, 13);
+            this.Lbl_Tarefa5.Size = new System.Drawing.Size(34, 12);
             this.Lbl_Tarefa5.TabIndex = 32;
             this.Lbl_Tarefa5.Text = "label11";
             // 
@@ -617,10 +618,10 @@
             // Lbl_Tarefa6
             // 
             this.Lbl_Tarefa6.AutoSize = true;
-            this.Lbl_Tarefa6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Lbl_Tarefa6.Location = new System.Drawing.Point(30, 0);
+            this.Lbl_Tarefa6.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Lbl_Tarefa6.Location = new System.Drawing.Point(5, 0);
             this.Lbl_Tarefa6.Name = "Lbl_Tarefa6";
-            this.Lbl_Tarefa6.Size = new System.Drawing.Size(41, 13);
+            this.Lbl_Tarefa6.Size = new System.Drawing.Size(34, 12);
             this.Lbl_Tarefa6.TabIndex = 30;
             this.Lbl_Tarefa6.Text = "label13";
             // 
@@ -663,10 +664,10 @@
             // Lbl_Tarefa7
             // 
             this.Lbl_Tarefa7.AutoSize = true;
-            this.Lbl_Tarefa7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Lbl_Tarefa7.Location = new System.Drawing.Point(30, 0);
+            this.Lbl_Tarefa7.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Lbl_Tarefa7.Location = new System.Drawing.Point(5, 0);
             this.Lbl_Tarefa7.Name = "Lbl_Tarefa7";
-            this.Lbl_Tarefa7.Size = new System.Drawing.Size(41, 13);
+            this.Lbl_Tarefa7.Size = new System.Drawing.Size(34, 12);
             this.Lbl_Tarefa7.TabIndex = 32;
             this.Lbl_Tarefa7.Text = "label15";
             // 

@@ -57,12 +57,16 @@
             this.Txt_NovoComentarioChat = new System.Windows.Forms.TextBox();
             this.Flw_ChatComentarios = new System.Windows.Forms.FlowLayoutPanel();
             this.Btn_FecharChat = new System.Windows.Forms.Button();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.Btn_Anexar = new System.Windows.Forms.Button();
+            this.Pnl_ArquivosIndexados = new System.Windows.Forms.Panel();
             this.Pnl_Cabecalho.SuspendLayout();
             this.Pnl_Conteudo.SuspendLayout();
             this.Pnl_Comentarios.SuspendLayout();
             this.Pnl_Subtarefas.SuspendLayout();
             this.Pnl_Prazo.SuspendLayout();
             this.Pnl_ChatComentarios.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // Pnl_Cabecalho
@@ -347,12 +351,39 @@
             this.Btn_FecharChat.Text = "✕";
             this.Btn_FecharChat.UseVisualStyleBackColor = true;
             // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.Pnl_ArquivosIndexados);
+            this.panel1.Controls.Add(this.Btn_Anexar);
+            this.panel1.Location = new System.Drawing.Point(1, 528);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(433, 99);
+            this.panel1.TabIndex = 3;
+            // 
+            // Btn_Anexar
+            // 
+            this.Btn_Anexar.Location = new System.Drawing.Point(3, 33);
+            this.Btn_Anexar.Name = "Btn_Anexar";
+            this.Btn_Anexar.Size = new System.Drawing.Size(75, 42);
+            this.Btn_Anexar.TabIndex = 0;
+            this.Btn_Anexar.Text = "Anexar Arquivo";
+            this.Btn_Anexar.UseVisualStyleBackColor = true;
+            // 
+            // Pnl_ArquivosIndexados
+            // 
+            this.Pnl_ArquivosIndexados.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.Pnl_ArquivosIndexados.Location = new System.Drawing.Point(84, 29);
+            this.Pnl_ArquivosIndexados.Name = "Pnl_ArquivosIndexados";
+            this.Pnl_ArquivosIndexados.Size = new System.Drawing.Size(328, 50);
+            this.Pnl_ArquivosIndexados.TabIndex = 1;
+            // 
             // Frm_TarefasDetalhes
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(434, 624);
             this.Controls.Add(this.Pnl_ChatComentarios);
+            this.Controls.Add(this.panel1);
             this.Controls.Add(this.Pnl_Conteudo);
             this.Controls.Add(this.Pnl_Cabecalho);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -371,6 +402,7 @@
             this.Pnl_Prazo.PerformLayout();
             this.Pnl_ChatComentarios.ResumeLayout(false);
             this.Pnl_ChatComentarios.PerformLayout();
+            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -406,5 +438,8 @@
         private System.Windows.Forms.Button Btn_FecharChat;
         private System.Windows.Forms.Label Lbl_TituloChat;
         private System.Windows.Forms.Button Btn_SalvarData;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Button Btn_Anexar;
+        private System.Windows.Forms.Panel Pnl_ArquivosIndexados;
     }
 }

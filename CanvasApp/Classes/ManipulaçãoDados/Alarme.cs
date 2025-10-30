@@ -423,6 +423,78 @@ namespace CanvasApp.Classes.Databases
             return alarmes;
         }
 
+        public List<Alarme> ObterAlarmesProximos(int usuarioId, int dias = 7)
+        {
+            List<Alarme> alarmes = new List<Alarme>();
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = @"
+                                    SELECT A.*, PT.Descricao as DescricaoTarefa 
+                                    FROM Alarme A 
+                                    INNER JOIN Projeto_Tarefas PT ON A.CodTarefa = PT.Codigo 
+                                    INNER JOIN Projeto_Membros PM ON PT.CodProjeto = PM.CodProjeto 
+                                    WHERE PM.CodMembro = @usuarioId 
+                                    AND A.Data BETWEEN @hoje AND @dataFutura 
+                                    AND PT.isConcluida = 0 
+                                    ORDER BY A.Data ASC, A.Hora ASC";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usuarioId", usuarioId);
+                        cmd.Parameters.AddWithValue("@hoje", DateTime.Today);
+                        cmd.Parameters.AddWithValue("@dataFutura", DateTime.Today.AddDays(dias));
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                TimeSpan hora = ConverterParaTimeSpan(reader["Hora"]);
+
+                                alarmes.Add(new Alarme
+                                {
+                                    Codigo = Convert.ToInt32(reader["Codigo"]),
+                                    CodTarefa = Convert.ToInt32(reader["CodTarefa"]),
+                                    CodUsuario = Convert.ToInt32(reader["CodUsuario"]),
+                                    Data = Convert.ToDateTime(reader["Data"]),
+                                    Hora = hora,
+                                    Repeticao = (RepeticaoAlarme)Enum.Parse(typeof(RepeticaoAlarme), reader["Repeticao"].ToString()),
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                Mensagem = "Erro ao obter alarmes próximos: " + ex.Message;
+            }
+            return alarmes;
+        }
+
+        public bool VerificarAlarmeExistente(int codTarefa)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    string sql = @"SELECT COUNT(*) FROM Alarme WHERE CodTarefa = @CodTarefa";
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@CodTarefa", codTarefa);
+                        int count = Convert.ToInt32(cmd.ExecuteScalar());
+                        return count > 0;
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                Mensagem = "Erro ao verificar alarme: " + ex.Message;
+                return false;
+            }
+        }
+
         public bool ResetarConfiguracoesTarefa(int codTarefa)
         {
             try

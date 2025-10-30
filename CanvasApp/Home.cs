@@ -138,7 +138,7 @@ namespace Home
 
         private void CarregarNotificacoes()
         {
-            if (CanvasApp.Sessao.UsuarioLogado == null) return;
+            if (CanvasApp.Classes.Databases.UsuarioCL.Sessao.UsuarioLogado == null) return;
 
             int usuarioId = Sessao.UsuarioLogado.Codigo;
 
@@ -359,7 +359,7 @@ namespace Home
             Flp_Categorias1.Controls.Clear();
             Flp_Projetos1.Controls.Clear();
 
-            if (CanvasApp.Sessao.UsuarioLogado == null) return;
+            if (CanvasApp.Classes.Databases.UsuarioCL.Sessao.UsuarioLogado == null) return;
 
             int usuarioId = Sessao.UsuarioLogado.Codigo;
 
@@ -599,7 +599,7 @@ namespace Home
 
         private void CategoriaMenuClicada(string categoria)
         {
-            if (CanvasApp.Sessao.UsuarioLogado == null) return;
+            if (CanvasApp.Classes.Databases.UsuarioCL.Sessao.UsuarioLogado == null) return;
 
             int usuarioId = Convert.ToInt32(Sessao.UsuarioLogado);
 
@@ -622,7 +622,7 @@ namespace Home
 
         private void ProjetoMenuClicado(Projetos projeto)
         {
-            if (CanvasApp.Sessao.UsuarioLogado == null) return;
+            if (CanvasApp.Classes.Databases.UsuarioCL.Sessao.UsuarioLogado == null) return;
 
             int usuarioId = Sessao.UsuarioLogado.Codigo; 
             AbrirFormProjeto(projeto, usuarioId);
@@ -920,9 +920,9 @@ namespace Home
             else
                 saudacao = (idioma == "PT") ? "Olá, " : "Hello, ";
 
-            if (CanvasApp.Sessao.UsuarioLogado != null)
+            if (CanvasApp.Classes.Databases.UsuarioCL.Sessao.UsuarioLogado != null)
             {
-                Lbl_BoasVindas.Text = saudacao + CanvasApp.Sessao.UsuarioLogado.Nome + "!";
+                Lbl_BoasVindas.Text = saudacao + CanvasApp.Classes.Databases.UsuarioCL.Sessao.UsuarioLogado.Nome + "!";
             }
         }
 

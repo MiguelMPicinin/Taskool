@@ -167,10 +167,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AlteraCor.cs">
+    <Compile Include="Formularios Pop-Ups\AlteraCor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AlteraCor.Designer.cs">
+    <Compile Include="Formularios Pop-Ups\AlteraCor.Designer.cs">
       <DependentUpon>AlteraCor.cs</DependentUpon>
     </Compile>
     <Compile Include="Autenticacao.cs">
@@ -188,6 +188,7 @@
     <Compile Include="Classes\Databases\Alarme.cs" />
     <Compile Include="Classes\Databases\Cliente.cs" />
     <Compile Include="Classes\Cls_Uteis.cs" />
+    <Compile Include="Classes\Databases\HistoricoModificacoes.cs" />
     <Compile Include="Classes\Databases\Items_Favoritos.cs" />
     <Compile Include="Classes\Databases\MensagemFun.cs" />
     <Compile Include="Classes\Databases\Notificacoes.cs" />
@@ -196,15 +197,20 @@
     <Compile Include="Classes\Databases\Projeto_Tarefas.cs" />
     <Compile Include="Classes\Databases\ProjetosTarefasDatas.cs" />
     <Compile Include="Classes\Databases\Sessao.cs" />
+    <Compile Include="Classes\Databases\Tarefas_Anexos.cs" />
     <Compile Include="Classes\Databases\Tarefas_Comentarios.cs" />
     <Compile Include="Classes\Databases\Tarefas_SubTarefas.cs" />
     <Compile Include="Classes\Databases\Mensagem.cs" />
     <Compile Include="Classes\Databases\SQLServerClass.cs" />
+    <Compile Include="Classes\Databases\Tarefa_Historico.cs" />
     <Compile Include="Classes\Databases\UsersErrors.cs" />
     <Compile Include="Classes\ManipulaçãoDados\Alarme.cs" />
+    <Compile Include="Classes\ManipulaçãoDados\Anexos.cs" />
     <Compile Include="Classes\ManipulaçãoDados\Auxiliares.cs" />
     <Compile Include="Classes\ManipulaçãoDados\Comentarios.cs" />
     <Compile Include="Classes\ManipulaçãoDados\Favoritos.cs" />
+    <Compile Include="Classes\ManipulaçãoDados\Historico.cs" />
+    <Compile Include="Classes\ManipulaçãoDados\HistoricoModificacoes.cs" />
     <Compile Include="Classes\ManipulaçãoDados\Membros.cs" />
     <Compile Include="Classes\ManipulaçãoDados\Notificacoes.cs" />
     <Compile Include="Classes\ManipulaçãoDados\PdfService.cs" />
@@ -213,6 +219,7 @@
     <Compile Include="Classes\ManipulaçãoDados\Subtarefas.cs" />
     <Compile Include="Classes\ManipulaçãoDados\Tarefas.cs" />
     <Compile Include="Classes\ManipulaçãoDados\Usuarios.cs" />
+    <Compile Include="Classes\ManipulaçãoDados\VerificarEmail.cs" />
     <Compile Include="Classes\Tema.cs" />
     <Compile Include="dbTarefas2DataSet.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -224,11 +231,28 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>dbTarefas4DataSet.xsd</DependentUpon>
     </Compile>
-    <Compile Include="FormOpcoesFTP.cs">
+    <Compile Include="dbTarefasDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dbTarefasDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Formularios Pop-Ups\FormOpcoesFTP.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FormOpcoesFTP.Designer.cs">
+    <Compile Include="Formularios Pop-Ups\FormOpcoesFTP.Designer.cs">
       <DependentUpon>FormOpcoesFTP.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Formularios Pop-Ups\Frm_AdicionarPostIt.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Formularios Pop-Ups\Frm_AdicionarPostIt.Designer.cs">
+      <DependentUpon>Frm_AdicionarPostIt.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Formularios Pop-Ups\Frm_Historico.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Formularios Pop-Ups\Frm_Historico.Designer.cs">
+      <DependentUpon>Frm_Historico.cs</DependentUpon>
     </Compile>
     <Compile Include="Frm_Dashboard.cs">
       <SubType>Form</SubType>
@@ -236,10 +260,10 @@
     <Compile Include="Frm_Dashboard.Designer.cs">
       <DependentUpon>Frm_Dashboard.cs</DependentUpon>
     </Compile>
-    <Compile Include="Frm_AtribuirResponsavelTarefa.cs">
+    <Compile Include="Formularios Pop-Ups\Frm_AtribuirResponsavelTarefa.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Frm_AtribuirResponsavelTarefa.Designer.cs">
+    <Compile Include="Formularios Pop-Ups\Frm_AtribuirResponsavelTarefa.Designer.cs">
       <DependentUpon>Frm_AtribuirResponsavelTarefa.cs</DependentUpon>
     </Compile>
     <Compile Include="Frm_CriarProjeto.cs">
@@ -248,17 +272,23 @@
     <Compile Include="Frm_CriarProjeto.Designer.cs">
       <DependentUpon>Frm_CriarProjeto.cs</DependentUpon>
     </Compile>
-    <Compile Include="Frm_EditarPerfil.cs">
+    <Compile Include="Formularios Pop-Ups\Frm_GerenciarMembros.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Frm_EditarPerfil.Designer.cs">
-      <DependentUpon>Frm_EditarPerfil.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Frm_GerenciarMembros.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Frm_GerenciarMembros.Designer.cs">
+    <Compile Include="Formularios Pop-Ups\Frm_GerenciarMembros.Designer.cs">
       <DependentUpon>Frm_GerenciarMembros.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Frm_Kanban.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frm_Kanban.Designer.cs">
+      <DependentUpon>Frm_Kanban.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Frm_PlanningPoker.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frm_PlanningPoker.Designer.cs">
+      <DependentUpon>Frm_PlanningPoker.cs</DependentUpon>
     </Compile>
     <Compile Include="Frm_Projeto.cs">
       <SubType>Form</SubType>
@@ -266,10 +296,10 @@
     <Compile Include="Frm_Projeto.Designer.cs">
       <DependentUpon>Frm_Projeto.cs</DependentUpon>
     </Compile>
-    <Compile Include="Frm_TarefasDetalhes.cs">
+    <Compile Include="Formularios Pop-Ups\Frm_TarefasDetalhes.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Frm_TarefasDetalhes.Designer.cs">
+    <Compile Include="Formularios Pop-Ups\Frm_TarefasDetalhes.Designer.cs">
       <DependentUpon>Frm_TarefasDetalhes.cs</DependentUpon>
     </Compile>
     <Compile Include="Frm_TarefasUsuario.cs">
@@ -278,10 +308,10 @@
     <Compile Include="Frm_TarefasUsuario.Designer.cs">
       <DependentUpon>Frm_TarefasUsuario.cs</DependentUpon>
     </Compile>
-    <Compile Include="FTPConfigForm.cs">
+    <Compile Include="Formularios Pop-Ups\FTPConfigForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FTPConfigForm.Designer.cs">
+    <Compile Include="Formularios Pop-Ups\FTPConfigForm.Designer.cs">
       <DependentUpon>FTPConfigForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Home.cs">
@@ -292,7 +322,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="AlteraCor.resx">
+    <EmbeddedResource Include="Formularios Pop-Ups\AlteraCor.resx">
       <DependentUpon>AlteraCor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Autenticacao.resx">
@@ -301,28 +331,40 @@
     <EmbeddedResource Include="Cadastre-se.resx">
       <DependentUpon>Cadastre-se.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Formularios Pop-Ups\Frm_AdicionarPostIt.resx">
+      <DependentUpon>Frm_AdicionarPostIt.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Formularios Pop-Ups\Frm_Historico.resx">
+      <DependentUpon>Frm_Historico.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Frm_Dashboard.resx">
       <DependentUpon>Frm_Dashboard.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Frm_AtribuirResponsavelTarefa.resx">
+    <EmbeddedResource Include="Formularios Pop-Ups\Frm_AtribuirResponsavelTarefa.resx">
       <DependentUpon>Frm_AtribuirResponsavelTarefa.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Frm_CriarProjeto.resx">
       <DependentUpon>Frm_CriarProjeto.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Frm_GerenciarMembros.resx">
+    <EmbeddedResource Include="Formularios Pop-Ups\Frm_GerenciarMembros.resx">
       <DependentUpon>Frm_GerenciarMembros.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Frm_Kanban.resx">
+      <DependentUpon>Frm_Kanban.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Frm_PlanningPoker.resx">
+      <DependentUpon>Frm_PlanningPoker.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Frm_Projeto.resx">
       <DependentUpon>Frm_Projeto.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Frm_TarefasDetalhes.resx">
+    <EmbeddedResource Include="Formularios Pop-Ups\Frm_TarefasDetalhes.resx">
       <DependentUpon>Frm_TarefasDetalhes.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Frm_TarefasUsuario.resx">
       <DependentUpon>Frm_TarefasUsuario.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FTPConfigForm.resx">
+    <EmbeddedResource Include="Formularios Pop-Ups\FTPConfigForm.resx">
       <DependentUpon>FTPConfigForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Home.resx">
@@ -359,6 +401,17 @@
     </None>
     <None Include="dbTarefas4DataSet.xss">
       <DependentUpon>dbTarefas4DataSet.xsd</DependentUpon>
+    </None>
+    <None Include="dbTarefasDataSet.xsc">
+      <DependentUpon>dbTarefasDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="dbTarefasDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dbTarefasDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="dbTarefasDataSet.xss">
+      <DependentUpon>dbTarefasDataSet.xsd</DependentUpon>
     </None>
     <None Include="Mensagens\mensagens.json" />
     <None Include="packages.config" />

@@ -132,7 +132,7 @@ namespace CanvasApp
                         MessageBox.Show("Autenticação bem-sucedida.", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                         // CORREÇÃO: Garantir que o usuário é do tipo correto
-                        Sessao.UsuarioLogado = usuario;
+                        CanvasApp.Classes.Databases.UsuarioCL.Sessao.UsuarioLogado = usuario;
 
                         Frm_Home f = new Frm_Home();
                         f.Show();

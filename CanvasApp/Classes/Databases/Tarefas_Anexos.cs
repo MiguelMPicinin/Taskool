@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace CanvasApp.Classes.Databases.UsuarioCL
 {
-    public class Tarefas_SubTarefas
+    public class Tarefas_Anexos
     {
         public int Codigo { get; set; }
-        public string Texto { get; set; }
         public int CodTarefa { get; set; }
-        public bool isConcluida { get; set; }
-        public bool isFazendo { get; set; }
+        public string NomeArquivo { get; set; }
+        public string Arquivo { get; set; }
+        public DateTime DataUpload { get; set; }
     }
 }

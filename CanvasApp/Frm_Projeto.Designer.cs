@@ -29,10 +29,12 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Frm_Projeto));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.Pnl_Titulo = new System.Windows.Forms.Panel();
+            this.Btn_UML = new System.Windows.Forms.Button();
+            this.Btn_Poker = new System.Windows.Forms.Button();
             this.Lbl_Titulo = new System.Windows.Forms.Label();
             this.Txt_Tarefa = new System.Windows.Forms.TextBox();
             this.Pic_IconPlus = new System.Windows.Forms.PictureBox();
@@ -77,12 +79,34 @@
             // Pnl_Titulo
             // 
             this.Pnl_Titulo.BackColor = System.Drawing.SystemColors.Info;
+            this.Pnl_Titulo.Controls.Add(this.Btn_UML);
+            this.Pnl_Titulo.Controls.Add(this.Btn_Poker);
             this.Pnl_Titulo.Controls.Add(this.Lbl_Titulo);
             this.Pnl_Titulo.ForeColor = System.Drawing.SystemColors.ControlText;
             this.Pnl_Titulo.Location = new System.Drawing.Point(150, 1);
             this.Pnl_Titulo.Name = "Pnl_Titulo";
             this.Pnl_Titulo.Size = new System.Drawing.Size(648, 39);
             this.Pnl_Titulo.TabIndex = 1;
+            // 
+            // Btn_UML
+            // 
+            this.Btn_UML.Location = new System.Drawing.Point(417, 4);
+            this.Btn_UML.Name = "Btn_UML";
+            this.Btn_UML.Size = new System.Drawing.Size(111, 29);
+            this.Btn_UML.TabIndex = 19;
+            this.Btn_UML.Text = "Kanban";
+            this.Btn_UML.UseVisualStyleBackColor = true;
+            this.Btn_UML.Click += new System.EventHandler(this.Btn_UML_Click);
+            // 
+            // Btn_Poker
+            // 
+            this.Btn_Poker.Location = new System.Drawing.Point(534, 4);
+            this.Btn_Poker.Name = "Btn_Poker";
+            this.Btn_Poker.Size = new System.Drawing.Size(111, 29);
+            this.Btn_Poker.TabIndex = 20;
+            this.Btn_Poker.Text = "Poker";
+            this.Btn_Poker.UseVisualStyleBackColor = true;
+            this.Btn_Poker.Click += new System.EventHandler(this.Btn_Poker_Click);
             // 
             // Lbl_Titulo
             // 
@@ -199,17 +223,17 @@
             // 
             // Chrt_Tarefas
             // 
-            chartArea1.Name = "ChartArea1";
-            this.Chrt_Tarefas.ChartAreas.Add(chartArea1);
+            chartArea2.Name = "ChartArea1";
+            this.Chrt_Tarefas.ChartAreas.Add(chartArea2);
             this.Chrt_Tarefas.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend1.Name = "Legend1";
-            this.Chrt_Tarefas.Legends.Add(legend1);
+            legend2.Name = "Legend1";
+            this.Chrt_Tarefas.Legends.Add(legend2);
             this.Chrt_Tarefas.Location = new System.Drawing.Point(0, 0);
             this.Chrt_Tarefas.Name = "Chrt_Tarefas";
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.Chrt_Tarefas.Series.Add(series1);
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.Chrt_Tarefas.Series.Add(series2);
             this.Chrt_Tarefas.Size = new System.Drawing.Size(96, 82);
             this.Chrt_Tarefas.TabIndex = 4;
             this.Chrt_Tarefas.Text = "chart1";
@@ -429,5 +453,7 @@
         private System.Windows.Forms.Label Lbl_TituloMenu;
         private System.Windows.Forms.Button Btn_MinhasTarefas;
         private System.Windows.Forms.Button Btn_GerenciaMembrosProjeto;
+        private System.Windows.Forms.Button Btn_UML;
+        private System.Windows.Forms.Button Btn_Poker;
     }
 }
