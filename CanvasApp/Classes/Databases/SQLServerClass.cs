@@ -17,9 +17,8 @@ namespace CanvasApp.Classes.Databases
 
         protected SqlConnection GetConnection()
         {
-            var conn = new SqlConnection(connectionString);
-            conn.Open();
-            return conn;
+            // CORREÇÃO: Retorna a conexão SEM abrir
+            return new SqlConnection(connectionString);
         }
 
         public void Dispose()

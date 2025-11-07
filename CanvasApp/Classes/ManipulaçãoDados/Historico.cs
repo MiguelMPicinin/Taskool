@@ -8,13 +8,17 @@ namespace CanvasApp.Classes.ManipulaçãoDados
 {
     public class TarefasHistoricoDB : BaseDB
     {
+        public string Mensagem { get; private set; }
+
         public bool InserirHistorico(Tarefas_Historico historico)
         {
             try
             {
                 using (SqlConnection conn = GetConnection())
                 {
-                    string sql = @"INSERT INTO Tarefas_Historico (CodTarefa, CodUsuario, Acao, DataAcao) VALUES (@CodTarefa, @CodUsuario, @Acao, @DataAcao)";
+                    conn.Open();
+                    string sql = @"INSERT INTO Tarefas_Historico (CodTarefa, CodUsuario, Acao, DataAcao) 
+                                   VALUES (@CodTarefa, @CodUsuario, @Acao, @DataAcao)";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@CodTarefa", historico.CodTarefa);
@@ -40,11 +44,11 @@ namespace CanvasApp.Classes.ManipulaçãoDados
             {
                 using (SqlConnection conn = GetConnection())
                 {
-                    string sql = @"SELECT H.Codigo, H.CodTarefa, H.CodUsuario, H.Acao, H.DataAcao, U.Nome 
-                                    FROM Tarefas_Historico H 
-                                    INNER JOIN Usuario U ON H.CodUsuario = U.Codigo 
-                                    WHERE H.CodTarefa = @CodTarefa 
-                                    ORDER BY H.DataAcao DESC";
+                    conn.Open();
+                    string sql = @"SELECT H.Codigo, H.CodTarefa, H.CodUsuario, H.Acao, H.DataAcao
+                                   FROM Tarefas_Historico H 
+                                   WHERE H.CodTarefa = @CodTarefa 
+                                   ORDER BY H.DataAcao DESC";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@CodTarefa", codTarefa);
@@ -72,7 +76,6 @@ namespace CanvasApp.Classes.ManipulaçãoDados
             return historicos;
         }
 
-        // MÉTODOS ADICIONADOS PARA RESOLVER OS ERROS CS1061
         public bool RegistrarMovimentacaoTarefa(int codTarefa, int codUsuario, string deStatus, string paraStatus)
         {
             try
@@ -109,6 +112,86 @@ namespace CanvasApp.Classes.ManipulaçãoDados
             catch (Exception ex)
             {
                 Mensagem = "Erro ao registrar criação: " + ex.Message;
+                return false;
+            }
+        }
+
+        public bool RegistrarExclusaoTarefa(int codTarefa, int codUsuario)
+        {
+            try
+            {
+                var historico = new Tarefas_Historico
+                {
+                    CodTarefa = codTarefa,
+                    CodUsuario = codUsuario,
+                    Acao = "Excluiu a tarefa",
+                    DataAcao = DateTime.Now
+                };
+                return InserirHistorico(historico);
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao registrar exclusão: " + ex.Message;
+                return false;
+            }
+        }
+
+        public bool RegistrarEdicaoDescricao(int codTarefa, int codUsuario, string novaDescricao)
+        {
+            try
+            {
+                var historico = new Tarefas_Historico
+                {
+                    CodTarefa = codTarefa,
+                    CodUsuario = codUsuario,
+                    Acao = $"Editou a descrição para: {novaDescricao}",
+                    DataAcao = DateTime.Now
+                };
+                return InserirHistorico(historico);
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao registrar edição: " + ex.Message;
+                return false;
+            }
+        }
+
+        public bool RegistrarConclusaoTarefa(int codTarefa, int codUsuario)
+        {
+            try
+            {
+                var historico = new Tarefas_Historico
+                {
+                    CodTarefa = codTarefa,
+                    CodUsuario = codUsuario,
+                    Acao = "Concluiu a tarefa",
+                    DataAcao = DateTime.Now
+                };
+                return InserirHistorico(historico);
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao registrar conclusão: " + ex.Message;
+                return false;
+            }
+        }
+
+        public bool RegistrarReaberturaTarefa(int codTarefa, int codUsuario)
+        {
+            try
+            {
+                var historico = new Tarefas_Historico
+                {
+                    CodTarefa = codTarefa,
+                    CodUsuario = codUsuario,
+                    Acao = "Reabriu a tarefa",
+                    DataAcao = DateTime.Now
+                };
+                return InserirHistorico(historico);
+            }
+            catch (Exception ex)
+            {
+                Mensagem = "Erro ao registrar reabertura: " + ex.Message;
                 return false;
             }
         }

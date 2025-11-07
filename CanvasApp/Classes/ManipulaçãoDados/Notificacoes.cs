@@ -12,6 +12,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"INSERT INTO Notificacoes (Texto, Data, CodProjeto, CodUsuario, isFechada) 
                                  VALUES (@Texto, @Data, @CodProjeto, @CodUsuario, @isFechada)";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -41,6 +42,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string query = @"SELECT Codigo, Texto, Data, CodProjeto, CodUsuario, isFechada 
                                FROM Notificacoes 
                                WHERE CodUsuario = @codUsuario
@@ -80,6 +82,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string query = @"SELECT Codigo, Texto, Data, CodProjeto, CodUsuario, isFechada 
                                FROM Notificacoes 
                                WHERE CodUsuario = @codUsuario AND isFechada = 0
@@ -118,6 +121,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = "UPDATE Notificacoes SET isFechada = 1 WHERE Codigo = @codNotificacao";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -141,6 +145,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = "DELETE FROM Notificacoes WHERE Codigo = @codNotificacao";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -164,6 +169,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"SELECT COUNT(*) FROM Notificacoes 
                                  WHERE CodUsuario = @codUsuario AND isFechada = 0";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -186,6 +192,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"DELETE FROM Notificacoes 
                                  WHERE CodUsuario = @codUsuario 
                                  AND Data < DATEADD(day, -@dias, GETDATE())";

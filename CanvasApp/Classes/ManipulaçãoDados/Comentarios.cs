@@ -12,6 +12,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"INSERT INTO Tarefas_Comentarios (CodUsuario, CodTarefa, Comentario, Data) 
                                  VALUES (@CodUsuario, @CodTarefa, @Comentario, @Data)";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -40,6 +41,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"SELECT * FROM Tarefas_Comentarios 
                                  WHERE CodTarefa = @CodTarefa 
                                  ORDER BY Data DESC";
@@ -76,6 +78,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = "DELETE FROM Tarefas_Comentarios WHERE Codigo = @Codigo";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -99,6 +102,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = "SELECT COUNT(*) FROM Tarefas_Comentarios WHERE CodTarefa = @CodTarefa";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {

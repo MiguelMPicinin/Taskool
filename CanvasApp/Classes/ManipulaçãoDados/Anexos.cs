@@ -1,10 +1,10 @@
 ﻿using CanvasApp.Classes.Databases;
 using CanvasApp.Classes.Databases.UsuarioCL;
-using iTextSharp.text;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
 
 namespace CanvasApp.Classes.ManipulaçãoDados
 {
@@ -16,20 +16,27 @@ namespace CanvasApp.Classes.ManipulaçãoDados
             {
                 using (SqlConnection conn = GetConnection())
                 {
-                    string sql = @"INSERT INTO Tarefas_Anexos (CodTarefa, NomeArquivo, Arquivo, DataUpload) VALUES (@CodTarefa, @NomeArquivo, @Arquivo, @DataUpload)";
-                    using (SqlCommand cmd = new SqlCommand(sql,conn))
+                    conn.Open();
+                    string sql = @"INSERT INTO Tarefas_Anexos (CodTarefa, NomeArquivo, Arquivo, DataUpload) 
+                         VALUES (@CodTarefa, @NomeArquivo, @Arquivo, @DataUpload)";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@CodTarefa", anexo.CodTarefa);
                         cmd.Parameters.AddWithValue("@NomeArquivo", anexo.NomeArquivo);
-                        cmd.Parameters.AddWithValue("@Arquivo", anexo.Arquivo);
+
+                        byte[] arquivoBytes = Convert.FromBase64String(anexo.Arquivo);
+                        cmd.Parameters.AddWithValue("@Arquivo", arquivoBytes);
+
                         cmd.Parameters.AddWithValue("@DataUpload", anexo.DataUpload);
-                        cmd.ExecuteNonQuery();
+
+                        int result = cmd.ExecuteNonQuery();
                         Mensagem = "Anexo inserido com sucesso.";
-                        return true;
+                        return result > 0;
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Mensagem = "Erro ao inserir anexo: " + ex.Message;
                 return false;
@@ -43,10 +50,12 @@ namespace CanvasApp.Classes.ManipulaçãoDados
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"SELECT Codigo, CodTarefa, NomeArquivo, Arquivo, DataUpload
                                  FROM Tarefas_Anexos 
                                  WHERE CodTarefa = @CodTarefa
                                  ORDER BY DataUpload DESC";
+
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@CodTarefa", codTarefa);
@@ -54,19 +63,20 @@ namespace CanvasApp.Classes.ManipulaçãoDados
                         {
                             while (reader.Read())
                             {
-                                byte[] arquivoData = null;
-                                var arquivoValue = reader["Arquivo"];
-                                if (arquivoValue != DBNull.Value)
+                                string arquivoBase64 = string.Empty;
+                                if (!reader.IsDBNull(reader.GetOrdinal("Arquivo")))
                                 {
-                                    arquivoData = (byte[])arquivoValue;
+                                    byte[] arquivoData = (byte[])reader["Arquivo"];
+                                    arquivoBase64 = Convert.ToBase64String(arquivoData);
                                 }
+
                                 anexos.Add(new Tarefas_Anexos
                                 {
-                                    Codigo = Convert.ToInt32(reader["Codigo"]),
-                                    CodTarefa = Convert.ToInt32(reader["CodTarefa"]),
+                                    Codigo = reader.GetInt32(reader.GetOrdinal("Codigo")),
+                                    CodTarefa = reader.GetInt32(reader.GetOrdinal("CodTarefa")),
                                     NomeArquivo = reader["NomeArquivo"].ToString(),
-                                    Arquivo = arquivoData.ToString(),
-                                    DataUpload = Convert.ToDateTime(reader["DataUpload"])
+                                    Arquivo = arquivoBase64,
+                                    DataUpload = reader.GetDateTime(reader.GetOrdinal("DataUpload"))
                                 });
                             }
                         }
@@ -86,13 +96,14 @@ namespace CanvasApp.Classes.ManipulaçãoDados
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"DELETE FROM Tarefas_Anexos WHERE Codigo = @Codigo";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@Codigo", codAnexo);
-                        cmd.ExecuteNonQuery();
-                        Mensagem = "Anexo excluido com sucesso";
-                        return true;
+                        int result = cmd.ExecuteNonQuery();
+                        Mensagem = "Anexo excluído com sucesso";
+                        return result > 0;
                     }
                 }
             }
@@ -109,35 +120,38 @@ namespace CanvasApp.Classes.ManipulaçãoDados
             {
                 using (SqlConnection conn = GetConnection())
                 {
-                    string sql = @"SELECT Codigo, CodTarefa, NomeArquivo, Arquivo, DataUpload FROM Tarefas_Anexos WHERE Codigo = @Codigo";
-                    using (SqlCommand cmd = new SqlCommand (sql, conn))
+                    conn.Open();
+                    string sql = @"SELECT Codigo, CodTarefa, NomeArquivo, Arquivo, DataUpload 
+                                 FROM Tarefas_Anexos WHERE Codigo = @Codigo";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@Codigo", codAnexo);
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
                             {
-                                byte[] arquivoData = null;
-                                var arquivoValue = reader["Arquivo"];
-                                if (arquivoValue != DBNull.Value)
+                                string arquivoBase64 = string.Empty;
+                                if (!reader.IsDBNull(reader.GetOrdinal("Arquivo")))
                                 {
-                                    arquivoData = (byte[])arquivoValue;
+                                    byte[] arquivoData = (byte[])reader["Arquivo"];
+                                    arquivoBase64 = Convert.ToBase64String(arquivoData);
                                 }
 
                                 return new Tarefas_Anexos
                                 {
-                                    Codigo = Convert.ToInt32(reader["Codigo"]),
-                                    CodTarefa = Convert.ToInt32(reader["CodTarefa"]),
-                                    NomeArquivo = reader["Nome"].ToString(),
-                                    Arquivo = arquivoData.ToString(),
-                                    DataUpload = Convert.ToDateTime(reader["DataUpload"])
+                                    Codigo = reader.GetInt32(reader.GetOrdinal("Codigo")),
+                                    CodTarefa = reader.GetInt32(reader.GetOrdinal("CodTarefa")),
+                                    NomeArquivo = reader["NomeArquivo"].ToString(),
+                                    Arquivo = arquivoBase64,
+                                    DataUpload = reader.GetDateTime(reader.GetOrdinal("DataUpload"))
                                 };
                             }
                         }
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Mensagem = "Erro ao obter anexo: " + ex.Message;
             }
@@ -148,7 +162,7 @@ namespace CanvasApp.Classes.ManipulaçãoDados
         {
             var extensoesPermitidas = new[] { ".txt", ".pdf", ".xlsx", ".xls", ".docx", ".doc", ".html", ".sql" };
             var extensao = Path.GetExtension(nomeArquivo).ToLower();
-            return Array.Exists(extensoesPermitidas, ext => ext == extensao);
+            return extensoesPermitidas.Contains(extensao);
         }
 
         public string ObterDescricaoTipoArquivo(string nomeArquivo)
@@ -160,8 +174,8 @@ namespace CanvasApp.Classes.ManipulaçãoDados
                 case ".pdf": return "Documento PDF";
                 case ".xlsx": return "Planilha Excel";
                 case ".xls": return "Planilha Excel";
-                case ".docx": return "Documento World";
-                case ".doc": return "Documento World";
+                case ".docx": return "Documento Word";
+                case ".doc": return "Documento Word";
                 case ".html": return "Página Web";
                 case ".sql": return "Script SQL";
                 default: return "Arquivo";

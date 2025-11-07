@@ -1,18 +1,22 @@
-﻿using System;
+﻿using CanvasApp.Classes.Databases;
+using CanvasApp.Classes.Databases.UsuarioCL;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using CanvasApp.Classes.Databases.UsuarioCL;
 
 namespace CanvasApp.Classes.Databases
 {
     public class HistoricoDB : BaseDB
     {
+        public string Mensagem { get; private set; }
+
         public bool InserirHistorico(HistoricoModificacoes historico)
         {
             try
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"INSERT INTO HistoricoModificacoes (CodTarefa, CodUsuario, Data, Texto) 
                                  VALUES (@CodTarefa, @CodUsuario, @Data, @Texto)";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -41,7 +45,8 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
-                    string sql = @"SELECT H.Codigo, H.CodTarefa, H.CodUsuario, H.Data, H.Texto, U.Nome
+                    conn.Open();
+                    string sql = @"SELECT H.Codigo, H.CodTarefa, H.CodUsuario, H.Data, H.Texto, U.Nome as NomeUsuario
                                  FROM HistoricoModificacoes H
                                  INNER JOIN Usuario U ON H.CodUsuario = U.Codigo
                                  WHERE H.CodTarefa = @CodTarefa
@@ -60,6 +65,7 @@ namespace CanvasApp.Classes.Databases
                                     CodUsuario = Convert.ToInt32(reader["CodUsuario"]),
                                     Data = Convert.ToDateTime(reader["Data"]),
                                     Texto = reader["Texto"].ToString(),
+                                    NomeUsuario = reader["NomeUsuario"].ToString()
                                 });
                             }
                         }
@@ -129,6 +135,14 @@ namespace CanvasApp.Classes.Databases
             };
 
             return InserirHistorico(historico);
+        }
+
+        // Método para obter a inicial do usuário
+        public static string ObterInicial(string nomeUsuario)
+        {
+            if (!string.IsNullOrEmpty(nomeUsuario))
+                return nomeUsuario[0].ToString().ToUpper();
+            return "?";
         }
     }
 }

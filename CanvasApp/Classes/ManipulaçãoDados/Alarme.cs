@@ -18,7 +18,6 @@ namespace CanvasApp.Classes.Databases
             _timerVerificacao.Start();
         }
 
-        // CORREÇÃO: Método para converter objeto para TimeSpan de forma segura
         private TimeSpan ConverterParaTimeSpan(object valor)
         {
             try
@@ -70,6 +69,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"INSERT INTO Alarme (CodTarefa, CodUsuario, Data, Hora, Repeticao) 
                                  VALUES (@CodTarefa, @CodUsuario, @Data, @Hora, @Repeticao)";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -98,6 +98,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"UPDATE Alarme SET Data = @Data, Hora = @Hora, Repeticao = @Repeticao 
                                  WHERE Codigo = @Codigo";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -125,6 +126,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = "DELETE FROM Alarme WHERE Codigo = @Codigo";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -148,6 +150,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = "SELECT * FROM Alarme WHERE CodTarefa = @CodTarefa";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -156,9 +159,7 @@ namespace CanvasApp.Classes.Databases
                         {
                             if (reader.Read())
                             {
-                                // CORREÇÃO: Usar método de conversão seguro
                                 TimeSpan hora = ConverterParaTimeSpan(reader["Hora"]);
-
                                 return new Alarme
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
@@ -188,6 +189,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = "SELECT * FROM Alarme WHERE Data >= @DataAtual";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -196,9 +198,7 @@ namespace CanvasApp.Classes.Databases
                         {
                             while (reader.Read())
                             {
-                                // CORREÇÃO: Usar método de conversão seguro
                                 TimeSpan hora = ConverterParaTimeSpan(reader["Hora"]);
-
                                 alarmes.Add(new Alarme
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
@@ -309,12 +309,10 @@ namespace CanvasApp.Classes.Databases
             }
         }
 
-        // CORREÇÃO: Método original com int como CodUsuario
         public bool DefinirPrazoELembrete(int codTarefa, int codUsuario, DateTime data, TimeSpan hora, RepeticaoAlarme repeticao)
         {
             try
             {
-                // CORREÇÃO: Validar se a data está dentro dos limites do SQL Server
                 if (data < new DateTime(1753, 1, 1))
                 {
                     Mensagem = "Data inválida para o SQL Server. Use uma data posterior a 01/01/1753.";
@@ -323,6 +321,7 @@ namespace CanvasApp.Classes.Databases
 
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string checkSql = "SELECT Codigo FROM Alarme WHERE CodTarefa = @CodTarefa";
                     using (SqlCommand checkCmd = new SqlCommand(checkSql, conn))
                     {
@@ -379,6 +378,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"
                         SELECT A.* 
                         FROM Alarme A
@@ -399,9 +399,7 @@ namespace CanvasApp.Classes.Databases
                         {
                             while (reader.Read())
                             {
-                                // CORREÇÃO: Usar método de conversão seguro
                                 TimeSpan hora = ConverterParaTimeSpan(reader["Hora"]);
-
                                 alarmes.Add(new Alarme
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
@@ -430,6 +428,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"
                                     SELECT A.*, PT.Descricao as DescricaoTarefa 
                                     FROM Alarme A 
@@ -451,7 +450,6 @@ namespace CanvasApp.Classes.Databases
                             while (reader.Read())
                             {
                                 TimeSpan hora = ConverterParaTimeSpan(reader["Hora"]);
-
                                 alarmes.Add(new Alarme
                                 {
                                     Codigo = Convert.ToInt32(reader["Codigo"]),
@@ -466,7 +464,7 @@ namespace CanvasApp.Classes.Databases
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Mensagem = "Erro ao obter alarmes próximos: " + ex.Message;
             }
@@ -479,6 +477,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"SELECT COUNT(*) FROM Alarme WHERE CodTarefa = @CodTarefa";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -488,7 +487,7 @@ namespace CanvasApp.Classes.Databases
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Mensagem = "Erro ao verificar alarme: " + ex.Message;
                 return false;

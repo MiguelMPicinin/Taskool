@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Net.Mail;
 using System.Windows.Forms;
 
 namespace CanvasApp
@@ -14,166 +15,317 @@ namespace CanvasApp
     {
         private int codProjeto;
         private string nomeProjeto;
+        private int usuarioId;
         private List<Projeto_Tarefas> tarefas;
         private TarefasDB tarefaDB;
         private TarefasHistoricoDB historicoDB;
+        private HistoricoDB historicoModificacoesDB = new HistoricoDB();
 
-        private readonly Dictionary<string, string> coresPostIt = new Dictionary<string, string>
+        // Cores dos post-its
+        private List<string> coresPostIt = new List<string>
         {
-            { "Amarelo", "#ffe079" },
-            { "Rosa", "#f097ca" },
-            { "Verde", "#98d366" },
-            { "Azul", "#82d3e5" }
+            "#ffe079", // Amarelo
+            "#f097ca", // Rosa
+            "#98d366", // Verde
+            "#82d3e5"  // Azul
         };
 
+        // Construtor original (para compatibilidade)
         public Frm_Kanban(int codProjeto, string nomeProjeto)
+            : this(codProjeto, nomeProjeto, 1)
+        {
+        }
+
+        // Novo construtor com usuário
+        public Frm_Kanban(int codProjeto, string nomeProjeto, int usuarioId)
         {
             InitializeComponent();
             this.codProjeto = codProjeto;
             this.nomeProjeto = nomeProjeto;
+            this.usuarioId = usuarioId;
             this.tarefaDB = new TarefasDB();
             this.historicoDB = new TarefasHistoricoDB();
 
-            Text = $"Quadro Kanban - {nomeProjeto}";
-            CarregarTarefas();
+            ConfigurarFormulario();
+            ConfigurarPainéis();
             ConfigurarDragDrop();
-            ConfigurarBotoesAdicionar();
         }
 
-        private void ConfigurarBotoesAdicionar()
-        {
-            // Configurar os labels de adicionar para parecerem botões
-            var labelsAdicionar = new[] { Lbl_Adicionar1, Lbl_Adicionar2, Lbl_Adicionar3 };
+        // =========================================================================
+        // MÉTODOS DE HISTÓRICO E NOTIFICAÇÃO POR E-MAIL
+        // =========================================================================
 
-            foreach (var label in labelsAdicionar)
+        private void RegistrarHistoricoModificacao(int codTarefa, int codUsuario, string acao, string nomeCartao, string nomeProjeto)
+        {
+            try
             {
-                label.Cursor = Cursors.Hand;
-                label.BackColor = Color.LightGray;
-                label.BorderStyle = BorderStyle.FixedSingle;
-                label.TextAlign = ContentAlignment.MiddleCenter;
-                label.Padding = new Padding(5);
+                var historico = new HistoricoModificacoes
+                {
+                    CodTarefa = codTarefa,
+                    CodUsuario = codUsuario,
+                    Data = DateTime.Now,
+                    Texto = $"{acao} o cartão '{nomeCartao}' no projeto '{nomeProjeto}'"
+                };
+
+                // Salvar no banco
+                historicoModificacoesDB.InserirHistorico(historico);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao registrar histórico: {ex.Message}");
             }
         }
 
-        private void CarregarTarefas()
+        private void EnviarEmailNotificacao(string acao, string nomeCartao, string nomeProjeto)
         {
-            tarefas = tarefaDB.ListarTarefasPorProjeto(codProjeto);
-            AtualizarQuadro();
-        }
-
-        private void AtualizarQuadro()
-        {
-            LimparColunas();
-
-            var aFazer = tarefas.Where(t => !t.isConcluida && !t.isFazendo).ToList();
-            var fazendo = tarefas.Where(t => !t.isConcluida && t.isFazendo).ToList();
-            var feito = tarefas.Where(t => t.isConcluida).ToList();
-
-            AdicionarTarefasNaColuna(Pnl_AFazer, aFazer, "A Fazer");
-            AdicionarTarefasNaColuna(Pnl_Fazendo, fazendo, "Fazendo");
-            AdicionarTarefasNaColuna(Pnl_Feito, feito, "Feito");
-
-            // Atualizar contadores nos labels
-            Lbl_aFazer.Text = $"A Fazer ({aFazer.Count})";
-            Lbl_Fazendo.Text = $"Fazendo ({fazendo.Count})";
-            Lbl_Feito.Text = $"Feito ({feito.Count})";
-        }
-
-        private void AdicionarTarefasNaColuna(Panel painel, List<Projeto_Tarefas> tarefasColuna, string nomeColuna)
-        {
-            // Remove apenas os post-its (Panels com Tag do tipo Projeto_Tarefas)
-            var controlesParaRemover = painel.Controls.OfType<Panel>()
-                .Where(p => p.Tag is Projeto_Tarefas).ToList();
-
-            foreach (var controle in controlesParaRemover)
+            try
             {
-                painel.Controls.Remove(controle);
-                controle.Dispose();
+                if (CanvasApp.Classes.Databases.UsuarioCL.Sessao.UsuarioLogado == null) return;
+
+                using (SmtpClient smtpClient = new SmtpClient("127.0.0.1", 8087))
+                {
+                    smtpClient.EnableSsl = false;
+                    smtpClient.UseDefaultCredentials = true;
+
+                    using (MailMessage mailMessage = new MailMessage())
+                    {
+                        mailMessage.From = new MailAddress("worldskills2019@gmail.com");
+                        mailMessage.To.Add(CanvasApp.Classes.Databases.UsuarioCL.Sessao.UsuarioLogado.Email ?? "destinatario@email.com");
+                        mailMessage.Subject = $"Nova ação no projeto {nomeProjeto}";
+                        mailMessage.Body = $"Olá, {CanvasApp.Classes.Databases.UsuarioCL.Sessao.UsuarioLogado.Nome}. Você acabou de realizar uma nova ação no projeto {nomeProjeto}: - {acao} o cartão {nomeCartao}.";
+                        mailMessage.IsBodyHtml = false;
+
+                        smtpClient.Send(mailMessage);
+                    }
+                }
             }
-
-            int yPos = 60;
-            foreach (var tarefa in tarefasColuna)
+            catch (Exception ex)
             {
-                var postIt = CriarPostIt(tarefa);
-                postIt.Location = new Point(10, yPos);
-                painel.Controls.Add(postIt);
-                yPos += postIt.Height + 10;
+                Console.WriteLine($"Erro ao enviar e-mail: {ex.Message}");
             }
         }
 
-        private Panel CriarPostIt(Projeto_Tarefas tarefa)
+        // =========================================================================
+        // MÉTODOS EXISTENTES (mantidos da versão anterior)
+        // =========================================================================
+
+        private void ConfigurarFormulario()
         {
-            var panel = new Panel
-            {
-                Size = new Size(360, 120),
-                BackColor = ColorTranslator.FromHtml(tarefa.Cor),
-                Margin = new Padding(5),
-                Padding = new Padding(8),
-                Tag = tarefa,
-                Cursor = Cursors.Hand,
-                BorderStyle = BorderStyle.FixedSingle
-            };
+            Text = $"Quadro Kanban - {nomeProjeto}";
+            Lbl_Titulo.Text = $"Quadro Kanban - {nomeProjeto}";
+            Lbl_Titulo.Font = new Font("Arial", 14, FontStyle.Bold);
+        }
 
-            var lblDescricao = new Label
-            {
-                Text = tarefa.Descricao,
-                Dock = DockStyle.Fill,
-                TextAlign = ContentAlignment.TopLeft,
-                Font = new Font("Arial", 9),
-                ForeColor = Color.Black,
-                BackColor = Color.Transparent
-            };
+        private void ConfigurarPainéis()
+        {
+            // Configurar FlowLayoutPanels
+            Flw_AFazer.BackColor = Color.LightGray;
+            Flw_Fazendo.BackColor = Color.LightGray;
+            Flw_Feito.BackColor = Color.LightGray;
 
-            var btnHistorico = new Button
-            {
-                Text = "⏰",
-                Size = new Size(30, 30),
-                Location = new Point(325, 5),
-                BackColor = Color.Transparent,
-                FlatStyle = FlatStyle.Flat,
-                Tag = tarefa,
-                Cursor = Cursors.Hand
-            };
-            btnHistorico.FlatAppearance.BorderSize = 0;
-            btnHistorico.Click += BtnHistorico_Click;
+            Flw_AFazer.FlowDirection = FlowDirection.TopDown;
+            Flw_Fazendo.FlowDirection = FlowDirection.TopDown;
+            Flw_Feito.FlowDirection = FlowDirection.TopDown;
 
-            // Botão de editar
-            var btnEditar = new Button
-            {
-                Text = "✏️",
-                Size = new Size(30, 30),
-                Location = new Point(290, 5),
-                BackColor = Color.Transparent,
-                FlatStyle = FlatStyle.Flat,
-                Tag = tarefa,
-                Cursor = Cursors.Hand
-            };
-            btnEditar.FlatAppearance.BorderSize = 0;
-            btnEditar.Click += BtnEditar_Click;
+            Flw_AFazer.WrapContents = false;
+            Flw_Fazendo.WrapContents = false;
+            Flw_Feito.WrapContents = false;
 
-            panel.Controls.Add(lblDescricao);
-            panel.Controls.Add(btnHistorico);
-            panel.Controls.Add(btnEditar);
+            Flw_AFazer.AutoScroll = true;
+            Flw_Fazendo.AutoScroll = true;
+            Flw_Feito.AutoScroll = true;
 
-            var toolTip = new ToolTip();
-            toolTip.SetToolTip(panel, $"Criado em: {tarefa.dataLimite:dd/MM/yyyy}");
-            toolTip.SetToolTip(btnHistorico, "Ver histórico");
-            toolTip.SetToolTip(btnEditar, "Editar tarefa");
-
-            panel.MouseDown += PostIt_MouseDown;
-            panel.AllowDrop = true;
-
-            return panel;
+            Flw_AFazer.AllowDrop = true;
+            Flw_Fazendo.AllowDrop = true;
+            Flw_Feito.AllowDrop = true;
         }
 
         private void ConfigurarDragDrop()
         {
-            var paineis = new[] { Pnl_AFazer, Pnl_Fazendo, Pnl_Feito };
-            foreach (var painel in paineis)
+            // Configurar eventos de Drag and Drop para os FlowLayoutPanels
+            Flw_AFazer.DragEnter += Painel_DragEnter;
+            Flw_Fazendo.DragEnter += Painel_DragEnter;
+            Flw_Feito.DragEnter += Painel_DragEnter;
+
+            Flw_AFazer.DragDrop += Painel_DragDrop;
+            Flw_Fazendo.DragDrop += Painel_DragDrop;
+            Flw_Feito.DragDrop += Painel_DragDrop;
+        }
+
+        private void Frm_Kanban_Load(object sender, EventArgs e)
+        {
+            CarregarTarefas();
+        }
+
+        private void CarregarTarefas()
+        {
+            try
             {
-                painel.AllowDrop = true;
-                painel.DragEnter += Painel_DragEnter;
-                painel.DragDrop += Painel_DragDrop;
+                tarefas = tarefaDB.ObterTarefasKanbanPorProjeto(codProjeto);
+
+                if (tarefas == null)
+                {
+                    tarefas = new List<Projeto_Tarefas>();
+                }
+
+                AtualizarQuadro();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao carregar tarefas: {ex.Message}", "Erro",
+                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+                tarefas = new List<Projeto_Tarefas>();
+            }
+        }
+
+        private void AtualizarQuadro()
+        {
+            LimparTodosPostIts();
+
+            if (tarefas == null || !tarefas.Any())
+            {
+                AtualizarContadores();
+                return;
+            }
+
+            // Distribuir tarefas pelos painéis
+            foreach (var tarefa in tarefas)
+            {
+                var postIt = CriarPostIt(tarefa);
+                if (postIt != null)
+                {
+                    if (tarefa.isConcluida)
+                    {
+                        Flw_Feito.Controls.Add(postIt);
+                    }
+                    else if (tarefa.isFazendo)
+                    {
+                        Flw_Fazendo.Controls.Add(postIt);
+                    }
+                    else
+                    {
+                        Flw_AFazer.Controls.Add(postIt);
+                    }
+                }
+            }
+
+            AtualizarContadores();
+        }
+
+        private void AtualizarContadores()
+        {
+            int aFazer = Flw_AFazer.Controls.Count;
+            int fazendo = Flw_Fazendo.Controls.Count;
+            int feito = Flw_Feito.Controls.Count;
+
+            Lbl_aFazer.Text = $"A Fazer ({aFazer})";
+            Lbl_Fazendo.Text = $"Fazendo ({fazendo})";
+            Lbl_Feito.Text = $"Feito ({feito})";
+        }
+
+        private Panel CriarPostIt(Projeto_Tarefas tarefa)
+        {
+            try
+            {
+                var panel = new Panel
+                {
+                    Size = new Size(180, 150),
+                    BackColor = ObterCor(tarefa.Cor),
+                    BorderStyle = BorderStyle.FixedSingle,
+                    Tag = tarefa,
+                    Cursor = Cursors.Hand,
+                    Margin = new Padding(10),
+                    Padding = new Padding(5)
+                };
+
+                // TextBox para descrição (editável)
+                var txtDescricao = new TextBox
+                {
+                    Text = tarefa.Descricao,
+                    Location = new Point(5, 30),
+                    Size = new Size(160, 80),
+                    Multiline = true,
+                    BorderStyle = BorderStyle.None,
+                    BackColor = ObterCor(tarefa.Cor),
+                    Font = new Font("Arial", 9),
+                    ForeColor = Color.Black,
+                    ScrollBars = ScrollBars.Vertical,
+                    Tag = tarefa
+                };
+
+                txtDescricao.TextChanged += (s, e) => AtualizarDescricaoTarefa(tarefa.Codigo, txtDescricao.Text);
+
+                // Label para ID da tarefa
+                var lblId = new Label
+                {
+                    Text = $"ID: {tarefa.Codigo}",
+                    Location = new Point(5, 5),
+                    Size = new Size(120, 20),
+                    Font = new Font("Arial", 7),
+                    ForeColor = Color.Gray,
+                    BackColor = Color.Transparent
+                };
+
+                // Label para data de conclusão (se existir)
+                if (tarefa.isConcluida && tarefa.dataConclusao != DateTime.MinValue)
+                {
+                    var lblConclusao = new Label
+                    {
+                        Text = $"Concluído: {tarefa.dataConclusao:dd/MM/yy}",
+                        Location = new Point(5, 125),
+                        Size = new Size(120, 20),
+                        Font = new Font("Arial", 7, FontStyle.Bold),
+                        ForeColor = Color.DarkGreen,
+                        BackColor = Color.Transparent
+                    };
+                    panel.Controls.Add(lblConclusao);
+                }
+
+                // Botão excluir
+                var btnExcluir = new Button
+                {
+                    Text = "X",
+                    Size = new Size(20, 20),
+                    Location = new Point(155, 5),
+                    BackColor = Color.Transparent,
+                    FlatStyle = FlatStyle.Flat,
+                    ForeColor = Color.Red,
+                    Font = new Font("Arial", 8, FontStyle.Bold),
+                    Tag = tarefa
+                };
+                btnExcluir.FlatAppearance.BorderSize = 0;
+                btnExcluir.Click += (s, e) => ExcluirTarefa(tarefa);
+
+                // Botão histórico
+                var btnHistorico = new Button
+                {
+                    Text = "H",
+                    Size = new Size(20, 20),
+                    Location = new Point(135, 5),
+                    BackColor = Color.Transparent,
+                    FlatStyle = FlatStyle.Flat,
+                    ForeColor = Color.Blue,
+                    Font = new Font("Arial", 8, FontStyle.Bold),
+                    Tag = tarefa
+                };
+                btnHistorico.FlatAppearance.BorderSize = 0;
+                btnHistorico.Click += (s, e) => MostrarHistoricoTarefa(tarefa);
+
+                panel.Controls.Add(txtDescricao);
+                panel.Controls.Add(lblId);
+                panel.Controls.Add(btnExcluir);
+                panel.Controls.Add(btnHistorico);
+
+                // Eventos de Drag and Drop
+                panel.MouseDown += PostIt_MouseDown;
+                panel.DragEnter += PostIt_DragEnter;
+
+                return panel;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao criar post-it: {ex.Message}", "Erro");
+                return null;
             }
         }
 
@@ -186,211 +338,121 @@ namespace CanvasApp
             }
         }
 
-        private void Painel_DragEnter(object sender, DragEventArgs e)
+        private void PostIt_DragEnter(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(typeof(Panel)))
-                e.Effect = DragDropEffects.Move;
+            e.Effect = DragDropEffects.Move;
         }
 
+        private void Painel_DragEnter(object sender, DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.Move;
+        }
+
+        // =========================================================================
+        // MÉTODO MODIFICADO: Painel_DragDrop COM HISTÓRICO E EMAIL
+        // =========================================================================
         private void Painel_DragDrop(object sender, DragEventArgs e)
         {
-            var painelDestino = sender as Panel;
+            var painelDestino = sender as FlowLayoutPanel;
             var panelPostIt = e.Data.GetData(typeof(Panel)) as Panel;
-            var tarefa = panelPostIt?.Tag as Projeto_Tarefas;
 
-            if (painelDestino != null && tarefa != null)
+            if (painelDestino != null && panelPostIt != null)
             {
-                var painelOrigem = panelPostIt.Parent as Panel;
-                var statusOrigem = ObterStatusPorPainel(painelOrigem);
-                var statusDestino = ObterStatusPorPainel(painelDestino);
+                var tarefa = panelPostIt.Tag as Projeto_Tarefas;
+                var painelOrigem = panelPostIt.Parent as FlowLayoutPanel;
 
-                if (painelOrigem != painelDestino)
+                if (painelOrigem != painelDestino && tarefa != null)
                 {
-                    painelOrigem?.Controls.Remove(panelPostIt);
+                    // Mover visualmente
+                    painelOrigem.Controls.Remove(panelPostIt);
                     painelDestino.Controls.Add(panelPostIt);
 
-                    ReorganizarPostIts(painelDestino);
-                    AtualizarStatusTarefa(tarefa, statusDestino);
+                    // Atualizar status no banco
+                    AtualizarStatusTarefa(tarefa, painelDestino);
 
-                    historicoDB.RegistrarMovimentacaoTarefa(
-                        tarefa.Codigo,
-                        Sessao.UsuarioLogado.Codigo,
-                        statusOrigem,
-                        statusDestino
-                    );
+                    // Registrar no histórico
+                    RegistrarMovimentacao(tarefa, painelOrigem, painelDestino);
 
-                    // Recarregar tarefas para atualizar contadores
-                    CarregarTarefas();
+                    // REGISTRAR HISTÓRICO DE MODIFICAÇÃO E ENVIAR EMAIL
+                    string deStatus = ObterNomeStatus(painelOrigem);
+                    string paraStatus = ObterNomeStatus(painelDestino);
+
+                    RegistrarHistoricoModificacao(tarefa.Codigo, usuarioId, $"Moveu de {deStatus} para {paraStatus}", tarefa.Descricao, nomeProjeto);
+                    EnviarEmailNotificacao($"Moveu de {deStatus} para {paraStatus}", tarefa.Descricao, nomeProjeto);
+
+                    AtualizarContadores();
                 }
             }
         }
 
-        private string ObterStatusPorPainel(Panel painel)
+        private void AtualizarStatusTarefa(Projeto_Tarefas tarefa, FlowLayoutPanel painelDestino)
         {
-            if (painel == Pnl_AFazer) return "A Fazer";
-            if (painel == Pnl_Fazendo) return "Fazendo";
-            if (painel == Pnl_Feito) return "Feito";
+            bool concluida = false;
+            bool fazendo = false;
+
+            if (painelDestino == Flw_AFazer)
+            {
+                concluida = false;
+                fazendo = false;
+            }
+            else if (painelDestino == Flw_Fazendo)
+            {
+                concluida = false;
+                fazendo = true;
+            }
+            else if (painelDestino == Flw_Feito)
+            {
+                concluida = true;
+                fazendo = false;
+            }
+
+            if (!tarefaDB.AtualizarStatusKanban(tarefa.Codigo, concluida, fazendo))
+            {
+                MessageBox.Show($"Erro ao atualizar status: {tarefaDB.Mensagem}", "Erro");
+            }
+        }
+
+        private void RegistrarMovimentacao(Projeto_Tarefas tarefa, FlowLayoutPanel origem, FlowLayoutPanel destino)
+        {
+            string deStatus = ObterNomeStatus(origem);
+            string paraStatus = ObterNomeStatus(destino);
+
+            historicoDB.RegistrarMovimentacaoTarefa(tarefa.Codigo, usuarioId, deStatus, paraStatus);
+        }
+
+        private string ObterNomeStatus(FlowLayoutPanel painel)
+        {
+            if (painel == Flw_AFazer) return "A Fazer";
+            if (painel == Flw_Fazendo) return "Fazendo";
+            if (painel == Flw_Feito) return "Feito";
             return "Desconhecido";
         }
 
-        private void ReorganizarPostIts(Panel painel)
+        private Color ObterCor(string corHex)
         {
-            var postIts = painel.Controls.OfType<Panel>().Where(p => p.Tag is Projeto_Tarefas).ToList();
-            int yPos = 60;
-
-            foreach (var postIt in postIts)
+            try
             {
-                postIt.Location = new Point(10, yPos);
-                yPos += postIt.Height + 10;
+                if (string.IsNullOrEmpty(corHex) || !corHex.StartsWith("#"))
+                    return ColorTranslator.FromHtml("#ffe079");
+
+                return ColorTranslator.FromHtml(corHex);
+            }
+            catch
+            {
+                return ColorTranslator.FromHtml("#ffe079");
             }
         }
 
-        private void AtualizarStatusTarefa(Projeto_Tarefas tarefa, string statusDestino)
+        private void LimparTodosPostIts()
         {
-            bool isConcluida = false;
-            bool isFazendo = false;
-
-            switch (statusDestino)
-            {
-                case "A Fazer":
-                    isConcluida = false;
-                    isFazendo = false;
-                    break;
-                case "Fazendo":
-                    isConcluida = false;
-                    isFazendo = true;
-                    break;
-                case "Feito":
-                    isConcluida = true;
-                    isFazendo = false;
-                    break;
-            }
-
-            tarefaDB.AtualizarStatusKanban(tarefa.Codigo, isConcluida, isFazendo);
+            LimparPainel(Flw_AFazer);
+            LimparPainel(Flw_Fazendo);
+            LimparPainel(Flw_Feito);
         }
 
-        private void Lbl_Adicionar1_Click(object sender, EventArgs e)
+        private void LimparPainel(FlowLayoutPanel painel)
         {
-            AdicionarTarefaComPopUp(false, false);
-        }
-
-        private void Lbl_Adicionar2_Click(object sender, EventArgs e)
-        {
-            AdicionarTarefaComPopUp(false, true);
-        }
-
-        private void Lbl_Adicionar3_Click(object sender, EventArgs e)
-        {
-            AdicionarTarefaComPopUp(true, false);
-        }
-
-        private void AdicionarTarefaComPopUp(bool concluida, bool fazendo)
-        {
-            using (var popup = new Frm_AdicionarPostIt())
-            {
-                if (popup.ShowDialog() == DialogResult.OK)
-                {
-                    var novaTarefa = new Projeto_Tarefas
-                    {
-                        CodProjeto = codProjeto,
-                        Descricao = popup.DescricaoTarefa,
-                        Cor = popup.CorSelecionada,
-                        isConcluida = concluida,
-                        isFazendo = fazendo,
-                        dataConclusao = concluida ? DateTime.Now : DateTime.MinValue,
-                        dataLimite = DateTime.Now.AddDays(7),
-                        NomeProjeto = nomeProjeto
-                    };
-
-                    if (tarefaDB.InserirTarefaComCor(novaTarefa))
-                    {
-                        CarregarTarefas();
-
-                        var tarefasRecentes = tarefaDB.ListarTarefasPorProjeto(codProjeto);
-                        var tarefaCriada = tarefasRecentes.FirstOrDefault(t => t.Descricao == popup.DescricaoTarefa);
-
-                        if (tarefaCriada != null)
-                        {
-                            historicoDB.RegistrarCriacaoTarefa(tarefaCriada.Codigo, Sessao.UsuarioLogado.Codigo);
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show($"Erro ao criar tarefa: {tarefaDB.Mensagem}", "Erro",
-                                      MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-            }
-        }
-
-        private void BtnEditar_Click(object sender, EventArgs e)
-        {
-            var btn = sender as Button;
-            var tarefa = btn?.Tag as Projeto_Tarefas;
-            if (tarefa != null)
-            {
-                EditarTarefa(tarefa);
-            }
-        }
-
-        private void EditarTarefa(Projeto_Tarefas tarefa)
-        {
-            using (var popup = new Frm_AdicionarPostIt())
-            {
-                // Preencher com dados atuais
-                var descricaoField = popup.Controls.OfType<TextBox>().FirstOrDefault();
-                if (descricaoField != null)
-                    descricaoField.Text = tarefa.Descricao;
-
-                if (popup.ShowDialog() == DialogResult.OK)
-                {
-                    tarefa.Descricao = popup.DescricaoTarefa;
-                    tarefa.Cor = popup.CorSelecionada;
-
-                    if (tarefaDB.AtualizarTarefa(tarefa))
-                    {
-                        CarregarTarefas();
-                        MessageBox.Show("Tarefa atualizada com sucesso!", "Sucesso",
-                                      MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    else
-                    {
-                        MessageBox.Show($"Erro ao atualizar tarefa: {tarefaDB.Mensagem}", "Erro",
-                                      MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-            }
-        }
-
-        private void BtnHistorico_Click(object sender, EventArgs e)
-        {
-            var btn = sender as Button;
-            var tarefa = btn?.Tag as Projeto_Tarefas;
-            if (tarefa != null)
-            {
-                var historico = historicoDB.ObterHistoricoPorTarefa(tarefa.Codigo);
-
-                string mensagem = $"Histórico da Tarefa: {tarefa.Descricao}\n\n";
-                foreach (var item in historico)
-                {
-                    mensagem += $"{item.DataAcao:dd/MM/yyyy HH:mm}: {item.Acao}\n";
-                }
-
-                MessageBox.Show(mensagem, "Histórico da Tarefa", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-
-        private void LimparColunas()
-        {
-            LimparPainel(Pnl_AFazer);
-            LimparPainel(Pnl_Fazendo);
-            LimparPainel(Pnl_Feito);
-        }
-
-        private void LimparPainel(Panel painel)
-        {
-            var controlesParaRemover = painel.Controls.OfType<Panel>()
-                .Where(p => p.Tag is Projeto_Tarefas).ToList();
+            var controlesParaRemover = painel.Controls.OfType<Panel>().ToList();
 
             foreach (var controle in controlesParaRemover)
             {
@@ -399,15 +461,215 @@ namespace CanvasApp
             }
         }
 
-        private void BtnFechar_Click(object sender, EventArgs e)
+        private void Btn_AddPostIt_Click(object sender, EventArgs e)
         {
-            this.Close();
+            AdicionarNovaTarefa();
+        }
+
+        // =========================================================================
+        // MÉTODO MODIFICADO: AdicionarNovaTarefa COM HISTÓRICO E EMAIL
+        // =========================================================================
+        private void AdicionarNovaTarefa()
+        {
+            try
+            {
+                using (var form = new Frm_AdicionarPostIt())
+                {
+                    if (form.ShowDialog() == DialogResult.OK)
+                    {
+                        var novaTarefa = new Projeto_Tarefas
+                        {
+                            CodProjeto = codProjeto,
+                            Descricao = form.DescricaoTarefa,
+                            Cor = form.CorSelecionada,
+                            isConcluida = false,
+                            isFazendo = false,
+                            dataConclusao = DateTime.MinValue,
+                            dataLimite = DateTime.Now.AddDays(7)
+                        };
+
+                        if (tarefaDB.InserirTarefaKanban(novaTarefa))
+                        {
+                            // Registrar criação no histórico
+                            var tarefaInserida = tarefaDB.ObterTarefasKanbanPorProjeto(codProjeto)
+                                .OrderByDescending(t => t.Codigo)
+                                .FirstOrDefault();
+
+                            if (tarefaInserida != null)
+                            {
+                                historicoDB.RegistrarCriacaoTarefa(tarefaInserida.Codigo, usuarioId);
+
+                                // REGISTRAR HISTÓRICO DE MODIFICAÇÃO E ENVIAR EMAIL
+                                RegistrarHistoricoModificacao(tarefaInserida.Codigo, usuarioId, "Criou", form.DescricaoTarefa, nomeProjeto);
+                                EnviarEmailNotificacao("Criou", form.DescricaoTarefa, nomeProjeto);
+                            }
+
+                            CarregarTarefas();
+                        }
+                        else
+                        {
+                            MessageBox.Show($"Erro ao criar tarefa: {tarefaDB.Mensagem}", "Erro");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao adicionar tarefa: {ex.Message}", "Erro");
+            }
+        }
+
+        // =========================================================================
+        // MÉTODO MODIFICADO: AtualizarDescricaoTarefa COM HISTÓRICO E EMAIL
+        // =========================================================================
+        private void AtualizarDescricaoTarefa(int codTarefa, string novaDescricao)
+        {
+            try
+            {
+                var tarefa = tarefas.FirstOrDefault(t => t.Codigo == codTarefa);
+                if (tarefa != null && tarefa.Descricao != novaDescricao)
+                {
+                    string descricaoAntiga = tarefa.Descricao;
+                    tarefa.Descricao = novaDescricao;
+
+                    if (!tarefaDB.AtualizarTarefa(tarefa))
+                    {
+                        MessageBox.Show($"Erro ao atualizar descrição: {tarefaDB.Mensagem}", "Erro");
+                    }
+                    else
+                    {
+                        // Registrar edição no histórico
+                        historicoDB.RegistrarEdicaoDescricao(codTarefa, usuarioId, novaDescricao);
+
+                        // REGISTRAR HISTÓRICO DE MODIFICAÇÃO E ENVIAR EMAIL
+                        RegistrarHistoricoModificacao(codTarefa, usuarioId, "Editou", $"{descricaoAntiga} para {novaDescricao}", nomeProjeto);
+                        EnviarEmailNotificacao("Editou", $"{descricaoAntiga} para {novaDescricao}", nomeProjeto);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao atualizar descrição: {ex.Message}", "Erro");
+            }
+        }
+
+        // =========================================================================
+        // MÉTODO MODIFICADO: ExcluirTarefa COM HISTÓRICO E EMAIL
+        // =========================================================================
+        private void ExcluirTarefa(Projeto_Tarefas tarefa)
+        {
+            try
+            {
+                var resultado = MessageBox.Show($"Deseja excluir a tarefa '{tarefa.Descricao}'?",
+                                              "Confirmar Exclusão",
+                                              MessageBoxButtons.YesNo,
+                                              MessageBoxIcon.Question);
+
+                if (resultado == DialogResult.Yes)
+                {
+                    // Registrar exclusão no histórico antes de excluir
+                    historicoDB.RegistrarExclusaoTarefa(tarefa.Codigo, usuarioId);
+
+                    // REGISTRAR HISTÓRICO DE MODIFICAÇÃO E ENVIAR EMAIL
+                    RegistrarHistoricoModificacao(tarefa.Codigo, usuarioId, "Excluiu", tarefa.Descricao, nomeProjeto);
+                    EnviarEmailNotificacao("Excluiu", tarefa.Descricao, nomeProjeto);
+
+                    if (tarefaDB.ExcluirTarefa(tarefa.Codigo))
+                    {
+                        CarregarTarefas();
+                        MessageBox.Show("Tarefa excluída com sucesso!", "Sucesso",
+                                      MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Erro ao excluir tarefa: {tarefaDB.Mensagem}", "Erro",
+                                      MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao excluir tarefa: {ex.Message}", "Erro",
+                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void MostrarHistoricoTarefa(Projeto_Tarefas tarefa)
+        {
+            try
+            {
+                var historicos = historicoDB.ObterHistoricoPorTarefa(tarefa.Codigo);
+                var historicosModificacoes = historicoModificacoesDB.ObterHistoricoPorTarefa(tarefa.Codigo);
+
+                var historicoFormatado = new List<string>();
+
+                // Adicionar histórico de movimentação
+                foreach (var historico in historicos)
+                {
+                    historicoFormatado.Add($"{historico.DataAcao:dd/MM/yyyy HH:mm} - {historico.Acao}");
+                }
+
+                // Adicionar histórico de modificações
+                foreach (var historico in historicosModificacoes)
+                {
+                    historicoFormatado.Add($"{historico.Data:dd/MM/yyyy HH:mm} - {historico.Texto}");
+                }
+
+                // Ordenar por data
+                historicoFormatado = historicoFormatado.OrderByDescending(h => h).ToList();
+
+                using (var formHistorico = new Frm_HistoricoTarefas(historicoFormatado))
+                {
+                    formHistorico.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao carregar histórico: {ex.Message}", "Erro");
+            }
+        }
+
+        private void Frm_Kanban_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Limpar recursos se necessário
         }
 
         private void Btn_Atividade_Click(object sender, EventArgs e)
         {
-            // Adicionar tarefa genérica na coluna "A Fazer"
-            AdicionarTarefaComPopUp(false, false);
+            try
+            {
+                // Mostrar histórico geral do projeto
+                var todasTarefas = tarefaDB.ObterTarefasKanbanPorProjeto(codProjeto);
+                var todosHistoricos = new List<string>();
+
+                foreach (var tarefa in todasTarefas)
+                {
+                    var historicos = historicoDB.ObterHistoricoPorTarefa(tarefa.Codigo);
+                    var historicosModificacoes = historicoModificacoesDB.ObterHistoricoPorTarefa(tarefa.Codigo);
+
+                    foreach (var historico in historicos)
+                    {
+                        todosHistoricos.Add($"Tarefa {tarefa.Codigo}: {historico.DataAcao:dd/MM/yyyy HH:mm} - {historico.Acao}");
+                    }
+
+                    foreach (var historico in historicosModificacoes)
+                    {
+                        todosHistoricos.Add($"Tarefa {tarefa.Codigo}: {historico.Data:dd/MM/yyyy HH:mm} - {historico.Texto}");
+                    }
+                }
+
+                todosHistoricos = todosHistoricos.OrderByDescending(h => h).ToList();
+
+                using (var formHistorico = new Frm_HistoricoTarefas(todosHistoricos))
+                {
+                    formHistorico.Text = "Histórico Completo do Projeto";
+                    formHistorico.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao carregar histórico completo: {ex.Message}", "Erro");
+            }
         }
     }
 }

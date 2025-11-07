@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Net.Mail;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 
@@ -29,6 +30,7 @@ namespace CanvasApp
         private readonly AlarmeDB dbAlarme = new AlarmeDB();
         private readonly SubtarefasDB dbSubtarefas = new SubtarefasDB();
         private readonly ComentariosDB dbComentarios = new ComentariosDB();
+        private readonly HistoricoDB historicoDB = new HistoricoDB();
 
         // Agora inicializamos as DBs com as dependências
         private readonly MembrosDB dbMembros;
@@ -75,6 +77,72 @@ namespace CanvasApp
             ConfigurarPainelNotificacoes();
             ConfigurarBotoesExistentes();
         }
+
+        // =========================================================================
+        // MÉTODOS DE HISTÓRICO E NOTIFICAÇÃO POR E-MAIL
+        // =========================================================================
+
+        private void RegistrarHistorico(int codTarefa, int codUsuario, string acao, string nomeCartao, string nomeProjeto)
+        {
+            try
+            {
+                var historico = new HistoricoModificacoes
+                {
+                    CodTarefa = codTarefa,
+                    CodUsuario = codUsuario,
+                    Data = DateTime.Now,
+                    Texto = $"{acao} o cartão '{nomeCartao}' no projeto '{nomeProjeto}'"
+                };
+
+                // Salvar no banco
+                historicoDB.InserirHistorico(historico);
+
+                // Atualizar interface se existir
+                AtualizarListViewHistorico(codTarefa);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao registrar histórico: {ex.Message}");
+            }
+        }
+
+        private void AtualizarListViewHistorico(int codTarefa)
+        {
+            // Implemente conforme sua interface
+        }
+
+        private void EnviarEmailNotificacao(string acao, string nomeCartao, string nomeProjeto)
+        {
+            try
+            {
+                if (CanvasApp.Classes.Databases.UsuarioCL.Sessao.UsuarioLogado == null) return;
+
+                using (SmtpClient smtpClient = new SmtpClient("127.0.0.1", 8087))
+                {
+                    smtpClient.EnableSsl = false;
+                    smtpClient.UseDefaultCredentials = true;
+
+                    using (MailMessage mailMessage = new MailMessage())
+                    {
+                        mailMessage.From = new MailAddress("worldskills2019@gmail.com");
+                        mailMessage.To.Add(CanvasApp.Classes.Databases.UsuarioCL.Sessao.UsuarioLogado.Email ?? "destinatario@email.com");
+                        mailMessage.Subject = $"Nova ação no projeto {nomeProjeto}";
+                        mailMessage.Body = $"Olá, {CanvasApp.Classes.Databases.UsuarioCL.Sessao.UsuarioLogado.Nome}. Você acabou de realizar uma nova ação no projeto {nomeProjeto}: - {acao} o cartão {nomeCartao}.";
+                        mailMessage.IsBodyHtml = false;
+
+                        smtpClient.Send(mailMessage);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao enviar e-mail: {ex.Message}");
+            }
+        }
+
+        // =========================================================================
+        // MÉTODOS EXISTENTES (mantidos da versão anterior)
+        // =========================================================================
 
         private void ConfigurarBotoesExistentes()
         {
@@ -1040,6 +1108,9 @@ namespace CanvasApp
             return panelCirculo;
         }
 
+        // =========================================================================
+        // MÉTODO MODIFICADO: AdicionarNovaTarefa COM HISTÓRICO E EMAIL
+        // =========================================================================
         private void AdicionarNovaTarefa()
         {
             if (isModoFavoritos) return;
@@ -1078,6 +1149,14 @@ namespace CanvasApp
                 Pic_IconPlus.Visible = true;
                 AtualizarInterface();
 
+                // REGISTRAR HISTÓRICO E ENVIAR EMAIL
+                var tarefaInserida = tarefasPendentes.OrderByDescending(t => t.Codigo).FirstOrDefault();
+                if (tarefaInserida != null)
+                {
+                    RegistrarHistorico(tarefaInserida.Codigo, usuarioLogadoId, "Criou", descricao, projetoSelecionado.Nome);
+                    EnviarEmailNotificacao("Criou", descricao, projetoSelecionado.Nome);
+                }
+
                 MessageBox.Show("Tarefa criada com sucesso!", "Sucesso",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -1089,7 +1168,7 @@ namespace CanvasApp
         }
 
         // =========================================================================
-        // MÉTODO PRINCIPAL MODIFICADO: CriarItemTarefa COM POSIÇÕES CORRIGIDAS
+        // MÉTODO PRINCIPAL MODIFICADO: CriarItemTarefa COM HISTÓRICO E EMAIL
         // =========================================================================
         private Control CriarItemTarefa(Projeto_Tarefas tarefa, bool isConcluida)
         {
@@ -1116,18 +1195,26 @@ namespace CanvasApp
 
                 checkBoxConcluida.CheckedChanged += (sender, e) =>
                 {
-                    ((CheckBox)sender).Tag = "checkedChanged";
-                    dbTarefas.AtualizarStatusTarefa(tarefa.Codigo, checkBoxConcluida.Checked);
+                    if (((CheckBox)sender).Tag?.ToString() == "checkedChanged") return;
 
-                    if (checkBoxConcluida.Checked)
+                    bool novoStatus = checkBoxConcluida.Checked;
+                    dbTarefas.AtualizarStatusTarefa(tarefa.Codigo, novoStatus);
+
+                    if (novoStatus)
                     {
                         tarefasPendentes.Remove(tarefa);
                         tarefasConcluidas.Add(tarefa);
+                        // REGISTRAR HISTÓRICO E ENVIAR EMAIL
+                        RegistrarHistorico(tarefa.Codigo, usuarioLogadoId, "Concluiu", tarefa.Descricao, projetoSelecionado?.Nome ?? "Favoritos");
+                        EnviarEmailNotificacao("Concluiu", tarefa.Descricao, projetoSelecionado?.Nome ?? "Favoritos");
                     }
                     else
                     {
                         tarefasConcluidas.Remove(tarefa);
                         tarefasPendentes.Add(tarefa);
+                        // REGISTRAR HISTÓRICO E ENVIAR EMAIL
+                        RegistrarHistorico(tarefa.Codigo, usuarioLogadoId, "Reabriu", tarefa.Descricao, projetoSelecionado?.Nome ?? "Favoritos");
+                        EnviarEmailNotificacao("Reabriu", tarefa.Descricao, projetoSelecionado?.Nome ?? "Favoritos");
                     }
                     AtualizarInterface();
                 };
@@ -1229,6 +1316,8 @@ namespace CanvasApp
                         {
                             pictureBox.Image = Properties.Resources.estrela__1_;
                             pictureBox.Tag = new { EstaFavoritado = true, Tarefa = tarefaClicada };
+                            // REGISTRAR HISTÓRICO
+                            RegistrarHistorico(tarefaClicada.Codigo, usuarioLogadoId, "Favoritou", tarefaClicada.Descricao, projetoSelecionado?.Nome ?? "Favoritos");
                         }
                     }
                     else
@@ -1237,6 +1326,8 @@ namespace CanvasApp
                         {
                             pictureBox.Image = Properties.Resources.estrela;
                             pictureBox.Tag = new { EstaFavoritado = false, Tarefa = tarefaClicada };
+                            // REGISTRAR HISTÓRICO
+                            RegistrarHistorico(tarefaClicada.Codigo, usuarioLogadoId, "Desfavoritou", tarefaClicada.Descricao, projetoSelecionado?.Nome ?? "Favoritos");
                         }
                     }
                 };
@@ -1314,7 +1405,7 @@ namespace CanvasApp
         }
 
         // =========================================================================
-        // MÉTODO ALTERADO: AlterarDataLimiteTarefa COM MELHOR VISUALIZAÇÃO
+        // MÉTODO ALTERADO: AlterarDataLimiteTarefa COM HISTÓRICO E EMAIL
         // =========================================================================
         private void AlterarDataLimiteTarefa(Projeto_Tarefas tarefa, Panel panelTarefa)
         {
@@ -1389,6 +1480,10 @@ namespace CanvasApp
                             // Atualizar estilo visual baseado na nova data
                             AtualizarEstiloDataLimite(panelTarefa, datePicker.Value);
                             formData.Close();
+
+                            // REGISTRAR HISTÓRICO E ENVIAR EMAIL
+                            RegistrarHistorico(tarefa.Codigo, usuarioLogadoId, "Alterou data limite de", tarefa.Descricao, projetoSelecionado?.Nome ?? "Favoritos");
+                            EnviarEmailNotificacao("Alterou data limite de", tarefa.Descricao, projetoSelecionado?.Nome ?? "Favoritos");
 
                             MessageBox.Show("Data limite atualizada com sucesso!", "Sucesso",
                                 MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -1676,7 +1771,7 @@ namespace CanvasApp
         private void Btn_UML_Click(object sender, EventArgs e)
         {
             this.Hide();
-            Frm_Kanban fk = new Frm_Kanban(projetoSelecionado.Codigo, projetoSelecionado.Nome);
+            Frm_Kanban fk = new Frm_Kanban(projetoSelecionado.Codigo, projetoSelecionado.Nome, usuarioLogadoId);
             fk.ShowDialog();
         }
     }

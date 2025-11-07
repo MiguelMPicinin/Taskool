@@ -13,6 +13,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"INSERT INTO Tarefas_SubTarefas (Texto, CodTarefa, isConcluida) 
                                  VALUES (@Texto, @CodTarefa, @isConcluida)";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -39,6 +40,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"UPDATE Tarefas_SubTarefas SET Texto = @Texto, isConcluida = @isConcluida 
                                  WHERE Codigo = @Codigo";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -65,6 +67,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = "DELETE FROM Tarefas_SubTarefas WHERE Codigo = @Codigo";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -89,6 +92,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"SELECT Codigo, Texto, CodTarefa, isConcluida 
                                  FROM Tarefas_SubTarefas 
                                  WHERE CodTarefa = @CodTarefa 
@@ -125,6 +129,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"UPDATE Tarefas_SubTarefas SET isConcluida = @isConcluida 
                                  WHERE Codigo = @Codigo";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -150,6 +155,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"SELECT COUNT(*) FROM Tarefas_SubTarefas 
                                  WHERE CodTarefa = @CodTarefa AND isConcluida = 1";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -172,6 +178,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"SELECT COUNT(*) FROM Tarefas_SubTarefas 
                                  WHERE CodTarefa = @CodTarefa";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))

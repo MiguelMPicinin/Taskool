@@ -13,5 +13,6 @@ namespace CanvasApp.Classes.Databases.UsuarioCL
         public int CodUsuario { get; set; }
         public DateTime Data { get; set; }
         public string Texto { get; set; }
+        public string NomeUsuario { get; set; } // Adicionado para armazenar o nome do usuário
     }
 }

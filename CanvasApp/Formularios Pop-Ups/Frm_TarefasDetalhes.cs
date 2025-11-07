@@ -1,8 +1,12 @@
 ﻿using CanvasApp.Classes.Databases;
 using CanvasApp.Classes.Databases.UsuarioCL;
+using CanvasApp.Classes.ManipulaçãoDados;
+using CanvasApp.Formularios_Pop_Ups;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -18,7 +22,8 @@ namespace CanvasApp.Forms
         private readonly ComentariosDB _comentariosDB;
         private readonly UsuarioDB _usuarioDB;
         private readonly MembrosDB _membrosDB;
-       
+        private readonly AnexosDB _anexosDB;
+
         private Button btnAdicionarSubtarefa;
 
         public Frm_TarefasDetalhes(Projeto_Tarefas tarefa)
@@ -27,11 +32,12 @@ namespace CanvasApp.Forms
             this.tarefaAtual = tarefa;
             this.usuarioLogado = Sessao.UsuarioLogado;
 
-            // ✅ CORREÇÃO: Inicializar os campos readonly diretamente no construtor
+            // Inicializar os DBs
             _alarmeDB = new AlarmeDB();
             _subtarefasDB = new SubtarefasDB();
             _comentariosDB = new ComentariosDB();
             _usuarioDB = new UsuarioDB();
+            _anexosDB = new AnexosDB(); // Corrigido: usar underscore
 
             var notificacoesDB = new NotificacoesDB();
             var projetosDB = new ProjetosDB();
@@ -50,6 +56,7 @@ namespace CanvasApp.Forms
             ConfigurarSubtarefas();
             ConfigurarComentarios();
             ConfigurarBotaoAtribuirResponsavel();
+            ConfigurarAnexos(); // NOVO: Configurar anexos
 
             Pnl_ChatComentarios.Visible = false;
             Pnl_ChatComentarios.BringToFront();
@@ -67,7 +74,429 @@ namespace CanvasApp.Forms
             Btn_EnviarComentario.Click += Bin_EnviarComentario_Click;
             Txt_NovoComentarioChat.KeyDown += Txt_NovoComentarioChat_KeyDown;
             Dtp_Prazo.ValueChanged += Dtp_Prazo_ValueChanged;
+            Btn_Anexar.Click += Btn_Anexar_Click; // NOVO: Evento do botão anexar
         }
+
+        // NOVO: Método para configurar anexos
+        private void ConfigurarAnexos()
+        {
+            CarregarAnexos();
+        }
+
+        // NOVO: Evento do botão anexar
+        private void Btn_Anexar_Click(object sender, EventArgs e)
+        {
+            using (var openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Arquivos permitidos|*.txt;*.pdf;*.xlsx;*.xls;*.docx;*.doc;*.html;*.sql";
+                openFileDialog.Multiselect = true;
+                openFileDialog.Title = "Selecionar arquivos para anexar";
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    foreach (string filePath in openFileDialog.FileNames)
+                    {
+                        AnexarArquivo(filePath);
+                    }
+                }
+            }
+        }
+
+        // NOVO: Método para anexar arquivo
+        private void AnexarArquivo(string filePath)
+        {
+            try
+            {
+                string fileName = Path.GetFileName(filePath);
+
+                // Validar tipo de arquivo
+                if (!_anexosDB.ValidarTipoArquivo(fileName))
+                {
+                    MessageBox.Show($"Tipo de arquivo {Path.GetExtension(filePath)} não é permitido.\n\nArquivos permitidos: .txt, .pdf, .xlsx, .xls, .docx, .doc, .html, .sql",
+                                  "Tipo de Arquivo Não Permitido",
+                                  MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Verificar se o arquivo não está vazio
+                FileInfo fileInfo = new FileInfo(filePath);
+                if (fileInfo.Length == 0)
+                {
+                    MessageBox.Show("O arquivo selecionado está vazio.", "Arquivo Vazio",
+                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Ler arquivo e converter para base64
+                byte[] fileBytes = File.ReadAllBytes(filePath);
+                string fileBase64 = Convert.ToBase64String(fileBytes);
+
+                // Criar objeto anexo
+                var anexo = new Tarefas_Anexos
+                {
+                    CodTarefa = tarefaAtual.Codigo,
+                    NomeArquivo = fileName,
+                    Arquivo = fileBase64,
+                    DataUpload = DateTime.Now
+                };
+
+                // Inserir no banco
+                if (_anexosDB.InserirAnexo(anexo))
+                {
+                    CarregarAnexos();
+                    MessageBox.Show($"Arquivo '{fileName}' anexado com sucesso!", "Sucesso",
+                                  MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show($"Erro ao anexar arquivo: {_anexosDB.Mensagem}", "Erro",
+                                  MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao anexar arquivo: {ex.Message}", "Erro",
+                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // NOVO: Método para carregar anexos
+        private void CarregarAnexos()
+        {
+            try
+            {
+                Pnl_ArquivosIndexados.Controls.Clear();
+
+                var anexos = _anexosDB.ListarAnexosPorTarefa(tarefaAtual.Codigo);
+
+                foreach (var anexo in anexos)
+                {
+                    AdicionarControleAnexo(anexo);
+                }
+
+                if (!anexos.Any())
+                {
+                    AdicionarLabelSemAnexos();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao carregar anexos: {ex.Message}", "Erro",
+                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // NOVO: Adicionar controle de anexo
+        private void AdicionarControleAnexo(Tarefas_Anexos anexo)
+        {
+            var pnlAnexo = new Panel
+            {
+                Width = Pnl_ArquivosIndexados.Width - 30,
+                Height = 40,
+                Margin = new Padding(0, 5, 0, 5),
+                BackColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle,
+                Tag = anexo,
+                Cursor = Cursors.Hand
+            };
+
+            // Ícone baseado na extensão
+            var picIcone = new PictureBox
+            {
+                Image = ObterIconePorExtensao(Path.GetExtension(anexo.NomeArquivo)),
+                SizeMode = PictureBoxSizeMode.Zoom,
+                Size = new Size(30, 30),
+                Location = new Point(5, 5),
+                Tag = anexo
+            };
+            picIcone.Click += (s, e) => AbrirAnexo(anexo);
+
+            // Nome do arquivo (clicável)
+            var lblNomeArquivo = new Label
+            {
+                Text = anexo.NomeArquivo,
+                Location = new Point(40, 5),
+                Size = new Size(200, 30),
+                Font = new Font("Segoe UI", 9),
+                ForeColor = Color.FromArgb(74, 124, 255),
+                Cursor = Cursors.Hand,
+                Tag = anexo,
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+            lblNomeArquivo.Click += (s, e) => AbrirAnexo(anexo);
+
+            // Descrição do tipo
+            var lblTipo = new Label
+            {
+                Text = _anexosDB.ObterDescricaoTipoArquivo(anexo.NomeArquivo),
+                Location = new Point(250, 5),
+                Size = new Size(120, 30),
+                Font = new Font("Segoe UI", 8),
+                ForeColor = Color.Gray,
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+
+            // Data do anexo
+            var lblData = new Label
+            {
+                Text = anexo.DataUpload.ToString("dd/MM/yy HH:mm"),
+                Location = new Point(380, 5),
+                Size = new Size(80, 30),
+                Font = new Font("Segoe UI", 8),
+                ForeColor = Color.Gray,
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+
+            // Botão excluir
+            var btnExcluir = new Button
+            {
+                Text = "×",
+                Size = new Size(25, 25),
+                Location = new Point(pnlAnexo.Width - 30, 8),
+                Tag = anexo.Codigo,
+                Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                ForeColor = Color.Red,
+                BackColor = Color.Transparent,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            btnExcluir.FlatAppearance.BorderSize = 0;
+            btnExcluir.FlatAppearance.MouseOverBackColor = Color.LightCoral;
+            btnExcluir.Click += (s, e) => ExcluirAnexo(anexo.Codigo);
+
+            pnlAnexo.Controls.Add(picIcone);
+            pnlAnexo.Controls.Add(lblNomeArquivo);
+            pnlAnexo.Controls.Add(lblTipo);
+            pnlAnexo.Controls.Add(lblData);
+            pnlAnexo.Controls.Add(btnExcluir);
+
+            Pnl_ArquivosIndexados.Controls.Add(pnlAnexo);
+        }
+
+        // NOVO: Obter ícone por extensão
+        private Image ObterIconePorExtensao(string extensao)
+        {
+            var bmp = new Bitmap(30, 30);
+            using (var g = Graphics.FromImage(bmp))
+            {
+                Color corFundo = ObterCorPorExtensao(extensao);
+                g.Clear(corFundo);
+                g.DrawRectangle(Pens.DarkGray, 0, 0, 29, 29);
+
+                using (var font = new Font("Arial", 7, FontStyle.Bold))
+                {
+                    string textoExtensao = extensao.Replace(".", "").ToUpper();
+                    if (textoExtensao.Length > 4) textoExtensao = textoExtensao.Substring(0, 4);
+
+                    var tamanhoTexto = g.MeasureString(textoExtensao, font);
+                    g.DrawString(textoExtensao, font, Brushes.White,
+                                (30 - tamanhoTexto.Width) / 2,
+                                (30 - tamanhoTexto.Height) / 2);
+                }
+            }
+            return bmp;
+        }
+
+        private Color ObterCorPorExtensao(string extensao)
+        {
+            switch (extensao.ToLower())
+            {
+                case ".txt": return Color.SteelBlue;
+                case ".pdf": return Color.IndianRed;
+                case ".xlsx": case ".xls": return Color.ForestGreen;
+                case ".docx": case ".doc": return Color.RoyalBlue;
+                case ".html": return Color.OrangeRed;
+                case ".sql": return Color.Purple;
+                default: return Color.Gray;
+            }
+        }
+
+        // NOVO: Label quando não há anexos
+        private void AdicionarLabelSemAnexos()
+        {
+            var label = new Label
+            {
+                Text = "Nenhum anexo adicionado\nClique em 'Anexar' para adicionar arquivos",
+                Font = new Font("Segoe UI", 9, FontStyle.Italic),
+                ForeColor = Color.Gray,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Dock = DockStyle.Fill,
+                Height = 60
+            };
+            Pnl_ArquivosIndexados.Controls.Add(label);
+        }
+
+        // NOVO: Abrir anexo
+        private void AbrirAnexo(Tarefas_Anexos anexo)
+        {
+            try
+            {
+                Cursor = Cursors.WaitCursor;
+
+                // Criar arquivo temporário
+                string tempPath = Path.GetTempPath();
+                string tempFilePath = Path.Combine(tempPath, anexo.NomeArquivo);
+
+                // Converter base64 para bytes e salvar arquivo
+                byte[] fileBytes = Convert.FromBase64String(anexo.Arquivo);
+                File.WriteAllBytes(tempFilePath, fileBytes);
+
+                string extensao = Path.GetExtension(anexo.NomeArquivo).ToLower();
+
+                switch (extensao)
+                {
+                    case ".txt":
+                        Process.Start("notepad.exe", tempFilePath);
+                        break;
+                    case ".pdf":
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = tempFilePath,
+                            UseShellExecute = true
+                        });
+                        break;
+                    case ".xlsx":
+                    case ".xls":
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = "excel.exe",
+                            Arguments = $"\"{tempFilePath}\"",
+                            UseShellExecute = true
+                        });
+                        break;
+                    case ".docx":
+                    case ".doc":
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = "winword.exe",
+                            Arguments = $"\"{tempFilePath}\"",
+                            UseShellExecute = true
+                        });
+                        break;
+                    case ".html":
+                        AbrirHtmlNoTaskool(tempFilePath);
+                        break;
+                    case ".sql":
+                        ExecutarScriptSQL(tempFilePath);
+                        break;
+                    default:
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = tempFilePath,
+                            UseShellExecute = true
+                        });
+                        break;
+                }
+
+                MessageBox.Show($"Arquivo '{anexo.NomeArquivo}' aberto com sucesso!", "Sucesso",
+                              MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao abrir arquivo: {ex.Message}\n\nCertifique-se de que o programa associado está instalado.", "Erro",
+                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
+            }
+        }
+
+        // NOVO: Abrir HTML no Taskool
+        private void AbrirHtmlNoTaskool(string caminhoArquivo)
+        {
+            var frmVisualizador = new Form
+            {
+                Text = "Visualizador HTML - Taskool",
+                Size = new Size(1024, 768),
+                StartPosition = FormStartPosition.CenterParent,
+                Icon = this.Icon
+            };
+
+            var webBrowser = new WebBrowser
+            {
+                Dock = DockStyle.Fill,
+                Url = new Uri($"file:///{caminhoArquivo.Replace("\\", "/")}"),
+                ScrollBarsEnabled = true
+            };
+
+            var btnFechar = new Button
+            {
+                Text = "Fechar",
+                Size = new Size(75, 30),
+                Location = new Point(10, 10),
+                BackColor = Color.FromArgb(74, 124, 255),
+                ForeColor = Color.White
+            };
+            btnFechar.Click += (s, e) => frmVisualizador.Close();
+
+            var panel = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 50,
+                BackColor = Color.LightGray
+            };
+            panel.Controls.Add(btnFechar);
+
+            frmVisualizador.Controls.Add(webBrowser);
+            frmVisualizador.Controls.Add(panel);
+            frmVisualizador.ShowDialog();
+        }
+
+        // NOVO: Executar script SQL
+        private void ExecutarScriptSQL(string caminhoArquivo)
+        {
+            using (var frmSQL = new Frm_ExecutarSQL())
+            {
+                frmSQL.ShowDialog();
+            }
+        }
+
+        // NOVO: Excluir anexo
+        private void ExcluirAnexo(int codAnexo)
+        {
+            if (MessageBox.Show("Deseja excluir este anexo?\nEsta ação não pode ser desfeita.", "Confirmar Exclusão",
+                               MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                try
+                {
+                    if (_anexosDB.ExcluirAnexo(codAnexo))
+                    {
+                        CarregarAnexos();
+                        MessageBox.Show("Anexo excluído com sucesso!", "Sucesso",
+                                      MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Erro ao excluir anexo: {_anexosDB.Mensagem}", "Erro",
+                                      MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Erro ao excluir anexo: {ex.Message}", "Erro",
+                                  MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        // MODIFIQUE o método CarregarDadosTarefa para incluir anexos
+        private void CarregarDadosTarefa()
+        {
+            Txt_TituloTarefa.Text = tarefaAtual.Descricao;
+
+            if (tarefaAtual.dataLimite != DateTime.MinValue && tarefaAtual.dataLimite >= new DateTime(1753, 1, 1))
+            {
+                Console.WriteLine($"Data limite da tarefa: {tarefaAtual.dataLimite:dd/MM/yyyy}");
+            }
+
+            CarregarPrazoAlarme();
+            CarregarSubtarefas();
+            CarregarAnexos(); // NOVO: Carregar anexos
+            AtualizarPreviewComentarios();
+        }
+
+        // ... (MANTENHA TODOS OS OUTROS MÉTODOS EXISTENTES ORIGINAIS)
 
         private void ConfigurarComboBoxRepeticao()
         {
@@ -135,22 +564,6 @@ namespace CanvasApp.Forms
             };
 
             this.Controls.Add(btnAtribuirResponsavel);
-        }
-
-        private void CarregarDadosTarefa()
-        {
-            Txt_TituloTarefa.Text = tarefaAtual.Descricao;
-
-            // NOVO: Carregar dataLimite se existir
-            if (tarefaAtual.dataLimite != DateTime.MinValue && tarefaAtual.dataLimite >= new DateTime(1753, 1, 1))
-            {
-                // Você pode adicionar um DateTimePicker no Frm_TarefasDetalhes também se quiser
-                Console.WriteLine($"Data limite da tarefa: {tarefaAtual.dataLimite:dd/MM/yyyy}");
-            }
-
-            CarregarPrazoAlarme();
-            CarregarSubtarefas();
-            AtualizarPreviewComentarios();
         }
 
         private void MostrarSelecaoDataAlarme()

@@ -7,153 +7,105 @@ namespace CanvasApp.Formularios_Pop_Ups
 {
     public partial class Frm_AdicionarPostIt : Form
     {
-        public string DescricaoTarefa { get; private set; }
-        public string CorSelecionada { get; private set; }
+        public string DescricaoTarefa { get; set; }
+        public string CorSelecionada { get; set; }
 
-        private readonly Dictionary<string, string> coresPostIt = new Dictionary<string, string>
-        {
-            { "Amarelo", "#ffe079" },
-            { "Rosa", "#f097ca" },
-            { "Verde", "#98d366" },
-            { "Azul", "#82d3e5" }
-        };
+        private Dictionary<Button, string> botaoCores = new Dictionary<Button, string>();
 
         public Frm_AdicionarPostIt()
         {
             InitializeComponent();
-            ConfigurarFormulario();
+            InicializarForm();
         }
 
-        private void ConfigurarFormulario()
+        private void InicializarForm()
         {
-            this.Size = new Size(400, 300);
-            this.Text = "Adicionar Post-It";
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
+            // Configurar cores dos botões
+            botaoCores[Btn_Cores1] = "#ffe079"; // Amarelo
+            botaoCores[Btn_Cores2] = "#f097ca"; // Rosa  
+            botaoCores[Btn_Cores3] = "#98d366"; // Verde
+            botaoCores[Btn_Cores4] = "#82d3e5"; // Azul
 
-            // Label de instrução
-            var lblInstrucao = new Label
+            // Aplicar cores aos botões
+            foreach (var botaoCor in botaoCores)
             {
-                Text = "Digite a descrição da tarefa:",
-                Location = new Point(20, 20),
-                Size = new Size(350, 20),
-                Font = new Font("Arial", 10, FontStyle.Bold)
-            };
+                botaoCor.Key.BackColor = ColorTranslator.FromHtml(botaoCor.Value);
+                botaoCor.Key.FlatStyle = FlatStyle.Flat;
+                botaoCor.Key.FlatAppearance.BorderSize = 2;
+                botaoCor.Key.FlatAppearance.BorderColor = Color.Gray;
+                botaoCor.Key.Size = new Size(50, 50);
+            }
 
-            // TextBox para descrição
-            var txtDescricao = new TextBox
+            // Selecionar primeira cor por padrão
+            SelecionarCor(Btn_Cores1);
+
+            // Configurar texto
+            Txt_Texto.Multiline = true;
+            Txt_Texto.ScrollBars = ScrollBars.Vertical;
+            Txt_Texto.Font = new Font("Arial", 10);
+        }
+
+        private void SelecionarCor(Button botaoSelecionado)
+        {
+            // Remover seleção de todos os botões
+            foreach (var botao in botaoCores.Keys)
             {
-                Location = new Point(20, 50),
-                Size = new Size(350, 100),
-                Multiline = true,
-                ScrollBars = ScrollBars.Vertical,
-                Font = new Font("Arial", 9)
-            };
+                botao.FlatAppearance.BorderColor = Color.Gray;
+                botao.FlatAppearance.BorderSize = 2;
+            }
 
-            // Label para cores
-            var lblCores = new Label
+            // Destacar botão selecionado
+            botaoSelecionado.FlatAppearance.BorderColor = Color.Black;
+            botaoSelecionado.FlatAppearance.BorderSize = 3;
+
+            // Definir cor selecionada
+            CorSelecionada = botaoCores[botaoSelecionado];
+        }
+
+        private void Btn_Cores1_Click(object sender, EventArgs e)
+        {
+            SelecionarCor(Btn_Cores1);
+        }
+
+        private void Btn_Cores2_Click(object sender, EventArgs e)
+        {
+            SelecionarCor(Btn_Cores2);
+        }
+
+        private void Btn_Cores3_Click(object sender, EventArgs e)
+        {
+            SelecionarCor(Btn_Cores3);
+        }
+
+        private void Btn_Cores4_Click(object sender, EventArgs e)
+        {
+            SelecionarCor(Btn_Cores4);
+        }
+
+        private void Btn_Ok_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(Txt_Texto.Text))
             {
-                Text = "Selecione a cor do post-it:",
-                Location = new Point(20, 160),
-                Size = new Size(350, 20),
-                Font = new Font("Arial", 10, FontStyle.Bold)
-            };
+                MessageBox.Show("Digite o texto do post-it!", "Aviso",
+                              MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Txt_Texto.Focus();
+                return;
+            }
 
-            // RadioButtons para cores
-            int yPos = 185;
-            var grupoCores = new GroupBox
-            {
-                Location = new Point(20, yPos),
-                Size = new Size(350, 80)
-            };
+            DescricaoTarefa = Txt_Texto.Text.Trim();
+            DialogResult = DialogResult.OK;
+            Close();
+        }
 
-            var rdbAmarelo = new RadioButton
-            {
-                Text = "Amarelo",
-                Location = new Point(10, 15),
-                Checked = true,
-                Tag = "#ffe079"
-            };
+        private void Btn_Cancelar_Click(object sender, EventArgs e)
+        {
+            DialogResult = DialogResult.Cancel;
+            Close();
+        }
 
-            var rdbRosa = new RadioButton
-            {
-                Text = "Rosa",
-                Location = new Point(100, 15),
-                Tag = "#f097ca"
-            };
-
-            var rdbVerde = new RadioButton
-            {
-                Text = "Verde",
-                Location = new Point(190, 15),
-                Tag = "#98d366"
-            };
-
-            var rdbAzul = new RadioButton
-            {
-                Text = "Azul",
-                Location = new Point(280, 15),
-                Tag = "#82d3e5"
-            };
-
-            // Botões
-            var btnAdicionar = new Button
-            {
-                Text = "Adicionar",
-                Location = new Point(200, 270),
-                Size = new Size(80, 25),
-                DialogResult = DialogResult.OK
-            };
-
-            var btnCancelar = new Button
-            {
-                Text = "Cancelar",
-                Location = new Point(290, 270),
-                Size = new Size(80, 25),
-                DialogResult = DialogResult.Cancel
-            };
-
-            // Adicionar controles ao grupo
-            grupoCores.Controls.AddRange(new Control[] { rdbAmarelo, rdbRosa, rdbVerde, rdbAzul });
-
-            // Adicionar controles ao formulário
-            this.Controls.AddRange(new Control[] {
-                lblInstrucao, txtDescricao, lblCores, grupoCores, btnAdicionar, btnCancelar
-            });
-
-            // Eventos
-            btnAdicionar.Click += (s, e) =>
-            {
-                if (string.IsNullOrWhiteSpace(txtDescricao.Text))
-                {
-                    MessageBox.Show("Por favor, digite uma descrição para a tarefa.", "Aviso",
-                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                DescricaoTarefa = txtDescricao.Text.Trim();
-
-                // Obter cor selecionada
-                foreach (RadioButton rdb in grupoCores.Controls)
-                {
-                    if (rdb.Checked)
-                    {
-                        CorSelecionada = rdb.Tag.ToString();
-                        break;
-                    }
-                }
-
-                this.DialogResult = DialogResult.OK;
-                this.Close();
-            };
-
-            btnCancelar.Click += (s, e) =>
-            {
-                this.DialogResult = DialogResult.Cancel;
-                this.Close();
-            };
+        private void Frm_AdicionarPostIt_Load(object sender, EventArgs e)
+        {
+            Txt_Texto.Focus();
         }
     }
 }

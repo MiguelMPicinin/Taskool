@@ -13,6 +13,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"INSERT INTO Items_Favoritos (CodUsuario, CodTarefa) VALUES (@CodUsuario, @CodTarefa)";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -37,6 +38,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"DELETE FROM Items_Favoritos WHERE CodUsuario = @CodUsuario AND CodTarefa = @CodTarefa";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -62,6 +64,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"
                         SELECT T.Codigo, T.Descricao, T.isConcluida, T.CodProjeto, T.CodUsuario
                         FROM Projeto_Tarefas T
@@ -102,6 +105,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"SELECT COUNT(1) FROM Items_Favoritos WHERE CodUsuario = @CodUsuario AND CodTarefa = @CodTarefa";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -125,6 +129,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"SELECT COUNT(*) FROM Items_Favoritos WHERE CodUsuario = @CodUsuario";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {

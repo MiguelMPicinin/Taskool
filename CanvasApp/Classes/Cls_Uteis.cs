@@ -14,7 +14,7 @@ using Umbraco.Core.Persistence.Mappers;
 
 namespace CanvasApp.Classes.ClsUteis
 {
-    
+
     public class Cls_Uteis
     {
         public static string GeraJSONCEP(string CEP)
@@ -39,14 +39,14 @@ namespace CanvasApp.Classes.ClsUteis
         }
     }
 
-    public class picture: PictureBox
+    public class picture : PictureBox
     {
         protected override void OnPaint(PaintEventArgs pe)
         {
             GraphicsPath graphicsPath = new GraphicsPath();
-            graphicsPath.AddEllipse(0,0, ClientSize.Width, ClientSize.Height);
+            graphicsPath.AddEllipse(0, 0, ClientSize.Width, ClientSize.Height);
             this.Region = new System.Drawing.Region(graphicsPath);
-            base .OnPaint(pe);
+            base.OnPaint(pe);
         }
     }
 
@@ -63,10 +63,8 @@ namespace CanvasApp.Classes.ClsUteis
             }
             catch (Exception ex)
             {
-                return false;                
+                return false;
             }
-
-            
         }
-    }   
+    }
 }

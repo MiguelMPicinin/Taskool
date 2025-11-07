@@ -29,19 +29,14 @@
         private void InitializeComponent()
         {
             this.Lbl_Titulo = new System.Windows.Forms.Label();
-            this.Pnl_AFazer = new System.Windows.Forms.Panel();
-            this.Lbl_Adicionar1 = new System.Windows.Forms.Label();
-            this.Pnl_Fazendo = new System.Windows.Forms.Panel();
-            this.Lbl_Adicionar2 = new System.Windows.Forms.Label();
-            this.Pnl_Feito = new System.Windows.Forms.Panel();
-            this.Lbl_Adicionar3 = new System.Windows.Forms.Label();
             this.Lbl_aFazer = new System.Windows.Forms.Label();
             this.Lbl_Fazendo = new System.Windows.Forms.Label();
             this.Lbl_Feito = new System.Windows.Forms.Label();
             this.Btn_Atividade = new System.Windows.Forms.Button();
-            this.Pnl_AFazer.SuspendLayout();
-            this.Pnl_Fazendo.SuspendLayout();
-            this.Pnl_Feito.SuspendLayout();
+            this.Flw_AFazer = new System.Windows.Forms.FlowLayoutPanel();
+            this.Flw_Fazendo = new System.Windows.Forms.FlowLayoutPanel();
+            this.Flw_Feito = new System.Windows.Forms.FlowLayoutPanel();
+            this.Btn_AddPostIt = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // Lbl_Titulo
@@ -54,65 +49,11 @@
             this.Lbl_Titulo.TabIndex = 0;
             this.Lbl_Titulo.Text = "Meu Quadro";
             // 
-            // Pnl_AFazer
-            // 
-            this.Pnl_AFazer.Controls.Add(this.Lbl_Adicionar1);
-            this.Pnl_AFazer.Location = new System.Drawing.Point(2, 81);
-            this.Pnl_AFazer.Name = "Pnl_AFazer";
-            this.Pnl_AFazer.Size = new System.Drawing.Size(243, 353);
-            this.Pnl_AFazer.TabIndex = 1;
-            // 
-            // Lbl_Adicionar1
-            // 
-            this.Lbl_Adicionar1.AutoSize = true;
-            this.Lbl_Adicionar1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Lbl_Adicionar1.Location = new System.Drawing.Point(3, 330);
-            this.Lbl_Adicionar1.Name = "Lbl_Adicionar1";
-            this.Lbl_Adicionar1.Size = new System.Drawing.Size(136, 20);
-            this.Lbl_Adicionar1.TabIndex = 4;
-            this.Lbl_Adicionar1.Text = "+ Adicionar post-it";
-            // 
-            // Pnl_Fazendo
-            // 
-            this.Pnl_Fazendo.Controls.Add(this.Lbl_Adicionar2);
-            this.Pnl_Fazendo.Location = new System.Drawing.Point(251, 81);
-            this.Pnl_Fazendo.Name = "Pnl_Fazendo";
-            this.Pnl_Fazendo.Size = new System.Drawing.Size(243, 353);
-            this.Pnl_Fazendo.TabIndex = 2;
-            // 
-            // Lbl_Adicionar2
-            // 
-            this.Lbl_Adicionar2.AutoSize = true;
-            this.Lbl_Adicionar2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Lbl_Adicionar2.Location = new System.Drawing.Point(3, 330);
-            this.Lbl_Adicionar2.Name = "Lbl_Adicionar2";
-            this.Lbl_Adicionar2.Size = new System.Drawing.Size(136, 20);
-            this.Lbl_Adicionar2.TabIndex = 5;
-            this.Lbl_Adicionar2.Text = "+ Adicionar post-it";
-            // 
-            // Pnl_Feito
-            // 
-            this.Pnl_Feito.Controls.Add(this.Lbl_Adicionar3);
-            this.Pnl_Feito.Location = new System.Drawing.Point(500, 81);
-            this.Pnl_Feito.Name = "Pnl_Feito";
-            this.Pnl_Feito.Size = new System.Drawing.Size(243, 353);
-            this.Pnl_Feito.TabIndex = 3;
-            // 
-            // Lbl_Adicionar3
-            // 
-            this.Lbl_Adicionar3.AutoSize = true;
-            this.Lbl_Adicionar3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Lbl_Adicionar3.Location = new System.Drawing.Point(3, 330);
-            this.Lbl_Adicionar3.Name = "Lbl_Adicionar3";
-            this.Lbl_Adicionar3.Size = new System.Drawing.Size(136, 20);
-            this.Lbl_Adicionar3.TabIndex = 6;
-            this.Lbl_Adicionar3.Text = "+ Adicionar post-it";
-            // 
             // Lbl_aFazer
             // 
             this.Lbl_aFazer.AutoSize = true;
             this.Lbl_aFazer.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Lbl_aFazer.Location = new System.Drawing.Point(100, 63);
+            this.Lbl_aFazer.Location = new System.Drawing.Point(90, 69);
             this.Lbl_aFazer.Name = "Lbl_aFazer";
             this.Lbl_aFazer.Size = new System.Drawing.Size(41, 16);
             this.Lbl_aFazer.TabIndex = 4;
@@ -122,7 +63,7 @@
             // 
             this.Lbl_Fazendo.AutoSize = true;
             this.Lbl_Fazendo.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Lbl_Fazendo.Location = new System.Drawing.Point(330, 63);
+            this.Lbl_Fazendo.Location = new System.Drawing.Point(336, 69);
             this.Lbl_Fazendo.Name = "Lbl_Fazendo";
             this.Lbl_Fazendo.Size = new System.Drawing.Size(60, 16);
             this.Lbl_Fazendo.TabIndex = 5;
@@ -132,7 +73,7 @@
             // 
             this.Lbl_Feito.AutoSize = true;
             this.Lbl_Feito.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Lbl_Feito.Location = new System.Drawing.Point(602, 63);
+            this.Lbl_Feito.Location = new System.Drawing.Point(604, 69);
             this.Lbl_Feito.Name = "Lbl_Feito";
             this.Lbl_Feito.Size = new System.Drawing.Size(37, 16);
             this.Lbl_Feito.TabIndex = 6;
@@ -146,28 +87,59 @@
             this.Btn_Atividade.TabIndex = 7;
             this.Btn_Atividade.Text = "Histórico de Modificações";
             this.Btn_Atividade.UseVisualStyleBackColor = true;
+            this.Btn_Atividade.Click += new System.EventHandler(this.Btn_Atividade_Click);
+            // 
+            // Flw_AFazer
+            // 
+            this.Flw_AFazer.AllowDrop = true;
+            this.Flw_AFazer.Location = new System.Drawing.Point(14, 98);
+            this.Flw_AFazer.Name = "Flw_AFazer";
+            this.Flw_AFazer.Size = new System.Drawing.Size(204, 329);
+            this.Flw_AFazer.TabIndex = 8;
+            // 
+            // Flw_Fazendo
+            // 
+            this.Flw_Fazendo.AllowDrop = true;
+            this.Flw_Fazendo.Location = new System.Drawing.Point(267, 98);
+            this.Flw_Fazendo.Name = "Flw_Fazendo";
+            this.Flw_Fazendo.Size = new System.Drawing.Size(204, 329);
+            this.Flw_Fazendo.TabIndex = 9;
+            // 
+            // Flw_Feito
+            // 
+            this.Flw_Feito.AllowDrop = true;
+            this.Flw_Feito.Location = new System.Drawing.Point(522, 98);
+            this.Flw_Feito.Name = "Flw_Feito";
+            this.Flw_Feito.Size = new System.Drawing.Size(204, 329);
+            this.Flw_Feito.TabIndex = 10;
+            // 
+            // Btn_AddPostIt
+            // 
+            this.Btn_AddPostIt.Location = new System.Drawing.Point(638, 20);
+            this.Btn_AddPostIt.Name = "Btn_AddPostIt";
+            this.Btn_AddPostIt.Size = new System.Drawing.Size(75, 38);
+            this.Btn_AddPostIt.TabIndex = 11;
+            this.Btn_AddPostIt.Text = "Adicionar Post-It";
+            this.Btn_AddPostIt.UseVisualStyleBackColor = true;
+            this.Btn_AddPostIt.Click += new System.EventHandler(this.Btn_AddPostIt_Click);
             // 
             // Frm_Kanban
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(757, 450);
+            this.Controls.Add(this.Btn_AddPostIt);
+            this.Controls.Add(this.Flw_Feito);
+            this.Controls.Add(this.Flw_Fazendo);
+            this.Controls.Add(this.Flw_AFazer);
             this.Controls.Add(this.Btn_Atividade);
             this.Controls.Add(this.Lbl_Feito);
             this.Controls.Add(this.Lbl_Fazendo);
             this.Controls.Add(this.Lbl_aFazer);
-            this.Controls.Add(this.Pnl_Feito);
-            this.Controls.Add(this.Pnl_Fazendo);
-            this.Controls.Add(this.Pnl_AFazer);
             this.Controls.Add(this.Lbl_Titulo);
             this.Name = "Frm_Kanban";
             this.Text = "Frm_Kanban";
-            this.Pnl_AFazer.ResumeLayout(false);
-            this.Pnl_AFazer.PerformLayout();
-            this.Pnl_Fazendo.ResumeLayout(false);
-            this.Pnl_Fazendo.PerformLayout();
-            this.Pnl_Feito.ResumeLayout(false);
-            this.Pnl_Feito.PerformLayout();
+            this.Load += new System.EventHandler(this.Frm_Kanban_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -176,15 +148,13 @@
         #endregion
 
         private System.Windows.Forms.Label Lbl_Titulo;
-        private System.Windows.Forms.Panel Pnl_AFazer;
-        private System.Windows.Forms.Label Lbl_Adicionar1;
-        private System.Windows.Forms.Panel Pnl_Fazendo;
-        private System.Windows.Forms.Label Lbl_Adicionar2;
-        private System.Windows.Forms.Panel Pnl_Feito;
-        private System.Windows.Forms.Label Lbl_Adicionar3;
         private System.Windows.Forms.Label Lbl_aFazer;
         private System.Windows.Forms.Label Lbl_Fazendo;
         private System.Windows.Forms.Label Lbl_Feito;
         private System.Windows.Forms.Button Btn_Atividade;
+        private System.Windows.Forms.FlowLayoutPanel Flw_AFazer;
+        private System.Windows.Forms.FlowLayoutPanel Flw_Fazendo;
+        private System.Windows.Forms.FlowLayoutPanel Flw_Feito;
+        private System.Windows.Forms.Button Btn_AddPostIt;
     }
 }

@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace CanvasApp.Formularios_Pop_Ups
 {
-    public partial class Frm_Historico : Form
+    public partial class Frm_ConfiguracaoEsforco : Form
     {
-        public Frm_Historico()
+        public Frm_ConfiguracaoEsforco()
         {
             InitializeComponent();
         }

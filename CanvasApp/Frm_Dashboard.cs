@@ -245,7 +245,6 @@ namespace CanvasApp
         {
             this.Load += (s, e) =>
             {
-                TestarConexaoBanco();
                 AtualizarTextosTarefas();
                 AtualizarGraficoCircular();
                 AtualizarGraficoSemanal();
@@ -313,18 +312,6 @@ namespace CanvasApp
             {
                 Console.WriteLine($"❌ Erro ao atualizar visibilidade do botão: {ex.Message}");
                 Btn_Avancar.Visible = false;
-            }
-        }
-
-        private void TestarConexaoBanco()
-        {
-            try
-            {
-                usuarioDB.DiagnosticoCompletoUsuario(usuarioId);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"❌ Erro ao testar conexão: {ex.Message}");
             }
         }
 

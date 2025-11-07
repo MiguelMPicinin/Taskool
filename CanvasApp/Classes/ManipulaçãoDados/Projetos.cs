@@ -9,6 +9,11 @@ namespace CanvasApp.Classes.Databases
     public class ProjetosDB : BaseDB
     {
         // MÉTODO ADICIONADO PARA CORRIGIR O ERRO
+        public List<Projetos> ObterProjetosDoUsuario(int usuarioId)
+        {
+            return ObterProjetosPorUsuario(usuarioId);
+        }
+
         public bool CriarProjetoCompartilhado(Projetos projeto)
         {
             return InserirProjeto(projeto);
@@ -21,6 +26,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string query = "SELECT Codigo, Nome, CodUsuario, NaoPertube FROM Projeto WHERE CodUsuario = @usuarioId";
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
@@ -55,6 +61,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string query = @"
                         SELECT P.Codigo, P.Nome, P.NaoPertube, P.CodUsuario
                         FROM Projeto P
@@ -92,6 +99,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = "SELECT Codigo, Nome, CodUsuario, NaoPertube FROM Projeto WHERE Codigo = @Codigo";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -130,6 +138,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = "SELECT Nome FROM Projeto WHERE Codigo = @codProjeto";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -150,6 +159,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"INSERT INTO Projeto (Nome, CodUsuario, NaoPertube) 
                                  VALUES (@Nome, @CodUsuario, @NaoPertube)";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -176,6 +186,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"UPDATE Projeto SET Nome = @Nome, NaoPertube = @NaoPertube 
                                  WHERE Codigo = @Codigo";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -202,7 +213,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
-                    // Primeiro excluir tarefas e membros associados
+                    conn.Open();
                     string sqlTarefas = "DELETE FROM Projeto_Tarefas WHERE CodProjeto = @CodProjeto";
                     string sqlMembros = "DELETE FROM Projeto_Membros WHERE CodProjeto = @CodProjeto";
                     string sqlProjeto = "DELETE FROM Projeto WHERE Codigo = @CodProjeto";
@@ -236,27 +247,13 @@ namespace CanvasApp.Classes.Databases
             }
         }
 
-        public List<Projetos> ObterTodosProjetosUsuario(int usuarioId)
-        {
-            var projetos = new List<Projetos>();
-
-            var projetosProprios = ObterProjetosPorUsuario(usuarioId);
-            if (projetosProprios != null)
-                projetos.AddRange(projetosProprios);
-
-            var projetosCompartilhados = ObterProjetosCompartilhados(usuarioId);
-            if (projetosCompartilhados != null)
-                projetos.AddRange(projetosCompartilhados);
-
-            return projetos.OrderBy(p => p.Nome).ToList();
-        }
-
         public int ObterProprietarioProjeto(int codProjeto)
         {
             try
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = "SELECT CodUsuario FROM Projeto WHERE Codigo = @codProjeto";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -278,6 +275,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"
                         SELECT COUNT(DISTINCT P.Codigo)
                         FROM Projeto P
@@ -295,6 +293,24 @@ namespace CanvasApp.Classes.Databases
                 Mensagem = "Erro ao contar projetos: " + ex.Message;
                 return 0;
             }
+        }
+
+        // MÉTODO ÚNICO - REMOVIDA A DUPLICAÇÃO
+        public List<Projetos> ObterTodosProjetosUsuario(int usuarioId)
+        {
+            var projetos = new List<Projetos>();
+
+            // Obter projetos próprios
+            var projetosProprios = ObterProjetosPorUsuario(usuarioId);
+            if (projetosProprios != null)
+                projetos.AddRange(projetosProprios);
+
+            // Obter projetos compartilhados
+            var projetosCompartilhados = ObterProjetosCompartilhados(usuarioId);
+            if (projetosCompartilhados != null)
+                projetos.AddRange(projetosCompartilhados);
+
+            return projetos.OrderBy(p => p.Nome).ToList();
         }
     }
 }

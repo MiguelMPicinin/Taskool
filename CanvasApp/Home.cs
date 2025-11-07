@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net.Mail;
 using System.Windows.Forms;
 using WMPLib;
 
@@ -26,6 +27,7 @@ namespace Home
         private readonly ProjetosDB dbProjetos = new ProjetosDB();
         private readonly FavoritosDB dbFavoritos = new FavoritosDB();
         private readonly NotificacoesDB dbNotificacoes = new NotificacoesDB();
+        private readonly HistoricoDB historicoDB = new HistoricoDB();
 
         // Painel de notificações
         private Panel Pnl_Notificacoes;
@@ -74,6 +76,73 @@ namespace Home
 
             this.Resize += Frm_Home_Resize;
         }
+
+        // =========================================================================
+        // MÉTODOS DE HISTÓRICO E NOTIFICAÇÃO POR E-MAIL
+        // =========================================================================
+
+        private void RegistrarHistorico(int codTarefa, int codUsuario, string acao, string nomeCartao, string nomeProjeto)
+        {
+            try
+            {
+                var historico = new HistoricoModificacoes
+                {
+                    CodTarefa = codTarefa,
+                    CodUsuario = codUsuario,
+                    Data = DateTime.Now,
+                    Texto = $"{acao} o cartão '{nomeCartao}' no projeto '{nomeProjeto}'"
+                };
+
+                // Salvar no banco
+                historicoDB.InserirHistorico(historico);
+
+                // Atualizar interface se existir
+                AtualizarListViewHistorico(codTarefa);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao registrar histórico: {ex.Message}");
+            }
+        }
+
+        private void AtualizarListViewHistorico(int codTarefa)
+        {
+            // Implemente conforme sua interface
+            // Exemplo: if (listViewHistorico != null) { ... }
+        }
+
+        private void EnviarEmailNotificacao(string acao, string nomeCartao, string nomeProjeto)
+        {
+            try
+            {
+                if (CanvasApp.Classes.Databases.UsuarioCL.Sessao.UsuarioLogado == null) return;
+
+                using (SmtpClient smtpClient = new SmtpClient("127.0.0.1", 8087))
+                {
+                    smtpClient.EnableSsl = false;
+                    smtpClient.UseDefaultCredentials = true;
+
+                    using (MailMessage mailMessage = new MailMessage())
+                    {
+                        mailMessage.From = new MailAddress("worldskills2019@gmail.com");
+                        mailMessage.To.Add(CanvasApp.Classes.Databases.UsuarioCL.Sessao.UsuarioLogado.Email ?? "destinatario@email.com");
+                        mailMessage.Subject = $"Nova ação no projeto {nomeProjeto}";
+                        mailMessage.Body = $"Olá, {CanvasApp.Classes.Databases.UsuarioCL.Sessao.UsuarioLogado.Nome}. Você acabou de realizar uma nova ação no projeto {nomeProjeto}: - {acao} o cartão {nomeCartao}.";
+                        mailMessage.IsBodyHtml = false;
+
+                        smtpClient.Send(mailMessage);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao enviar e-mail: {ex.Message}");
+            }
+        }
+
+        // =========================================================================
+        // MÉTODOS EXISTENTES (mantidos da versão anterior)
+        // =========================================================================
 
         private void ConfigurarPainelNotificacoes()
         {
@@ -601,7 +670,7 @@ namespace Home
         {
             if (CanvasApp.Classes.Databases.UsuarioCL.Sessao.UsuarioLogado == null) return;
 
-            int usuarioId = Convert.ToInt32(Sessao.UsuarioLogado);
+            int usuarioId = Sessao.UsuarioLogado.Codigo;
 
             switch (categoria)
             {
@@ -624,12 +693,10 @@ namespace Home
         {
             if (CanvasApp.Classes.Databases.UsuarioCL.Sessao.UsuarioLogado == null) return;
 
-            int usuarioId = Sessao.UsuarioLogado.Codigo; 
+            int usuarioId = Sessao.UsuarioLogado.Codigo;
             AbrirFormProjeto(projeto, usuarioId);
-
         }
 
-        // CORREÇÃO: Todos os métodos convertem usuarioId para string
         private int ObterQuantidadeFavoritas(int usuarioId)
         {
             try
@@ -647,11 +714,10 @@ namespace Home
         {
             try
             {
-                // CORREÇÃO: Converta para string
                 var tarefasHoje = dbTarefas.ObterTarefasComAlarmeHoje(usuarioId);
                 return tarefasHoje.Count;
             }
-            catch (Exception) // CORREÇÃO: Removida variável não utilizada
+            catch (Exception)
             {
                 Console.WriteLine("Erro ao obter quantidade de tarefas hoje");
                 return 0;
@@ -662,11 +728,10 @@ namespace Home
         {
             try
             {
-                // CORREÇÃO: Converta para string
                 var tarefasSemana = dbTarefas.ObterTarefasComAlarmeSemana(usuarioId);
                 return tarefasSemana.Count;
             }
-            catch (Exception) // CORREÇÃO: Removida variável não utilizada
+            catch (Exception)
             {
                 Console.WriteLine("Erro ao obter quantidade de tarefas semana");
                 return 0;
@@ -677,11 +742,10 @@ namespace Home
         {
             try
             {
-                // CORREÇÃO: Converta para string
                 var tarefasMes = dbTarefas.ObterTarefasComAlarmeMes(usuarioId);
                 return tarefasMes.Count;
             }
-            catch (Exception) // CORREÇÃO: Removida variável não utilizada
+            catch (Exception)
             {
                 Console.WriteLine("Erro ao obter quantidade de tarefas mês");
                 return 0;
@@ -721,7 +785,6 @@ namespace Home
             {
                 Console.WriteLine($"=== INICIANDO FILTRO HOJE - Usuário: {usuarioId} ===");
 
-                // CORREÇÃO: Converta para string
                 var tarefasHoje = dbTarefas.ObterTarefasComAlarmeHoje(usuarioId);
 
                 Console.WriteLine($"Tarefas com alarme para HOJE encontradas: {tarefasHoje.Count}");
@@ -754,7 +817,6 @@ namespace Home
             {
                 Console.WriteLine($"=== INICIANDO FILTRO SEMANA - Usuário: {usuarioId} ===");
 
-                // CORREÇÃO: Converta para string
                 var tarefasSemana = dbTarefas.ObterTarefasComAlarmeSemana(usuarioId);
 
                 Console.WriteLine($"Tarefas com alarme para SEMANA encontradas: {tarefasSemana.Count}");
@@ -787,7 +849,6 @@ namespace Home
             {
                 Console.WriteLine($"=== INICIANDO FILTRO MÊS - Usuário: {usuarioId} ===");
 
-                // CORREÇÃO: Converta para string
                 var tarefasMes = dbTarefas.ObterTarefasComAlarmeMes(usuarioId);
 
                 Console.WriteLine($"Tarefas com alarme para MÊS encontradas: {tarefasMes.Count}");
@@ -878,7 +939,7 @@ namespace Home
                 player.controls.play();
                 musicaTocando = true;
             }
-            catch (Exception) // CORREÇÃO: Removida variável não utilizada
+            catch (Exception)
             {
                 Lbl_NomeMusica.Text = "Erro ao carregar música";
             }

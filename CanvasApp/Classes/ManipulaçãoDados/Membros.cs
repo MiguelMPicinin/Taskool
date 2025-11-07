@@ -21,6 +21,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"SELECT COUNT(*) FROM Projeto_Membros 
                                 WHERE CodProjeto = @CodProjeto AND CodMembro = @CodMembro";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -52,6 +53,7 @@ namespace CanvasApp.Classes.Databases
 
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = "DELETE FROM Projeto_Membros WHERE CodProjeto = @CodProjeto AND CodMembro = @CodMembro";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -86,6 +88,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"
                         SELECT U.Codigo, U.Nome, U.Email, U.NomeUsuario, U.DataNascimento, U.Telefone
                         FROM Usuario U
@@ -126,6 +129,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     // Verificar se o membro já existe
                     string sqlVerificar = @"SELECT COUNT(*) FROM Projeto_Membros 
                                           WHERE CodProjeto = @CodProjeto AND CodMembro = @CodMembro";
@@ -169,6 +173,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     // Verificar se o usuário existe
                     string sqlVerificarUsuario = "SELECT Codigo FROM Usuario WHERE Email = @Email";
                     int codUsuarioCompartilhar;
@@ -230,6 +235,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"SELECT COUNT(*) FROM Projeto_Membros WHERE CodProjeto = @CodProjeto";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -252,6 +258,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"SELECT CodProjeto FROM Projeto_Membros WHERE CodMembro = @CodMembro";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {

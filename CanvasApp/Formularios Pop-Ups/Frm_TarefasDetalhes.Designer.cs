@@ -57,16 +57,22 @@
             this.Txt_NovoComentarioChat = new System.Windows.Forms.TextBox();
             this.Flw_ChatComentarios = new System.Windows.Forms.FlowLayoutPanel();
             this.Btn_FecharChat = new System.Windows.Forms.Button();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.Btn_Anexar = new System.Windows.Forms.Button();
+            this.Pnl_Anexo = new System.Windows.Forms.Panel();
             this.Pnl_ArquivosIndexados = new System.Windows.Forms.Panel();
+            this.Btn_Anexar = new System.Windows.Forms.Button();
+            this.Pnl_Historico = new System.Windows.Forms.Panel();
+            this.Lst_Historico = new System.Windows.Forms.ListView();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.Pnl_Cabecalho.SuspendLayout();
             this.Pnl_Conteudo.SuspendLayout();
             this.Pnl_Comentarios.SuspendLayout();
             this.Pnl_Subtarefas.SuspendLayout();
             this.Pnl_Prazo.SuspendLayout();
             this.Pnl_ChatComentarios.SuspendLayout();
-            this.panel1.SuspendLayout();
+            this.Pnl_Anexo.SuspendLayout();
+            this.Pnl_Historico.SuspendLayout();
             this.SuspendLayout();
             // 
             // Pnl_Cabecalho
@@ -351,14 +357,22 @@
             this.Btn_FecharChat.Text = "✕";
             this.Btn_FecharChat.UseVisualStyleBackColor = true;
             // 
-            // panel1
+            // Pnl_Anexo
             // 
-            this.panel1.Controls.Add(this.Pnl_ArquivosIndexados);
-            this.panel1.Controls.Add(this.Btn_Anexar);
-            this.panel1.Location = new System.Drawing.Point(1, 528);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(433, 99);
-            this.panel1.TabIndex = 3;
+            this.Pnl_Anexo.Controls.Add(this.Pnl_ArquivosIndexados);
+            this.Pnl_Anexo.Controls.Add(this.Btn_Anexar);
+            this.Pnl_Anexo.Location = new System.Drawing.Point(1, 528);
+            this.Pnl_Anexo.Name = "Pnl_Anexo";
+            this.Pnl_Anexo.Size = new System.Drawing.Size(433, 99);
+            this.Pnl_Anexo.TabIndex = 3;
+            // 
+            // Pnl_ArquivosIndexados
+            // 
+            this.Pnl_ArquivosIndexados.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.Pnl_ArquivosIndexados.Location = new System.Drawing.Point(84, 29);
+            this.Pnl_ArquivosIndexados.Name = "Pnl_ArquivosIndexados";
+            this.Pnl_ArquivosIndexados.Size = new System.Drawing.Size(328, 50);
+            this.Pnl_ArquivosIndexados.TabIndex = 1;
             // 
             // Btn_Anexar
             // 
@@ -369,21 +383,53 @@
             this.Btn_Anexar.Text = "Anexar Arquivo";
             this.Btn_Anexar.UseVisualStyleBackColor = true;
             // 
-            // Pnl_ArquivosIndexados
+            // Pnl_Historico
             // 
-            this.Pnl_ArquivosIndexados.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.Pnl_ArquivosIndexados.Location = new System.Drawing.Point(84, 29);
-            this.Pnl_ArquivosIndexados.Name = "Pnl_ArquivosIndexados";
-            this.Pnl_ArquivosIndexados.Size = new System.Drawing.Size(328, 50);
-            this.Pnl_ArquivosIndexados.TabIndex = 1;
+            this.Pnl_Historico.Controls.Add(this.Lst_Historico);
+            this.Pnl_Historico.Location = new System.Drawing.Point(0, 627);
+            this.Pnl_Historico.Name = "Pnl_Historico";
+            this.Pnl_Historico.Size = new System.Drawing.Size(433, 99);
+            this.Pnl_Historico.TabIndex = 4;
+            // 
+            // Lst_Historico
+            // 
+            this.Lst_Historico.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2,
+            this.columnHeader3});
+            this.Lst_Historico.FullRowSelect = true;
+            this.Lst_Historico.GridLines = true;
+            this.Lst_Historico.HideSelection = false;
+            this.Lst_Historico.Location = new System.Drawing.Point(3, 3);
+            this.Lst_Historico.Name = "Lst_Historico";
+            this.Lst_Historico.Size = new System.Drawing.Size(427, 94);
+            this.Lst_Historico.TabIndex = 0;
+            this.Lst_Historico.UseCompatibleStateImageBehavior = false;
+            this.Lst_Historico.View = System.Windows.Forms.View.Details;
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "Usuario";
+            this.columnHeader1.Width = 80;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "Ação";
+            this.columnHeader2.Width = 200;
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "Data/Hora";
+            this.columnHeader3.Width = 150;
             // 
             // Frm_TarefasDetalhes
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(434, 624);
+            this.ClientSize = new System.Drawing.Size(437, 727);
+            this.Controls.Add(this.Pnl_Historico);
             this.Controls.Add(this.Pnl_ChatComentarios);
-            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.Pnl_Anexo);
             this.Controls.Add(this.Pnl_Conteudo);
             this.Controls.Add(this.Pnl_Cabecalho);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -402,7 +448,8 @@
             this.Pnl_Prazo.PerformLayout();
             this.Pnl_ChatComentarios.ResumeLayout(false);
             this.Pnl_ChatComentarios.PerformLayout();
-            this.panel1.ResumeLayout(false);
+            this.Pnl_Anexo.ResumeLayout(false);
+            this.Pnl_Historico.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -438,8 +485,13 @@
         private System.Windows.Forms.Button Btn_FecharChat;
         private System.Windows.Forms.Label Lbl_TituloChat;
         private System.Windows.Forms.Button Btn_SalvarData;
-        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel Pnl_Anexo;
         private System.Windows.Forms.Button Btn_Anexar;
         private System.Windows.Forms.Panel Pnl_ArquivosIndexados;
+        private System.Windows.Forms.Panel Pnl_Historico;
+        private System.Windows.Forms.ListView Lst_Historico;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
     }
 }

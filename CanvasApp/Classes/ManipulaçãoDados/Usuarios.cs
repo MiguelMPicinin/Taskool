@@ -17,6 +17,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = "SELECT Nome FROM Usuario WHERE Codigo = @codUsuario";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -37,6 +38,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"INSERT INTO Usuario (Nome, Email, NomeUsuario, DataNascimento, Telefone, Foto)
                                  VALUES (@Nome, @Email, @NomeUsuario, @DataNascimento, @Telefone, @Foto)";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -67,6 +69,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"SELECT * FROM Usuario WHERE NomeUsuario = @Login OR Email = @Login";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -117,6 +120,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"UPDATE Usuario SET Nome = @Nome, Email = @Email, NomeUsuario = @NomeUsuario,
                                  DataNascimento = @DataNascimento, Telefone = @Telefone, Foto = @Foto
                                  WHERE Codigo = @Codigo";
@@ -148,6 +152,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"UPDATE Usuario SET Nome = @Nome, Email = @Email, Foto = @Foto
                                  WHERE Codigo = @Codigo";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -175,6 +180,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = "DELETE FROM Usuario WHERE Codigo = @Codigo";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -198,6 +204,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = "SELECT * FROM Usuario WHERE Codigo = @Codigo";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -242,6 +249,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"SELECT * FROM Usuario 
                                  WHERE NomeUsuario LIKE @Texto OR Email LIKE @Texto OR Nome LIKE @Texto
                                  ORDER BY Nome";
@@ -287,6 +295,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"SELECT COUNT(*) FROM Usuario WHERE NomeUsuario = @NomeUsuario";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -309,6 +318,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"SELECT COUNT(*) FROM Usuario WHERE Email = @Email";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -331,6 +341,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = @"SELECT * FROM Usuario 
                                WHERE (NomeUsuario = @Login OR Email = @Login)";
 
@@ -471,6 +482,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = "SELECT COUNT(*) FROM Usuario";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -491,6 +503,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = "SELECT COUNT(*) FROM Usuario WHERE Codigo = @usuarioId";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -513,6 +526,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = "SELECT * FROM Usuario ORDER BY Nome";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -555,6 +569,7 @@ namespace CanvasApp.Classes.Databases
             {
                 using (SqlConnection conn = GetConnection())
                 {
+                    conn.Open();
                     string sql = "SELECT Codigo, Nome, Email, NomeUsuario FROM Usuario WHERE Codigo = @Codigo";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {

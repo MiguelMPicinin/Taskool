@@ -28,92 +28,102 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.Lbl_Descricao = new System.Windows.Forms.Label();
-            this.Txt_Descricao = new System.Windows.Forms.TextBox();
-            this.Lbl_Cor = new System.Windows.Forms.Label();
-            this.Cmb_Cores = new System.Windows.Forms.ComboBox();
-            this.Pnl_Preview = new System.Windows.Forms.Panel();
-            this.Btn_Adicionar = new System.Windows.Forms.Button();
+            this.Txt_Texto = new System.Windows.Forms.TextBox();
+            this.Btn_Cores1 = new System.Windows.Forms.Button();
+            this.Btn_Cores2 = new System.Windows.Forms.Button();
+            this.Btn_Cores3 = new System.Windows.Forms.Button();
+            this.Btn_Cores4 = new System.Windows.Forms.Button();
+            this.Btn_Ok = new System.Windows.Forms.Button();
             this.Btn_Cancelar = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // Lbl_Descricao
+            // Txt_Texto
             // 
-            this.Lbl_Descricao.AutoSize = true;
-            this.Lbl_Descricao.Location = new System.Drawing.Point(20, 20);
-            this.Lbl_Descricao.Name = "Lbl_Descricao";
-            this.Lbl_Descricao.Size = new System.Drawing.Size(55, 13);
-            this.Lbl_Descricao.TabIndex = 0;
-            this.Lbl_Descricao.Text = "Descrição";
+            this.Txt_Texto.Location = new System.Drawing.Point(20, 60);
+            this.Txt_Texto.Multiline = true;
+            this.Txt_Texto.Name = "Txt_Texto";
+            this.Txt_Texto.Size = new System.Drawing.Size(250, 80);
+            this.Txt_Texto.TabIndex = 0;
             // 
-            // Txt_Descricao
+            // Btn_Cores1
             // 
-            this.Txt_Descricao.Location = new System.Drawing.Point(20, 50);
-            this.Txt_Descricao.Multiline = true;
-            this.Txt_Descricao.Name = "Txt_Descricao";
-            this.Txt_Descricao.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.Txt_Descricao.Size = new System.Drawing.Size(340, 100);
-            this.Txt_Descricao.TabIndex = 1;
+            this.Btn_Cores1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(121)))));
+            this.Btn_Cores1.Location = new System.Drawing.Point(20, 10);
+            this.Btn_Cores1.Name = "Btn_Cores1";
+            this.Btn_Cores1.Size = new System.Drawing.Size(40, 40);
+            this.Btn_Cores1.TabIndex = 1;
+            this.Btn_Cores1.UseVisualStyleBackColor = false;
+            this.Btn_Cores1.Click += new System.EventHandler(this.Btn_Cores1_Click);
             // 
-            // Lbl_Cor
+            // Btn_Cores2
             // 
-            this.Lbl_Cor.AutoSize = true;
-            this.Lbl_Cor.Location = new System.Drawing.Point(20, 160);
-            this.Lbl_Cor.Name = "Lbl_Cor";
-            this.Lbl_Cor.Size = new System.Drawing.Size(23, 13);
-            this.Lbl_Cor.TabIndex = 2;
-            this.Lbl_Cor.Text = "Cor";
+            this.Btn_Cores2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(151)))), ((int)(((byte)(202)))));
+            this.Btn_Cores2.Location = new System.Drawing.Point(80, 10);
+            this.Btn_Cores2.Name = "Btn_Cores2";
+            this.Btn_Cores2.Size = new System.Drawing.Size(40, 40);
+            this.Btn_Cores2.TabIndex = 2;
+            this.Btn_Cores2.UseVisualStyleBackColor = false;
+            this.Btn_Cores2.Click += new System.EventHandler(this.Btn_Cores2_Click);
             // 
-            // Cmb_Cores
+            // Btn_Cores3
             // 
-            this.Cmb_Cores.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.Cmb_Cores.FormattingEnabled = true;
-            this.Cmb_Cores.Location = new System.Drawing.Point(20, 190);
-            this.Cmb_Cores.Name = "Cmb_Cores";
-            this.Cmb_Cores.Size = new System.Drawing.Size(200, 21);
-            this.Cmb_Cores.TabIndex = 3;
+            this.Btn_Cores3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(152)))), ((int)(((byte)(211)))), ((int)(((byte)(102)))));
+            this.Btn_Cores3.Location = new System.Drawing.Point(140, 10);
+            this.Btn_Cores3.Name = "Btn_Cores3";
+            this.Btn_Cores3.Size = new System.Drawing.Size(40, 40);
+            this.Btn_Cores3.TabIndex = 3;
+            this.Btn_Cores3.UseVisualStyleBackColor = false;
+            this.Btn_Cores3.Click += new System.EventHandler(this.Btn_Cores3_Click);
             // 
-            // Pnl_Preview
+            // Btn_Cores4
             // 
-            this.Pnl_Preview.Location = new System.Drawing.Point(230, 190);
-            this.Pnl_Preview.Name = "Pnl_Preview";
-            this.Pnl_Preview.Size = new System.Drawing.Size(50, 20);
-            this.Pnl_Preview.TabIndex = 4;
+            this.Btn_Cores4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(130)))), ((int)(((byte)(211)))), ((int)(((byte)(229)))));
+            this.Btn_Cores4.Location = new System.Drawing.Point(200, 10);
+            this.Btn_Cores4.Name = "Btn_Cores4";
+            this.Btn_Cores4.Size = new System.Drawing.Size(40, 40);
+            this.Btn_Cores4.TabIndex = 4;
+            this.Btn_Cores4.UseVisualStyleBackColor = false;
+            this.Btn_Cores4.Click += new System.EventHandler(this.Btn_Cores4_Click);
             // 
-            // Btn_Adicionar
+            // Btn_Ok
             // 
-            this.Btn_Adicionar.Location = new System.Drawing.Point(200, 230);
-            this.Btn_Adicionar.Name = "Btn_Adicionar";
-            this.Btn_Adicionar.Size = new System.Drawing.Size(80, 30);
-            this.Btn_Adicionar.TabIndex = 5;
-            this.Btn_Adicionar.Text = "Adicionar";
-            this.Btn_Adicionar.UseVisualStyleBackColor = true;
+            this.Btn_Ok.Location = new System.Drawing.Point(115, 150);
+            this.Btn_Ok.Name = "Btn_Ok";
+            this.Btn_Ok.Size = new System.Drawing.Size(75, 23);
+            this.Btn_Ok.TabIndex = 5;
+            this.Btn_Ok.Text = "Adicionar";
+            this.Btn_Ok.UseVisualStyleBackColor = true;
+            this.Btn_Ok.Click += new System.EventHandler(this.Btn_Ok_Click);
             // 
             // Btn_Cancelar
             // 
-            this.Btn_Cancelar.Location = new System.Drawing.Point(290, 230);
+            this.Btn_Cancelar.Location = new System.Drawing.Point(195, 150);
             this.Btn_Cancelar.Name = "Btn_Cancelar";
-            this.Btn_Cancelar.Size = new System.Drawing.Size(80, 30);
+            this.Btn_Cancelar.Size = new System.Drawing.Size(75, 23);
             this.Btn_Cancelar.TabIndex = 6;
             this.Btn_Cancelar.Text = "Cancelar";
             this.Btn_Cancelar.UseVisualStyleBackColor = true;
+            this.Btn_Cancelar.Click += new System.EventHandler(this.Btn_Cancelar_Click);
             // 
             // Frm_AdicionarPostIt
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(384, 261);
+            this.ClientSize = new System.Drawing.Size(284, 182);
             this.Controls.Add(this.Btn_Cancelar);
-            this.Controls.Add(this.Btn_Adicionar);
-            this.Controls.Add(this.Pnl_Preview);
-            this.Controls.Add(this.Cmb_Cores);
-            this.Controls.Add(this.Lbl_Cor);
-            this.Controls.Add(this.Txt_Descricao);
-            this.Controls.Add(this.Lbl_Descricao);
+            this.Controls.Add(this.Btn_Ok);
+            this.Controls.Add(this.Btn_Cores4);
+            this.Controls.Add(this.Btn_Cores3);
+            this.Controls.Add(this.Btn_Cores2);
+            this.Controls.Add(this.Btn_Cores1);
+            this.Controls.Add(this.Txt_Texto);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "Frm_AdicionarPostIt";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Adicionar Tarefa";
+            this.Load += new System.EventHandler(this.Frm_AdicionarPostIt_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -121,12 +131,12 @@
 
         #endregion
 
-        private System.Windows.Forms.Label Lbl_Descricao;
-        private System.Windows.Forms.TextBox Txt_Descricao;
-        private System.Windows.Forms.Label Lbl_Cor;
-        private System.Windows.Forms.ComboBox Cmb_Cores;
-        private System.Windows.Forms.Panel Pnl_Preview;
-        private System.Windows.Forms.Button Btn_Adicionar;
+        private System.Windows.Forms.TextBox Txt_Texto;
+        private System.Windows.Forms.Button Btn_Cores1;
+        private System.Windows.Forms.Button Btn_Cores2;
+        private System.Windows.Forms.Button Btn_Cores3;
+        private System.Windows.Forms.Button Btn_Cores4;
+        private System.Windows.Forms.Button Btn_Ok;
         private System.Windows.Forms.Button Btn_Cancelar;
     }
 }

@@ -18,6 +18,7 @@ namespace CanvasApp.Classes.Databases.UsuarioCL
         public string Cor { get; set; }
         public DateTime dataConclusao { get; set; }
         public DateTime dataLimite { get; set; }
-        public string NomeProjeto { get; set; }
+
+        // Removida a propriedade Posicao que não existe na tabela
     }
 }

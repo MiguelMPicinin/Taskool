@@ -167,6 +167,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\Databases\UsuarioLogado.cs" />
+    <Compile Include="Classes\Databases\UsuarioSessao.cs" />
+    <Compile Include="Classes\Classes de Jogos\ClasseJogos.cs" />
+    <Compile Include="Classes\Classes de Jogos\RegraCondicional.cs" />
+    <Compile Include="Classes\ManipulaçãoDados\EnviarEmail.cs" />
+    <Compile Include="Classes\ManipulaçãoDados\RegistrarHistorico.cs" />
     <Compile Include="Formularios Pop-Ups\AlteraCor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -219,7 +225,6 @@
     <Compile Include="Classes\ManipulaçãoDados\Subtarefas.cs" />
     <Compile Include="Classes\ManipulaçãoDados\Tarefas.cs" />
     <Compile Include="Classes\ManipulaçãoDados\Usuarios.cs" />
-    <Compile Include="Classes\ManipulaçãoDados\VerificarEmail.cs" />
     <Compile Include="Classes\Tema.cs" />
     <Compile Include="dbTarefas2DataSet.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -248,11 +253,29 @@
     <Compile Include="Formularios Pop-Ups\Frm_AdicionarPostIt.Designer.cs">
       <DependentUpon>Frm_AdicionarPostIt.cs</DependentUpon>
     </Compile>
+    <Compile Include="Formularios Pop-Ups\Frm_ConfiguracaoEsforco.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Formularios Pop-Ups\Frm_ConfiguracaoEsforco.Designer.cs">
+      <DependentUpon>Frm_ConfiguracaoEsforco.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Formularios Pop-Ups\Frm_ExecutarSQL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Formularios Pop-Ups\Frm_ExecutarSQL.Designer.cs">
+      <DependentUpon>Frm_ExecutarSQL.cs</DependentUpon>
+    </Compile>
     <Compile Include="Formularios Pop-Ups\Frm_Historico.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Formularios Pop-Ups\Frm_Historico.Designer.cs">
       <DependentUpon>Frm_Historico.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Formularios Pop-Ups\Frm_HistoricoTarefas.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Formularios Pop-Ups\Frm_HistoricoTarefas.Designer.cs">
+      <DependentUpon>Frm_HistoricoTarefas.cs</DependentUpon>
     </Compile>
     <Compile Include="Frm_Dashboard.cs">
       <SubType>Form</SubType>
@@ -334,8 +357,11 @@
     <EmbeddedResource Include="Formularios Pop-Ups\Frm_AdicionarPostIt.resx">
       <DependentUpon>Frm_AdicionarPostIt.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Formularios Pop-Ups\Frm_Historico.resx">
-      <DependentUpon>Frm_Historico.cs</DependentUpon>
+    <EmbeddedResource Include="Formularios Pop-Ups\Frm_ExecutarSQL.resx">
+      <DependentUpon>Frm_ExecutarSQL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Formularios Pop-Ups\Frm_HistoricoTarefas.resx">
+      <DependentUpon>Frm_HistoricoTarefas.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Frm_Dashboard.resx">
       <DependentUpon>Frm_Dashboard.cs</DependentUpon>
@@ -472,6 +498,7 @@
     <Content Include="Imagens\salvar.png" />
     <Content Include="Imagens\sinal-de-adicao.png" />
     <Content Include="Imagens\texto.png" />
+    <Content Include="Mensagens\esforcoDias.txt" />
     <Content Include="musicas-testes\Beethoven Silence.mp3" />
     <Content Include="musicas-testes\Requiem.mp3" />
     <Content Include="musicas-testes\Ride Of The Valkyries.mp3" />
