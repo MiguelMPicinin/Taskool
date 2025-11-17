@@ -23,6 +23,7 @@ namespace CanvasApp.Forms
         private readonly UsuarioDB _usuarioDB;
         private readonly MembrosDB _membrosDB;
         private readonly AnexosDB _anexosDB;
+        private readonly HistoricoDB _historicoDB;
 
         private Button btnAdicionarSubtarefa;
 
@@ -37,7 +38,8 @@ namespace CanvasApp.Forms
             _subtarefasDB = new SubtarefasDB();
             _comentariosDB = new ComentariosDB();
             _usuarioDB = new UsuarioDB();
-            _anexosDB = new AnexosDB(); // Corrigido: usar underscore
+            _anexosDB = new AnexosDB();
+            _historicoDB = new HistoricoDB();
 
             var notificacoesDB = new NotificacoesDB();
             var projetosDB = new ProjetosDB();
@@ -46,6 +48,7 @@ namespace CanvasApp.Forms
 
             ConfigurarLayoutDetalhes();
             CarregarDadosTarefa();
+            CarregarHistoricoTarefa();
         }
 
         private void ConfigurarLayoutDetalhes()
@@ -56,11 +59,8 @@ namespace CanvasApp.Forms
             ConfigurarSubtarefas();
             ConfigurarComentarios();
             ConfigurarBotaoAtribuirResponsavel();
-            ConfigurarAnexos(); // NOVO: Configurar anexos
-
-            Pnl_ChatComentarios.Visible = false;
-            Pnl_ChatComentarios.BringToFront();
-            MostrarSelecaoDataAlarme();
+            ConfigurarAnexos();
+            ConfigurarHistorico();
         }
 
         private void ConfigurarEventos()
@@ -74,7 +74,82 @@ namespace CanvasApp.Forms
             Btn_EnviarComentario.Click += Bin_EnviarComentario_Click;
             Txt_NovoComentarioChat.KeyDown += Txt_NovoComentarioChat_KeyDown;
             Dtp_Prazo.ValueChanged += Dtp_Prazo_ValueChanged;
-            Btn_Anexar.Click += Btn_Anexar_Click; // NOVO: Evento do botão anexar
+            Btn_Anexar.Click += Btn_Anexar_Click;
+            Txt_TituloTarefa.Leave += Txt_TituloTarefa_Leave;
+        }
+
+        private void ConfigurarHistorico()
+        {
+            // Configurar ListView do histórico
+            Lst_Historico.View = View.Details;
+            Lst_Historico.FullRowSelect = true;
+            Lst_Historico.GridLines = true;
+            Lst_Historico.MultiSelect = false;
+
+            // Adicionar colunas
+            Lst_Historico.Columns.Clear();
+            Lst_Historico.Columns.Add("Usuário", 150);
+            Lst_Historico.Columns.Add("Ação", 300);
+            Lst_Historico.Columns.Add("Data/Hora", 120);
+        }
+
+        private void CarregarHistoricoTarefa()
+        {
+            try
+            {
+                Lst_Historico.Items.Clear();
+
+                var historicos = _historicoDB.ObterHistoricoPorTarefa(tarefaAtual.Codigo);
+
+                if (!historicos.Any())
+                {
+                    // Adicionar item indicando que não há histórico
+                    var item = new ListViewItem("Sistema");
+                    item.SubItems.Add("Tarefa criada");
+                    item.SubItems.Add(DateTime.Now.ToString("dd/MM/yyyy HH:mm")); // CORREÇÃO: Usar DateTime.Now
+                    Lst_Historico.Items.Add(item);
+                    return;
+                }
+
+                foreach (var historico in historicos)
+                {
+                    var item = new ListViewItem(historico.NomeUsuario ?? "Usuário Desconhecido");
+                    item.SubItems.Add(historico.Texto);
+                    item.SubItems.Add(historico.Data.ToString("dd/MM/yyyy HH:mm"));
+                    Lst_Historico.Items.Add(item);
+                }
+
+                // Ajustar largura das colunas
+                Lst_Historico.Columns[1].Width = Lst_Historico.Width - 270;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao carregar histórico: {ex.Message}", "Erro",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void RegistrarHistorico(string acao)
+        {
+            try
+            {
+                if (usuarioLogado == null) return;
+
+                var historico = new HistoricoModificacoes
+                {
+                    CodTarefa = tarefaAtual.Codigo,
+                    CodUsuario = usuarioLogado.Codigo,
+                    Data = DateTime.Now,
+                    Texto = acao
+                };
+
+                _historicoDB.InserirHistorico(historico);
+                CarregarHistoricoTarefa();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao registrar histórico: {ex.Message}");
+            }
         }
 
         // NOVO: Método para configurar anexos
@@ -144,6 +219,7 @@ namespace CanvasApp.Forms
                 if (_anexosDB.InserirAnexo(anexo))
                 {
                     CarregarAnexos();
+                    RegistrarHistorico($"Anexou o arquivo: {fileName}");
                     MessageBox.Show($"Arquivo '{fileName}' anexado com sucesso!", "Sucesso",
                                   MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -463,6 +539,7 @@ namespace CanvasApp.Forms
                     if (_anexosDB.ExcluirAnexo(codAnexo))
                     {
                         CarregarAnexos();
+                        RegistrarHistorico("Removeu um anexo");
                         MessageBox.Show("Anexo excluído com sucesso!", "Sucesso",
                                       MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
@@ -480,7 +557,6 @@ namespace CanvasApp.Forms
             }
         }
 
-        // MODIFIQUE o método CarregarDadosTarefa para incluir anexos
         private void CarregarDadosTarefa()
         {
             Txt_TituloTarefa.Text = tarefaAtual.Descricao;
@@ -492,11 +568,32 @@ namespace CanvasApp.Forms
 
             CarregarPrazoAlarme();
             CarregarSubtarefas();
-            CarregarAnexos(); // NOVO: Carregar anexos
+            CarregarAnexos();
             AtualizarPreviewComentarios();
         }
 
-        // ... (MANTENHA TODOS OS OUTROS MÉTODOS EXISTENTES ORIGINAIS)
+        private void Txt_TituloTarefa_Leave(object sender, EventArgs e)
+        {
+            if (tarefaAtual.Descricao != Txt_TituloTarefa.Text.Trim())
+            {
+                string descricaoAntiga = tarefaAtual.Descricao;
+                tarefaAtual.Descricao = Txt_TituloTarefa.Text.Trim();
+
+                if (_tarefasDB.AtualizarTarefa(tarefaAtual))
+                {
+                    RegistrarHistorico($"Alterou o título de '{descricaoAntiga}' para '{tarefaAtual.Descricao}'");
+                    MessageBox.Show("Título atualizado com sucesso!", "Sucesso",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show($"Erro ao atualizar título: {_tarefasDB.Mensagem}", "Erro",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Txt_TituloTarefa.Text = descricaoAntiga;
+                    tarefaAtual.Descricao = descricaoAntiga;
+                }
+            }
+        }
 
         private void ConfigurarComboBoxRepeticao()
         {
@@ -560,6 +657,7 @@ namespace CanvasApp.Forms
                 {
                     frmAtribuir.ShowDialog();
                     CarregarDadosTarefa();
+                    CarregarHistoricoTarefa();
                 }
             };
 
@@ -659,6 +757,7 @@ namespace CanvasApp.Forms
                     Dtp_HoraAlarme.Value.TimeOfDay,
                     repeticao))
                 {
+                    RegistrarHistorico($"Definiu prazo para {Dtp_Prazo.Value:dd/MM/yyyy} com alarme às {Dtp_HoraAlarme.Value:HH:mm}");
                     MessageBox.Show("Prazo e alarme salvos com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     CarregarPrazoAlarme();
                 }
@@ -696,6 +795,7 @@ namespace CanvasApp.Forms
                 {
                     if (_alarmeDB.ResetarConfiguracoesTarefa(tarefaAtual.Codigo))
                     {
+                        RegistrarHistorico("Removeu o prazo e alarme");
                         CarregarPrazoAlarme();
                         MessageBox.Show("Prazo e alarme removidos com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
@@ -763,6 +863,7 @@ namespace CanvasApp.Forms
 
                 if (_subtarefasDB.InserirSubtarefa(novaSub))
                 {
+                    RegistrarHistorico($"Adicionou subtarefa: {Txt_NovaSubtarefa.Text.Trim()}");
                     CarregarSubtarefas();
                     Txt_NovaSubtarefa.Clear();
                     Txt_NovaSubtarefa.Focus();
@@ -830,7 +931,12 @@ namespace CanvasApp.Forms
             try
             {
                 sub.isConcluida = chk.Checked;
-                if (!_subtarefasDB.AtualizarSubtarefa(sub))
+                if (_subtarefasDB.AtualizarSubtarefa(sub))
+                {
+                    string acao = sub.isConcluida ? "Concluiu" : "Reabriu";
+                    RegistrarHistorico($"{acao} a subtarefa: {sub.Texto}");
+                }
+                else
                 {
                     MessageBox.Show(_subtarefasDB.Mensagem, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     chk.Checked = !chk.Checked;
@@ -870,6 +976,7 @@ namespace CanvasApp.Forms
                 {
                     if (_subtarefasDB.ExcluirSubtarefa(sub.Codigo))
                     {
+                        RegistrarHistorico($"Removeu a subtarefa: {sub.Texto}");
                         CarregarSubtarefas();
                     }
                     else
@@ -999,6 +1106,7 @@ namespace CanvasApp.Forms
 
                 if (_comentariosDB.InserirComentario(novoCom))
                 {
+                    RegistrarHistorico("Adicionou um comentário");
                     CarregarComentariosNoChat();
                     Txt_NovoComentarioChat.Clear();
                     AtualizarPreviewComentarios();

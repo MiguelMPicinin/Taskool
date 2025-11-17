@@ -41,7 +41,7 @@ namespace CanvasApp
         private Panel Pnl_Notificacoes;
         private bool notificacoesVisiveis = false;
 
-        // Controle para Frm_TarefasUsuario - RENOMEADO
+        // Controle para Frm_TarefasUsuario
         private Frm_TarefasUsuario _frmTarefasUsuario;
         private bool tarefasUsuarioAberto = false;
 
@@ -96,19 +96,11 @@ namespace CanvasApp
 
                 // Salvar no banco
                 historicoDB.InserirHistorico(historico);
-
-                // Atualizar interface se existir
-                AtualizarListViewHistorico(codTarefa);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Erro ao registrar histórico: {ex.Message}");
             }
-        }
-
-        private void AtualizarListViewHistorico(int codTarefa)
-        {
-            // Implemente conforme sua interface
         }
 
         private void EnviarEmailNotificacao(string acao, string nomeCartao, string nomeProjeto)
@@ -197,7 +189,6 @@ namespace CanvasApp
             {
                 if (projetoSelecionado == null) return;
 
-                // CORREÇÃO: Comparação correta de tipos
                 if (projetoSelecionado.CodUsuario != usuarioLogadoId)
                 {
                     MessageBox.Show("Apenas o proprietário do projeto pode gerenciar membros.", "Aviso",
@@ -205,7 +196,6 @@ namespace CanvasApp
                     return;
                 }
 
-                // CORREÇÃO: Usar ShowDialog sem using
                 Frm_GerenciarMembros frmGerenciarMembros = new Frm_GerenciarMembros(projetoSelecionado.Codigo, usuarioLogadoId, dbMembros, dbTarefas);
                 frmGerenciarMembros.ShowDialog(this);
 
@@ -1646,7 +1636,7 @@ namespace CanvasApp
             novoForm.Show();
         }
 
-        // --- NOVO MÉTODO PARA ABRIR FORMULÁRIO DE ATRIBUIR RESPONSÁVEL ---
+        // --- MÉTODO PARA ABRIR FORMULÁRIO DE ATRIBUIR RESPONSÁVEL ---
         private void AbrirAtribuirResponsavel(Projeto_Tarefas tarefa)
         {
             try

@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Frm_Projeto));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.Pnl_Titulo = new System.Windows.Forms.Panel();
             this.Btn_UML = new System.Windows.Forms.Button();
             this.Btn_Poker = new System.Windows.Forms.Button();
@@ -223,17 +223,17 @@
             // 
             // Chrt_Tarefas
             // 
-            chartArea2.Name = "ChartArea1";
-            this.Chrt_Tarefas.ChartAreas.Add(chartArea2);
+            chartArea1.Name = "ChartArea1";
+            this.Chrt_Tarefas.ChartAreas.Add(chartArea1);
             this.Chrt_Tarefas.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend2.Name = "Legend1";
-            this.Chrt_Tarefas.Legends.Add(legend2);
+            legend1.Name = "Legend1";
+            this.Chrt_Tarefas.Legends.Add(legend1);
             this.Chrt_Tarefas.Location = new System.Drawing.Point(0, 0);
             this.Chrt_Tarefas.Name = "Chrt_Tarefas";
-            series2.ChartArea = "ChartArea1";
-            series2.Legend = "Legend1";
-            series2.Name = "Series1";
-            this.Chrt_Tarefas.Series.Add(series2);
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.Chrt_Tarefas.Series.Add(series1);
             this.Chrt_Tarefas.Size = new System.Drawing.Size(96, 82);
             this.Chrt_Tarefas.TabIndex = 4;
             this.Chrt_Tarefas.Text = "chart1";

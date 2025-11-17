@@ -265,12 +265,6 @@
     <Compile Include="Formularios Pop-Ups\Frm_ExecutarSQL.Designer.cs">
       <DependentUpon>Frm_ExecutarSQL.cs</DependentUpon>
     </Compile>
-    <Compile Include="Formularios Pop-Ups\Frm_Historico.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Formularios Pop-Ups\Frm_Historico.Designer.cs">
-      <DependentUpon>Frm_Historico.cs</DependentUpon>
-    </Compile>
     <Compile Include="Formularios Pop-Ups\Frm_HistoricoTarefas.cs">
       <SubType>Form</SubType>
     </Compile>
